@@ -26,7 +26,7 @@ manifest_signature_url = ""   # empty: <manifest_url>.sig
 
 A missed release flagged `security`, or one that drops the protocol version you run, is urgent at once. A manifest that keeps failing to load turns from a notice into a warning after `stale_after_days`.
 
-Set `manifest_public_key` to pin the release signing key. The server then rejects a manifest whose Ed25519 signature over `telium-release-manifest-v1 sha256=<hex>` does not verify. See [Supply chain](/docs/self-hosting/supply-chain/).
+Set `manifest_public_key` to pin the release signing key. The server then rejects a manifest whose Ed25519 signature over `telium-release-manifest-v1 sha256=<hex>` does not verify. See [Supply chain](/self-hosting/supply-chain/).
 
 ### Deployment count
 
@@ -63,7 +63,7 @@ A manifest entry:
 }
 ```
 
-Each release's notes say whether you can roll it back. A release that added a migration or changed the state format cannot be undone by running the old binary; see [Upgrades](/docs/self-hosting/upgrades/).
+Each release's notes say whether you can roll it back. A release that added a migration or changed the state format cannot be undone by running the old binary; see [Upgrades](/self-hosting/upgrades/).
 
 ## The two updaters
 
@@ -93,7 +93,7 @@ Neither updater writes `telium.toml`. Both drop the release's `telium.example.to
 
 ### Container updater
 
-`deploy/install.sh` installs it (see [Running in production](/docs/self-hosting/production/#container)). `compose.yml` follows the `server-latest` tag. Each run pulls, stops if the digest did not move, reconciles `compose.yml`, then restarts the server.
+`deploy/install.sh` installs it (see [Running in production](/self-hosting/production/#container)). `compose.yml` follows the `server-latest` tag. Each run pulls, stops if the digest did not move, reconciles `compose.yml`, then restarts the server.
 
 A release can ship a new `compose.yml`. The updater keeps the last shipped copy in `/opt/telium/.baseline/` and compares three files:
 
@@ -159,7 +159,7 @@ The settings footer shows the publisher state:
 | Android | `store` | Link to the release page |
 | Tauri desktop, distro package, self-built | `package` | Update it the way you installed it |
 
-A homeserver can only refuse a client, with gateway close code `4015` (`PROTOCOL_INCOMPATIBLE`), which shows an urgent banner. See [Compatibility](/docs/reference/compatibility/).
+A homeserver can only refuse a client, with gateway close code `4015` (`PROTOCOL_INCOMPATIBLE`), which shows an urgent banner. See [Compatibility](/reference/compatibility/).
 
 Dismissing the banner snoozes it for 3 days for an ordinary release, 8 hours when a missed release is security-relevant, and 1 hour after a `4015`. A staged update shows a Restart banner that cannot be dismissed.
 

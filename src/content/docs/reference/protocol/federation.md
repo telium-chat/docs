@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-This page lists how one Telium server finds another, authenticates to it, which routes are signed, and how errors are reported. Every signed route uses [Family C](/docs/reference/protocol/signing/#family-c-federation-requests) request signing and none accepts a user session token. Behaviour is described in [Federation overview](/docs/federation/overview/).
+This page lists how one Telium server finds another, authenticates to it, which routes are signed, and how errors are reported. Every signed route uses [Family C](/reference/protocol/signing/#family-c-federation-requests) request signing and none accepts a user session token. Behaviour is described in [Federation overview](/federation/overview/).
 
 ## Discovery
 
@@ -62,7 +62,7 @@ Branch only on `code`. `message` is English prose and may change.
 | HTTP | `error` | Retry |
 | --- | --- | --- |
 | 400 | `bad_request` | no |
-| 400 | `incompatible_protocol` | no; see [Compatibility](/docs/reference/compatibility/) |
+| 400 | `incompatible_protocol` | no; see [Compatibility](/reference/compatibility/) |
 | 401 | `unauthorized` | no (unless your clock was wrong) |
 | 403 | `forbidden` | no; includes defederation |
 | 403 | `step_up_required` | after step-up (admin routes) |
@@ -71,7 +71,7 @@ Branch only on `code`. `message` is English prose and may change.
 | 409 | `try_again` | yes, shortly (tell it apart from `conflict` by `code`) |
 | 409 | `demoted` | no; follow the `authority` field |
 | 413 | `too_large` | no |
-| 422 | `unprocessable_entity` | no; version skew, see [Compatibility](/docs/reference/compatibility/) |
+| 422 | `unprocessable_entity` | no; version skew, see [Compatibility](/reference/compatibility/) |
 | 429 | `rate_limited` | yes, with backoff |
 | 500 | `internal` | yes, with backoff |
 | 502 | `bad_gateway` | upstream failure |
@@ -79,7 +79,7 @@ Branch only on `code`. `message` is English prose and may change.
 | 504 | `gateway_timeout` | upstream failure |
 
 - A request to a defederated domain fails locally as `403 forbidden`.
-- Codes are the constants in [`server/src/errcodes.rs`](https://github.com/telium-chat/telium/blob/main/server/src/errcodes.rs) (normative). A code never changes spelling or meaning and never changes its status or `error`. Adding a code is compatible ([Stability](/docs/start/stability/)). A 500 has no code.
+- Codes are the constants in [`server/src/errcodes.rs`](https://github.com/telium-chat/telium/blob/main/server/src/errcodes.rs) (normative). A code never changes spelling or meaning and never changes its status or `error`. Adding a code is compatible ([Stability](/start/stability/)). A 500 has no code.
 - Values named in the message travel as extra top-level fields, for example `permission` alongside `missing_permission`. They never shadow `error`, `code` or `message`.
 - `demoted`, `standby_read_only` and `shut_down` appear in both `error` and `code`.
 - For an unknown code, fall back to `error` for retry decisions and `message` for display.

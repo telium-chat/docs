@@ -9,7 +9,7 @@ The sync store (`/_telium/v1/sync`) carries preferences, recent emoji, GIF favou
 
 ## Key
 
-The sync key comes from your MLS recovery keyring ([DM encryption](/docs/security/dm-encryption/#key-custody)):
+The sync key comes from your MLS recovery keyring ([DM encryption](/security/dm-encryption/#key-custody)):
 
 ```text
 OPAQUE export key ─┐
@@ -43,7 +43,7 @@ Under legacy `escrowed` custody the server can open the keyring and derive the s
 
 The associated data is `"telium/sealed-sync/v1" LF kid LF key-name`. The plaintext is a 4-byte big-endian length, the JSON `{"n": counter, "t": written_at_ms, "v": value}`, and zero padding.
 
-Binding the key name stops the server from returning a value sealed as `gif.favorites.v1` under `prefs.v1`. Each account's keyring is its own 32 random bytes, so a value from another account fails authentication. The user id is not bound, so sealed values keep opening after an [account move](/docs/federation/migration/) or a [server relocation](/docs/self-hosting/relocation/).
+Binding the key name stops the server from returning a value sealed as `gif.favorites.v1` under `prefs.v1`. Each account's keyring is its own 32 random bytes, so a value from another account fails authentication. The user id is not bound, so sealed values keep opening after an [account move](/federation/migration/) or a [server relocation](/self-hosting/relocation/).
 
 ## Rollback and replay
 
@@ -120,7 +120,7 @@ A row with an unknown `kid` is overwritten if the device opened the keyring from
 
 ## Identity pins
 
-`identity.pins.v1` syncs the [identity pins](/docs/security/identity-continuity/#verification) your browser holds for other people, so a new device starts from what your other devices already pinned. Each pin is `{ immutableId, sequence, currentKey, policyVersion, policySignature, verified }`.
+`identity.pins.v1` syncs the [identity pins](/security/identity-continuity/#verification) your browser holds for other people, so a new device starts from what your other devices already pinned. Each pin is `{ immutableId, sequence, currentKey, policyVersion, policySignature, verified }`.
 
 Pins merge instead of last-write-wins. For the same identity, the further root, newer policy and `verified` flag are kept. A conflict (a different `tid:`, two roots at one sequence, or two policies at one version) is never resolved silently: a verified pin beats an unverified one, the conflict is recorded, and the person shows as `changed` until someone verifies them again.
 

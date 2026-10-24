@@ -188,5 +188,5 @@ These commands work on the database directly and need no browser, session or pri
 
 - This is not high availability. Writes stop until a human promotes, and the last few seconds of writes can be lost.
 - Only one server accepts writes at a time; the sequence number enforces that.
-- A standby replicates deletions immediately. Keep [backups](/docs/self-hosting/backups/) as well.
-- Pairings are signed for a domain. After a [relocation](/docs/self-hosting/relocation/), pair again under the new name.
+- A standby replicates deletions immediately. Keep [backups](/self-hosting/backups/) as well.
+- Pairings are signed for a domain. After a [relocation](/self-hosting/relocation/), pair again under the new name.

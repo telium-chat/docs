@@ -8,7 +8,7 @@ sidebar:
 Direct messages and group DMs use MLS (RFC 9420). Your client encrypts message bodies, attachment keys, reactions, edits, pins and other conversation signals before your homeserver receives them. This page covers key custody and recovery, device trust, the conversation sequencer, and what the infrastructure can still see.
 
 :::caution
-Only DMs and group DMs are end-to-end encrypted. Guild channels are not; see [Privacy](/docs/security/privacy/). Typing indicators in DMs are also sent in plaintext.
+Only DMs and group DMs are end-to-end encrypted. Guild channels are not; see [Privacy](/security/privacy/). Typing indicators in DMs are also sent in plaintext.
 :::
 
 ## Key custody
@@ -31,7 +31,7 @@ The vault's custody mode decides who can open it:
 
 With `opaque_custody`, OPAQUE gives your client an export key the server never receives. The client derives the vault wrapper from it with HMAC-SHA256. A new device signs in with your normal password and recovers the keyring without a second password and without another device online.
 
-New accounts also get a recovery key (`telium-recovery-v1-...`). The server stores only its Ed25519 public key. The key is separately derived into a wrapper for a second encrypted copy of the keyring, stored as the `k1.` entry in `independent_ciphertext`. This copy opens on any server, which is how a vault that moved with your account opens at the destination. Password reset with the recovery key is on [Account security](/docs/security/account-security/#password-reset).
+New accounts also get a recovery key (`telium-recovery-v1-...`). The server stores only its Ed25519 public key. The key is separately derived into a wrapper for a second encrypted copy of the keyring, stored as the `k1.` entry in `independent_ciphertext`. This copy opens on any server, which is how a vault that moved with your account opens at the destination. Password reset with the recovery key is on [Account security](/security/account-security/#password-reset).
 
 The server stores the OPAQUE registration record and encrypted recovery data. It holds no password-equivalent value that opens the vault, and it never receives the recovery key.
 
@@ -45,7 +45,7 @@ Older accounts may have an independent recovery passphrase. Clients still unlock
 
 ### Accounts created before OPAQUE
 
-An old account has an Argon2 password verifier. A current client does one legacy login, which sends the password to the server that one time, then replaces the verifier with an OPAQUE record. The client asks for an explicit **Upgrade this account** action first. Downgrade rules are on [Account security](/docs/security/account-security/#password-login-opaque).
+An old account has an Argon2 password verifier. A current client does one legacy login, which sends the password to the server that one time, then replaces the verifier with an OPAQUE record. The client asks for an explicit **Upgrade this account** action first. Downgrade rules are on [Account security](/security/account-security/#password-login-opaque).
 
 On a homeserver that does not advertise OPAQUE, `device_custody` is the fallback: the keyring stays on approved devices, and a new device needs a trusted device to hand it over.
 
@@ -76,7 +76,7 @@ The client does not discard a keyring it holds:
 
 ## Cross-signing and device trust
 
-Your cross-signing secret signs each device's MLS leaf signature key. Accounts also anchor an immutable `tid:` and a signed root-transition chain ([Identity continuity](/docs/security/identity-continuity/)). Once a client has pinned your identity, a homeserver cannot substitute a new cross-signing key by publishing it.
+Your cross-signing secret signs each device's MLS leaf signature key. Accounts also anchor an immutable `tid:` and a signed root-transition chain ([Identity continuity](/security/identity-continuity/)). Once a client has pinned your identity, a homeserver cannot substitute a new cross-signing key by publishing it.
 
 When building or expanding a group, the client checks that:
 
@@ -91,7 +91,7 @@ A device is its MLS leaf signature key, generated once per browser profile and a
 
 ## Revoked devices
 
-A revocation signed by your account root ([Account security](/docs/security/account-security/#signed-revocation)) is enforced by every client. Clients keep the verified revoked keys per account, re-read their own at start, and re-read a peer's on refresh. With that set, a client:
+A revocation signed by your account root ([Account security](/security/account-security/#signed-revocation)) is enforced by every client. Clients keep the verified revoked keys per account, re-read their own at start, and re-read a peer's on refresh. With that set, a client:
 
 - does not use a KeyPackage with a revoked key and refuses rejoins from one;
 - skips application frames and proposals from a revoked leaf;
@@ -193,7 +193,7 @@ The client shows three states separately: frames not yet processed (withheld), e
 
 ## What servers still see
 
-The sequencer and homeservers see routing metadata: conversation membership, sender and sender device, frame kind, MLS epoch, sequence number, timestamps, ciphertext size and traffic timing. For a group with a policy, they also see the policy and each declared membership change. The history mirror exposes row identifiers, scopes, update times and ciphertext sizes. Typing indicators are plaintext gateway events, forwarded to remote members' homes. See [Privacy](/docs/security/privacy/).
+The sequencer and homeservers see routing metadata: conversation membership, sender and sender device, frame kind, MLS epoch, sequence number, timestamps, ciphertext size and traffic timing. For a group with a policy, they also see the policy and each declared membership change. The history mirror exposes row identifiers, scopes, update times and ciphertext sizes. Typing indicators are plaintext gateway events, forwarded to remote members' homes. See [Privacy](/security/privacy/).
 
 End-to-end encryption hides content. It does not hide that you communicated, with whom, or when.
 

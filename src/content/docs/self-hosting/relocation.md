@@ -7,7 +7,7 @@ sidebar:
 
 A relocation renames your server from `old.example` to `new.example`. The operator, database, accounts, passwords, devices, guilds and history stay the same. The server and its peers rewrite every reference to the old name.
 
-A relocation moves no data and asks users for nothing. To move a single account or guild between two servers, use [migration](/docs/federation/migration/) instead. To close a server for good, see [Sunset](/docs/self-hosting/sunset/).
+A relocation moves no data and asks users for nothing. To move a single account or guild between two servers, use [migration](/federation/migration/) instead. To close a server for good, see [Sunset](/self-hosting/sunset/).
 
 ## Steps
 
@@ -96,6 +96,6 @@ These are not rewritten:
 - **Signed data.** Message signatures, co-signed tombstones and identity anchors keep the old id. They still verify with the old name's historical key, which peers keep.
 - **Message text.** What people typed stays as typed.
 - **Secrets and key material:** hashes, tokens, ciphertexts, `server_keys`, `remote_keys`, cold archives, the replication log, and migrations in flight.
-- **Failover pairings.** Pair your [warm standby](/docs/self-hosting/warm-standby/) again under the new name.
+- **Failover pairings.** Pair your [warm standby](/self-hosting/warm-standby/) again under the new name.
 
 A chain of relocations (`a` to `b`, then `b` to `c`) is followed up to eight hops.

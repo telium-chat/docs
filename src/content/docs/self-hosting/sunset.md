@@ -5,9 +5,9 @@ sidebar:
   order: 15
 ---
 
-A planned shutdown gives your users notice, lets them move or download their accounts, and ends with signed tombstones so peers and clients stop retrying. The server never moves anyone: each user decides where to go and starts their own [migration](/docs/federation/migration/).
+A planned shutdown gives your users notice, lets them move or download their accounts, and ends with signed tombstones so peers and clients stop retrying. The server never moves anyone: each user decides where to go and starts their own [migration](/federation/migration/).
 
-If your server is changing its name rather than closing, see [Relocation](/docs/self-hosting/relocation/).
+If your server is changing its name rather than closing, see [Relocation](/self-hosting/relocation/).
 
 ## 1. Announce
 

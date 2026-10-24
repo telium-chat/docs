@@ -59,7 +59,7 @@ Rules the server enforces:
 - With no usable admin, the claim is granted immediately. Otherwise it waits `ownership.recovery_delay_secs` from the announcement, and any admin can cancel it.
 
 :::danger
-A recovery claim you did not open means someone has write access to your host. Cancel it and follow [Disaster recovery](/docs/self-hosting/disaster-recovery/#signing-key-stolen).
+A recovery claim you did not open means someone has write access to your host. Cancel it and follow [Disaster recovery](/self-hosting/disaster-recovery/#signing-key-stolen).
 :::
 
 ## CLI

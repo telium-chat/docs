@@ -61,7 +61,7 @@ The database holds the federation signing key, the OPAQUE setup, the VAPID key a
 | FCM service account | `push.fcm.service_account_file` | New key in Google Cloud, replace the file, restart, delete the old key. |
 | APNs signing key | `push.apns.key_file`, `push.apns.key_id` | New `.p8` at Apple, replace, restart, revoke the old one. Apple does not let you download it again. |
 | Klipy API key | `klipy.api_key` | Public by design; clients receive it. Not a secret. |
-| Release signing key | never on a homeserver | `updates.manifest_public_key` pins the public half. Repin when the project publishes a new key. See [Supply chain](/docs/self-hosting/supply-chain/). |
+| Release signing key | never on a homeserver | `updates.manifest_public_key` pins the public half. Repin when the project publishes a new key. See [Supply chain](/self-hosting/supply-chain/). |
 | SFU LiveKit key and secret | `livekit.api_key`, `livekit.api_secret` in `sfu.toml` | In spawn mode, clear both and restart the SFU to regenerate. |
 
 ## Rotating

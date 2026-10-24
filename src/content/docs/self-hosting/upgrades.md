@@ -13,7 +13,7 @@ This page covers moving a homeserver to a new release and back. A newer binary m
 |---|---|
 | Migration version | Table shape (`server/migrations/`) |
 | State format version | The meaning of stored values |
-| Protocol version | The wire format. See [Compatibility](/docs/reference/compatibility/). |
+| Protocol version | The wire format. See [Compatibility](/reference/compatibility/). |
 
 The `schema_provenance` table records the highest migration and state format versions seen, plus the last release to open the database. The guard checks it before running migrations, on primaries and replicas alike, and refuses with one of two reasons:
 
@@ -26,7 +26,7 @@ Releases can be skipped. Each upgrade path from a set of older schema versions t
 
 ## Procedure
 
-1. Take and check a backup. See [Backups](/docs/self-hosting/backups/).
+1. Take and check a backup. See [Backups](/self-hosting/backups/).
 
    ```sh
    telium-server backup now
@@ -38,7 +38,7 @@ Releases can be skipped. Each upgrade path from a set of older schema versions t
 
 Peers upgrade on their own schedule. A peer still on the previous release shows as `ok` with no capabilities.
 
-The container and native updaters run these steps for you. See [Updates](/docs/self-hosting/updates/).
+The container and native updaters run these steps for you. See [Updates](/self-hosting/updates/).
 
 ## Rollback
 

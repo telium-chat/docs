@@ -4,8 +4,7 @@ import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
 
 export default defineConfig({
-  site: 'https://telium-chat.github.io',
-  base: '/docs',
+  site: 'https://docs.telium.chat',
   trailingSlash: 'always',
   integrations: [
     starlight({

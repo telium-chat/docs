@@ -67,4 +67,4 @@ Two tables support encryption repair. Neither holds a key or plaintext, neither 
 | `[integrity] foreign_key_check` | `true` | Refuse dangling references at boot |
 | `[integrity] refuse_start_on_corruption` | `true` | `false` starts anyway so you can salvage |
 
-Zero means "never" for every retention key. There is no message retention sweep; to move old history off the main database, use cold archiving (see [Configuration](/docs/self-hosting/configuration/)).
+Zero means "never" for every retention key. There is no message retention sweep; to move old history off the main database, use cold archiving (see [Configuration](/self-hosting/configuration/)).

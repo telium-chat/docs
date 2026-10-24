@@ -50,7 +50,7 @@ A block is private to your home. The blocked person's home is told only that the
 
 Only accepted friends receive your presence through your home. Pending requests and blocked accounts do not. Guild members see your presence inside guilds you share, which is separate from friendship.
 
-Your public profile page shows presence only if your settings allow it. See [Rich presence](/docs/features/rich-presence/) for activity status.
+Your public profile page shows presence only if your settings allow it. See [Rich presence](/features/rich-presence/) for activity status.
 
 ## Mutual friends
 
@@ -70,4 +70,4 @@ The client asks only the guild servers of guilds you are already in whether the 
 
 ## Migration
 
-Moving your account to another server carries all relationship rows, including blocks. See [Migration](/docs/federation/migration/).
+Moving your account to another server carries all relationship rows, including blocks. See [Migration](/federation/migration/).

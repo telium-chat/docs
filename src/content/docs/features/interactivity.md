@@ -7,7 +7,7 @@ sidebar:
 
 Bots can attach controls (`components`) and structured blocks (`cards`) to a message. A person pressing a control creates an *interaction* that the server delivers to the bot, which answers with a callback.
 
-Only a bot, or an application hosted by the same server, can attach non-empty `components` or `cards`. A human session that tries gets `403` and nothing is written. The same check applies on edit, so a person cannot add buttons to a message later. See [Bots](/docs/features/bots/) for installing one.
+Only a bot, or an application hosted by the same server, can attach non-empty `components` or `cards`. A human session that tries gets `403` and nothing is written. The same check applies on edit, so a person cannot add buttons to a message later. See [Bots](/features/bots/) for installing one.
 
 ## Round trip
 
@@ -111,7 +111,7 @@ Clients draw cards with the bot's name on them, separate from link embeds. `imag
 { "camo": "<blake3>", "width": 800, "height": 200 }
 ```
 
-`origin` plus `hash` names uploaded media (foreign origins go through the normal federated media check). `camo` names a hash already in this server's media cache. Both are resolved on write, so readers only fetch from their own server. See [Media](/docs/features/media/).
+`origin` plus `hash` names uploaded media (foreign origins go through the normal federated media check). `camo` names a hash already in this server's media cache. Both are resolved on write, so readers only fetch from their own server. See [Media](/features/media/).
 
 ## Receiving an interaction
 

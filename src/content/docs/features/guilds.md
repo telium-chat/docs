@@ -11,7 +11,7 @@ A guild is a community with channels, roles and members. This page covers how pe
 
 Each guild has one authoritative guild server. That server owns the channels, members, messages, roles, bans and voice state, and it makes every permission decision. Your account home only proves who you are: the client asks your home for a signed identity assertion for the guild server, then trades it for a guild-local session (`POST /_telium/v1/sessions`).
 
-Guild messages are not end-to-end encrypted. The guild server can read them. See [DM encryption](/docs/security/dm-encryption/) for what is encrypted.
+Guild messages are not end-to-end encrypted. The guild server can read them. See [DM encryption](/security/dm-encryption/) for what is encrypted.
 
 ## Channels
 
@@ -63,7 +63,7 @@ The server computes a member's permissions in a channel like this:
 3. Apply the channel's `@everyone` overwrite: remove its `deny`, then add its `allow`.
 4. Combine all overwrites for roles the member holds. Remove the combined `deny`, then add the combined `allow`. A role allow beats an `@everyone` deny.
 5. Apply the member-specific overwrite last. It beats any role overwrite.
-6. Bots are capped at the permission ceiling they were installed with (see [Bots](/docs/features/bots/)).
+6. Bots are capped at the permission ceiling they were installed with (see [Bots](/features/bots/)).
 7. A timed-out member keeps only `VIEW_CHANNEL` and `READ_MESSAGE_HISTORY`, in every channel and at guild level, even if they are an administrator.
 
 Channel overwrites are set with `PUT /_telium/v1/channels/{channel_id}/overwrites/{role|member}/{target_id}` and a body of `{"allow": "<u64>", "deny": "<u64>"}`. This needs `MANAGE_ROLES`.
@@ -91,7 +91,7 @@ Kick, ban, timeout and changing someone else's nickname need you to outrank the 
 | Ban, unban, list bans | `BAN_MEMBERS` | A ban takes an optional `reason`, strips roles and disconnects voice. |
 | Transfer ownership | owner only | `POST /_telium/v1/guilds/{guild_id}/transfer-ownership` to a current member. |
 
-Bot members are managed through their installation, so kick, ban and role changes on a bot return a conflict. Voice moderation (server mute, deafen, move) is covered in [Voice and video](/docs/features/voice-and-video/).
+Bot members are managed through their installation, so kick, ban and role changes on a bot return a conflict. Voice moderation (server mute, deafen, move) is covered in [Voice and video](/features/voice-and-video/).
 
 ## Invites
 
@@ -114,7 +114,7 @@ A guild's id is a ULID that never changes. With `MANAGE_GUILD` you can also give
 - the Telium address `#gaming:guilds.example`
 - the link `https://guilds.example/invite/gaming`
 
-New guilds have no vanity. While one is set, anyone can resolve the address, preview the guild and try to join, subject to bans and gates. Changing or removing it breaks both old spellings at once; generated invite links keep working. After a guild migrates, its old server redirects the old address to the new one. See [Federation overview](/docs/federation/overview/) for address rules and [Migration](/docs/federation/migration/) for moving a guild.
+New guilds have no vanity. While one is set, anyone can resolve the address, preview the guild and try to join, subject to bans and gates. Changing or removing it breaks both old spellings at once; generated invite links keep working. After a guild migrates, its old server redirects the old address to the new one. See [Federation overview](/federation/overview/) for address rules and [Migration](/federation/migration/) for moving a guild.
 
 ## Custom emoji and stickers
 
@@ -123,7 +123,7 @@ Uploads need `MANAGE_EXPRESSIONS`. Accepted emoji and stickers are public media 
 - The guild you post in decides whether it accepts foreign emoji (`external_emoji`), and you need `USE_EXTERNAL_EMOJI`.
 - The emoji's own guild decides who may take it elsewhere with `emoji_export_policy`: `everyone`, `members`, or `role` plus `emoji_export_role_id` (that role or any role above it).
 
-The export rule applies between two guilds on the same server too. Format and size limits are on the [Media](/docs/features/media/) page.
+The export rule applies between two guilds on the same server too. Format and size limits are on the [Media](/features/media/) page.
 
 ## Join gates and screening
 
@@ -186,4 +186,4 @@ bot.install  bot.update  bot.uninstall
 
 ## Guild moderators and server operators
 
-Guild permissions only reach inside one guild. Server-wide controls such as user reports, defederation, blocklist feeds and upload scanning belong to the server operator and are not grantable through any guild role. See [Production](/docs/self-hosting/production/).
+Guild permissions only reach inside one guild. Server-wide controls such as user reports, defederation, blocklist feeds and upload scanning belong to the server operator and are not grantable through any guild role. See [Production](/self-hosting/production/).

@@ -16,7 +16,7 @@ Watch together puts one video on everyone's screen in a call and keeps every cop
 | Direct video file (`.mp4`, `.webm`, `.m3u8` and similar) | play, pause, seek, speed | plays in a `<video>` element, best sync |
 | Any other page | not possible | the start dialog says so and suggests screen sharing |
 
-Pages on other origins cannot be controlled from the client (same-origin policy), so they are refused up front rather than drifting. [Screen sharing](/docs/features/voice-and-video/#screen-sharing) plays anything and contacts nobody outside the call.
+Pages on other origins cannot be controlled from the client (same-origin policy), so they are refused up front rather than drifting. [Screen sharing](/features/voice-and-video/#screen-sharing) plays anything and contacts nobody outside the call.
 
 ## Starting and consent
 
@@ -24,7 +24,7 @@ In a guild voice channel, starting a session needs `STREAM`. In a DM or group ca
 
 Before a player loads, the stage names the exact host it will connect to and what that host learns, and waits for you to agree. Consent is per session and held in memory only: it does not sync, and the next video asks again. No provider SDK is loaded at any point; the client speaks each player's documented `postMessage` protocol directly.
 
-Link cards in channels never become players. Outside a watch-together session, links still go through [camo](/docs/features/media/#link-previews-and-camo).
+Link cards in channels never become players. Outside a watch-together session, links still go through [camo](/features/media/#link-previews-and-camo).
 
 ## Sync behaviour
 

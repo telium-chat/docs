@@ -23,7 +23,7 @@ Frames are JSON text only (binary closes with 4002), with no compression. Every 
 3. The server sends `READY` with `session_id`, `user` (`user_id`, `device_id`, `is_bot`, `application_id`), `server_name`, `protocol`, `intents` and the guild list.
 4. The client sends `{"op":"HEARTBEAT"}` every `heartbeat_interval_ms` (read it from `HELLO`). The server replies `HEARTBEAT_ACK` and closes with 4009 after 2× the interval without one.
 
-`HELLO` and `READY` carry the server's `protocol: {version, min_supported, capabilities}`. A client outside that window is closed with 4015. Negotiation rules are in [Compatibility](/docs/reference/compatibility/).
+`HELLO` and `READY` carry the server's `protocol: {version, min_supported, capabilities}`. A client outside that window is closed with 4015. Negotiation rules are in [Compatibility](/reference/compatibility/).
 
 There is no resume. `RESUME` gets `{"op":"INVALID_SESSION","d":{"resumable":false}}`. Use `s` for gap detection only. After a reconnect a client **MUST** re-fetch state over HTTP.
 
@@ -73,4 +73,4 @@ Bot sessions are masked to the bot intent set (everything except `DIRECT_MESSAGE
 | 4008 | `IDENTIFY` timeout | reconnect |
 | 4009 | Heartbeat timeout | reconnect |
 | 4010 | Falling behind; events dropped | reconnect immediately and resync from `READY`; keep reconnecting |
-| 4015 | Protocol version outside the server's window | upgrade the client, see [Compatibility](/docs/reference/compatibility/) |
+| 4015 | Protocol version outside the server's window | upgrade the client, see [Compatibility](/reference/compatibility/) |

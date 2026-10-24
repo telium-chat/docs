@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-This page covers calls in direct messages and group chats: the three call privacy settings, how a call picks mesh or SFU, where the SFU comes from, and what each server can see. Guild voice channels are covered in [Voice and video](/docs/features/voice-and-video/).
+This page covers calls in direct messages and group chats: the three call privacy settings, how a call picks mesh or SFU, where the SFU comes from, and what each server can see. Guild voice channels are covered in [Voice and video](/features/voice-and-video/).
 
 ## Call privacy
 
@@ -49,7 +49,7 @@ The sequencer picks, in order:
 2. **The sequencer's own SFU regions.**
 3. **The first participant home, in domain order, that has regions.**
 
-The server hosting the SFU mints all tokens for the call. Other homes request them over signed federation (`POST /_telium/v1/dm/voice/token`), and the host checks the request comes from the user's own home and that the user is a member. Tokens carry `room_kind: "conversation"` and `e2ee: true`, and grant speak, video and stream (no priority). See [SFU](/docs/self-hosting/sfu/) for running one.
+The server hosting the SFU mints all tokens for the call. Other homes request them over signed federation (`POST /_telium/v1/dm/voice/token`), and the host checks the request comes from the user's own home and that the user is a member. Tokens carry `room_kind: "conversation"` and `e2ee: true`, and grant speak, video and stream (no priority). See [SFU](/self-hosting/sfu/) for running one.
 
 ## Encryption through the SFU
 
@@ -64,7 +64,7 @@ A client that cannot do this refuses to join an SFU call instead of joining in t
 
 ## Restarts
 
-A call survives a home server restart because media never passes through it. The sequencer keeps a row for every participant, including those homed elsewhere. When the grace window ends, it asks each remote participant's home whether that device is still live (`/_telium/v1/dm/voice`, `op: "held"`). Anything other than yes drops the seat. See [Voice and video](/docs/features/voice-and-video/#restarts) for the shared mechanism.
+A call survives a home server restart because media never passes through it. The sequencer keeps a row for every participant, including those homed elsewhere. When the grace window ends, it asks each remote participant's home whether that device is still live (`/_telium/v1/dm/voice`, `op: "held"`). Anything other than yes drops the seat. See [Voice and video](/features/voice-and-video/#restarts) for the shared mechanism.
 
 ## What each server learns
 
@@ -96,7 +96,7 @@ turn_secret = "shared secret, matching coturn's static-auth-secret"
 turn_ttl_secs = 3600
 ```
 
-TURN must be reachable on UDP from the public internet, so it cannot sit behind an HTTP-only ingress such as a Cloudflare Tunnel. `TELIUM_TURN_SECRET` overrides `turn_secret`; see [Secrets](/docs/self-hosting/secrets/).
+TURN must be reachable on UDP from the public internet, so it cannot sit behind an HTTP-only ingress such as a Cloudflare Tunnel. `TELIUM_TURN_SECRET` overrides `turn_secret`; see [Secrets](/self-hosting/secrets/).
 
 :::caution
 On a server with neither TURN nor an SFU, the Relay only setting is unusable: those users' clients refuse calls rather than expose their address.

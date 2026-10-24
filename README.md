@@ -1,10 +1,10 @@
 # Telium docs
 
-Source for [telium-chat.github.io/docs](https://telium-chat.github.io/docs/), built with [Starlight](https://starlight.astro.build).
+Source for [docs.telium.chat](https://docs.telium.chat/), built with [Starlight](https://starlight.astro.build).
 
 ```sh
 bun install
-bun run dev      # http://localhost:4321/docs/
+bun run dev      # http://localhost:4321/
 bun run build    # dist/, fails on broken internal links
 ```
 

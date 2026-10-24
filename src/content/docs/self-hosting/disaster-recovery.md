@@ -44,7 +44,7 @@ Either restore the newest archive on a new box:
 telium-server restore s3://latest --yes --key ./backup.key
 ```
 
-Start it and confirm `/.well-known/telium/server` shows the old `current_key_id`. Or promote the standby with `telium-server standby promote a.example` (see [Warm standby](/docs/self-hosting/warm-standby/#failing-over)).
+Start it and confirm `/.well-known/telium/server` shows the old `current_key_id`. Or promote the standby with `telium-server standby promote a.example` (see [Warm standby](/self-hosting/warm-standby/#failing-over)).
 
 ## Corrupted database
 
@@ -69,7 +69,7 @@ At startup the server runs `PRAGMA quick_check` (`[integrity] startup_check`) an
 4. Start the server, let migrations run, and check that `telium-server keys list` shows the same key id as before.
 5. Find the cause: a full disk, power loss, a copy taken of a live file, or bad storage.
 
-`TELIUM_DB_INTEGRITY` overrides `startup_check` for one run, and `refuse_start_on_corruption = false` starts anyway so you can salvage. See [Backups](/docs/self-hosting/backups/) for archive contents.
+`TELIUM_DB_INTEGRITY` overrides `startup_check` for one run, and `refuse_start_on_corruption = false` starts anyway so you can salvage. See [Backups](/self-hosting/backups/) for archive contents.
 
 ## Media store lost
 
@@ -83,7 +83,7 @@ Or restore an archive on a scratch box and rsync its `media/`. Media in an S3 me
 
 ## Domain or DNS lost
 
-Check with `dig +short NS a.example`. Until you control the domain again, peers cannot reach you. If you are moving to a new domain, see [Relocation](/docs/self-hosting/relocation/).
+Check with `dig +short NS a.example`. Until you control the domain again, peers cannot reach you. If you are moving to a new domain, see [Relocation](/self-hosting/relocation/).
 
 ## TLS certificate expired
 
@@ -115,7 +115,7 @@ Your own server shows nothing; peers see the forgeries. There is no protocol-lev
 
    Peers stop accepting the old key after their key-cache TTL (up to a day).
 4. Re-pair each standby: `telium-server standby pair b.example`.
-5. Rotate every other secret that was in the database or on the disk, and start a new backup key. See [Secrets](/docs/self-hosting/secrets/).
+5. Rotate every other secret that was in the database or on the disk, and start a new backup key. See [Secrets](/self-hosting/secrets/).
 6. Look for records claiming your domain:
 
    ```sh
@@ -155,11 +155,11 @@ Admin status is read on every request, so revocation is immediate. Guild session
 telium-server admin recover @someone:a.example --reason "..."
 ```
 
-The claim is granted after `ownership.recovery_delay_secs` (24 hours), or immediately if no usable admin exists. See [Server administrators](/docs/self-hosting/server-ownership/).
+The claim is granted after `ownership.recovery_delay_secs` (24 hours), or immediately if no usable admin exists. See [Server administrators](/self-hosting/server-ownership/).
 
 ## Other secret disclosed
 
-Rotate it (see [Secrets](/docs/self-hosting/secrets/)), then run `telium-server check`, `telium-server admin list` and `telium-server admin claims`.
+Rotate it (see [Secrets](/self-hosting/secrets/)), then run `telium-server check`, `telium-server admin list` and `telium-server admin claims`.
 
 ## Standby promoted by mistake
 
@@ -175,7 +175,7 @@ Check `curl -H "authorization: Bearer $TOKEN" https://a.example/_telium/v1/admin
 
 ## Voice down
 
-Check `curl https://sfu.example/health` and the `sfu_health` table. `POST /_telium/v1/admin/revalidate` re-checks. See [SFU](/docs/self-hosting/sfu/).
+Check `curl https://sfu.example/health` and the `sfu_health` table. `POST /_telium/v1/admin/revalidate` re-checks. See [SFU](/self-hosting/sfu/).
 
 ## External provider down
 
@@ -193,10 +193,10 @@ Then ask the peer to `POST /_telium/v1/admin/revalidate`.
 
 ## "Another instance holds the lease"
 
-The lease expires 2 minutes after its last heartbeat. Set `TELIUM_INSTANCE_LOCK=off` for one start, only once you are sure nothing else is serving. See [Scaling](/docs/self-hosting/scaling/#one-process-per-database).
+The lease expires 2 minutes after its last heartbeat. Set `TELIUM_INSTANCE_LOCK=off` for one start, only once you are sure nothing else is serving. See [Scaling](/self-hosting/scaling/#one-process-per-database).
 
 ## Before you need this
 
 - Store the backup key and `telium.toml` off the box. Neither is in the archive.
-- Configure a [warm standby](/docs/self-hosting/warm-standby/). Write archives to a separate disk and a remote.
+- Configure a [warm standby](/self-hosting/warm-standby/). Write archives to a separate disk and a remote.
 - Keep `backup.drill = true` (the default) so restore drills run on a schedule.

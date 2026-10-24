@@ -31,9 +31,9 @@ cargo run -- serve
 cargo test
 ```
 
-Migrations live in `server/migrations/`. Never reuse a migration number that has landed. A migration makes the release impossible to roll back past (see [Upgrades](/docs/self-hosting/upgrades/)).
+Migrations live in `server/migrations/`. Never reuse a migration number that has landed. A migration makes the release impossible to roll back past (see [Upgrades](/self-hosting/upgrades/)).
 
-Wire-format changes (server-to-server requests, gateway frames, bundles, signed documents) follow [Compatibility](/docs/reference/compatibility/): adding a field is fine, removing or retyping one is not.
+Wire-format changes (server-to-server requests, gateway frames, bundles, signed documents) follow [Compatibility](/reference/compatibility/): adding a field is fine, removing or retyping one is not.
 
 `server/telium.example.toml` is the annotated config reference. Document any new operator option there.
 
@@ -76,7 +76,7 @@ Keep the renderer locked down (`contextIsolation`, `sandbox`, `webSecurity` on).
 TELIUM_ANDROID_BUILD_TYPE=release ./build-android.sh    # release, unsigned
 ```
 
-Requirements and options are on [Clients](/docs/start/clients/#build). Release signing uses a key kept off workstations. To exercise signing locally, make a throwaway key with `scripts/create-android-keystore.sh` and sign with `apksigner`.
+Requirements and options are on [Clients](/start/clients/#build). Release signing uses a key kept off workstations. To exercise signing locally, make a throwaway key with `scripts/create-android-keystore.sh` and sign with `apksigner`.
 
 Treat Android WebView as its own runtime. Keyboard insets, resume, Back, audio focus and native permissions do not behave like a desktop browser.
 
@@ -123,7 +123,7 @@ git tag -a server-v0.2.0 -m "Telium Server 0.2.0"
 git push origin server-v0.2.0
 ```
 
-The release workflow refuses a tag whose commit is not on `main` or whose `server/Cargo.toml` version disagrees with the tag. Dispatch it with `dry_run` to test the build without publishing. Signing and publishing details are in [Updates](/docs/self-hosting/updates/) and [Supply chain](/docs/self-hosting/supply-chain/).
+The release workflow refuses a tag whose commit is not on `main` or whose `server/Cargo.toml` version disagrees with the tag. Dispatch it with `dry_run` to test the build without publishing. Signing and publishing details are in [Updates](/self-hosting/updates/) and [Supply chain](/self-hosting/supply-chain/).
 
 ## Conventions by boundary
 
@@ -133,7 +133,7 @@ The release workflow refuses a tag whose commit is not on `main` or whose `serve
 
 **Client state.** Decide which kind each piece of state is: server-authoritative, synced preference, device-local preference, local security checkpoint or secret, or disposable cache. Unsent content, provider credentials and machine-local settings do not belong in account sync.
 
-**User-visible text.** Follow [Translating](/docs/reference/translating/#adding-a-string).
+**User-visible text.** Follow [Translating](/reference/translating/#adding-a-string).
 
 **Native bridges.** Keep browser security on. Validate the calling frame and every URL, path, token, type and size. Do not expose generic fetch, filesystem or shell primitives.
 

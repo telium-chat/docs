@@ -39,7 +39,7 @@ The desktop and Android artifacts have no SBOM.
 
 ## The signed release manifest
 
-Your server polls `updates.manifest_url` (by default `deploy/releases.json` on `main`) to learn the current release. See [Updates](/docs/self-hosting/updates/).
+Your server polls `updates.manifest_url` (by default `deploy/releases.json` on `main`) to learn the current release. See [Updates](/self-hosting/updates/).
 
 The signature covers the statement `telium-release-manifest-v1 sha256=<hex of the manifest bytes>`. The verifier checks the statement against the bytes it downloaded before checking the signature, which prevents replaying a signature onto other content. The same key signs `client-releases.json` under a different statement prefix, and the clients refuse an unverified client manifest.
 

@@ -154,4 +154,4 @@ A valid current document with no usable servers wins over the cache. Expired doc
 
 A recommended server is eligible under published criteria, not endorsed. It holds the server-visible data and metadata any account home holds. Grouping by operator contact does not stop an operator who uses distinct contacts; public registry review covers that case.
 
-You can move your account later. See [Migration](/docs/federation/migration/).
+You can move your account later. See [Migration](/federation/migration/).

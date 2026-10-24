@@ -27,7 +27,7 @@ A new root is accepted only as the next link in the chain:
 R0 --authorized--> R1 --authorized--> R2
 ```
 
-The sequence must increase by exactly one, and `previous_key` must equal the verified head. A rotation is signed by the previous root (or by guardians, below) and also by the new root over the same payload (`new_key_signature`), so the chain can only extend to a key the account holds. Clients accept a transition without `new_key_signature` only at or below a sequence they had already pinned. The same request re-signs the devices that stay ([Account security](/docs/security/account-security/#root-rotation)).
+The sequence must increase by exactly one, and `previous_key` must equal the verified head. A rotation is signed by the previous root (or by guardians, below) and also by the new root over the same payload (`new_key_signature`), so the chain can only extend to a key the account holds. Clients accept a transition without `new_key_signature` only at or below a sequence they had already pinned. The same request re-signs the devices that stay ([Account security](/security/account-security/#root-rotation)).
 
 Device revocations are signed by a root in the chain and bound to the `tid:`. Clients accept a revocation from any root in the verified chain, so a compromised old root could revoke devices (denial of service) but could not add one.
 
@@ -42,7 +42,7 @@ An account can publish a root-signed recovery policy naming two to five guardian
 - Replacing the policy increments its version. Only the newest policy at a given identity state can authorize recovery.
 - A guardian's later root rotation does not update your policy. Replace the policy to adopt their new root.
 
-Guardians gain no access to your password, OPAQUE export key, DM recovery keyring or MLS state. Guardians authorize identity-root transitions only; they cannot reset your password. Password reset uses the recovery key ([Account security](/docs/security/account-security/#password-reset)) and leaves the `tid:`, root history, guardian policy and cross-signing rows unchanged.
+Guardians gain no access to your password, OPAQUE export key, DM recovery keyring or MLS state. Guardians authorize identity-root transitions only; they cannot reset your password. Password reset uses the recovery key ([Account security](/security/account-security/#password-reset)) and leaves the `tid:`, root history, guardian policy and cross-signing rows unchanged.
 
 :::note[Guardian lists are public]
 The continuity document publishes signed recovery policies so other clients can check which guardian set was active. Your guardians' account ids, `tid:`s and policy history are visible to anyone who fetches it.
@@ -63,7 +63,7 @@ A changed identity cannot authorize a trusted device or rejoin.
 
 Clients pin the `tid:`, the highest verified root sequence and current root, and the recovery-policy version. Later documents must extend that checkpoint, and the counters cannot go backwards. A policy version that first appears after a checkpoint cannot be signed by a root already retired at that checkpoint. This stops a server replaying an old chain prefix, reviving a revoked guardian set, or presenting new state signed by a retired root.
 
-Pins sync across your own devices, sealed ([Sync encryption](/docs/security/sync-encryption/#identity-pins)).
+Pins sync across your own devices, sealed ([Sync encryption](/security/sync-encryption/#identity-pins)).
 
 ## What the client checks
 
@@ -90,6 +90,6 @@ The same applies to a brand-new device of an account whose checkpoint has never 
 
 Other limits:
 
-- An [account move](/docs/federation/migration/) does not carry the `tid:` chain. The destination account has its own identity, clients treat it as new, and contacts must verify it again.
+- An [account move](/federation/migration/) does not carry the `tid:` chain. The destination account has its own identity, clients treat it as new, and contacts must verify it again.
 - Legacy homeservers stay usable until an identity has been pinned.
 - Identity revocation notices sent to guild servers when a device is revoked or an account moves affect sessions only. They do not change which key a contact has pinned.

@@ -7,7 +7,7 @@ sidebar:
 
 This page defines how Telium servers and clients on different versions talk to each other. The rules are enforced in [`telium-protocol/src/compat.rs`](https://github.com/telium-chat/telium/blob/main/telium-protocol/src/compat.rs) and tested in `server/tests/interop.rs`.
 
-The protocol version is one integer covering the durable wire formats: the federation API (`/_telium/v1/`), gateway frames, migration bundles, and signed documents (identity assertions, key documents, promotion and relocation records). It is separate from the release version and from the local database format (`STATE_FORMAT_VERSION`, see [Upgrades](/docs/self-hosting/upgrades/)).
+The protocol version is one integer covering the durable wire formats: the federation API (`/_telium/v1/`), gateway frames, migration bundles, and signed documents (identity assertions, key documents, promotion and relocation records). It is separate from the release version and from the local database format (`STATE_FORMAT_VERSION`, see [Upgrades](/self-hosting/upgrades/)).
 
 ## Version window
 
@@ -74,4 +74,4 @@ Outside the window:
 
 `server/tests/fixtures/interop/` holds `v0-legacy/` (before this contract), `v1/` (current) and `hypothetical-v2/` (synthetic, for testing refusal). Frozen shapes are never edited; a new version adds a directory. The suite also checks that every key path an older release published is still published.
 
-See [Federation](/docs/federation/overview/#errors-between-peers) for how peer errors reach clients.
+See [Federation](/federation/overview/#errors-between-peers) for how peer errors reach clients.

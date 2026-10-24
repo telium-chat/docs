@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-This page covers calls in **guild voice channels**: joining, mesh and SFU modes, end-to-end encryption, regions, permissions, camera and screen sharing. Calls in DMs and group chats work differently; see [DM calls](/docs/features/dm-calls/). Running an SFU is covered in [SFU](/docs/self-hosting/sfu/).
+This page covers calls in **guild voice channels**: joining, mesh and SFU modes, end-to-end encryption, regions, permissions, camera and screen sharing. Calls in DMs and group chats work differently; see [DM calls](/features/dm-calls/). Running an SFU is covered in [SFU](/self-hosting/sfu/).
 
 ## Who decides what
 
@@ -26,7 +26,7 @@ The SFU does not evaluate roles. It receives a short-lived token, signed by the 
 | `CONNECT` | joining the voice channel |
 | `SPEAK` | sending microphone audio |
 | `VIDEO` | publishing camera video |
-| `STREAM` | screen sharing, and starting a [watch-together](/docs/features/watch-together/) session |
+| `STREAM` | screen sharing, and starting a [watch-together](/features/watch-together/) session |
 | `PRIORITY_SPEAKER` | priority speaker flag on the SFU token |
 | `MUTE_MEMBERS`, `DEAFEN_MEMBERS` | server mute and deafen |
 | `MOVE_MEMBERS` | moving another member to a different voice channel, and joining a channel that is at its user limit |
@@ -184,7 +184,7 @@ name = "local"
 sfu = "https://sfu.your-domain.example"
 ```
 
-With no addressed `[[voice.regions]]`, every guild call is mesh. Do not leave a placeholder SFU URL: configured addresses are advertised to clients. For deploying the SFU and TURN, see [SFU](/docs/self-hosting/sfu/).
+With no addressed `[[voice.regions]]`, every guild call is mesh. Do not leave a placeholder SFU URL: configured addresses are advertised to clients. For deploying the SFU and TURN, see [SFU](/self-hosting/sfu/).
 
 ## Routes
 
@@ -203,4 +203,4 @@ POST      /_telium/v1/channels/{channel_id}/voice/e2ee/refuse
 POST      /_telium/v1/guilds/{guild_id}/voice/{user_id}
 ```
 
-See the [API reference](/docs/reference/api/) for the rest.
+See the [API reference](/reference/api/) for the rest.

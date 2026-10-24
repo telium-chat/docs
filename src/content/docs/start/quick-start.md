@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-This page gets a homeserver and the web client running locally, then shows the minimum changes to serve it on your own domain. For a hardened deployment, continue with [Production](/docs/self-hosting/production/).
+This page gets a homeserver and the web client running locally, then shows the minimum changes to serve it on your own domain. For a hardened deployment, continue with [Production](/self-hosting/production/).
 
 ## Requirements
 
@@ -75,9 +75,9 @@ trusted_proxies = ["127.0.0.1"]
 
 `web.dir` is relative to the process's working directory. Comment it out to run headless. If you host the client on a different origin, set `web.client_url`.
 
-Any string value can be `"${env:NAME}"` or `"${file:/path}"`. Use that for secrets. See [Secrets](/docs/self-hosting/secrets/).
+Any string value can be `"${env:NAME}"` or `"${file:/path}"`. Use that for secrets. See [Secrets](/self-hosting/secrets/).
 
-[`server/telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml) lists every option with its default. [Configuration](/docs/self-hosting/configuration/) covers the important ones.
+[`server/telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml) lists every option with its default. [Configuration](/self-hosting/configuration/) covers the important ones.
 
 ### 3. Put a proxy in front
 
@@ -133,7 +133,7 @@ name = "local"
 sfu = "https://sfu.example.com"
 ```
 
-The SFU needs its own public address with UDP ports open. See [SFU](/docs/self-hosting/sfu/).
+The SFU needs its own public address with UDP ports open. See [SFU](/self-hosting/sfu/).
 
 Some network pairs (symmetric NAT, many corporate networks) need a TURN relay. Set both `voice.turn` (`host:port`, reachable on UDP) and `voice.turn_secret` (matching coturn's `static-auth-secret`). Setting only one does nothing, and the server warns at startup.
 

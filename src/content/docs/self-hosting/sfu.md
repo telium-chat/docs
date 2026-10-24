@@ -186,4 +186,4 @@ Keep `trust.allow_insecure_discovery = false` on any SFU reachable from the inte
 | Calls use mesh | No `voice.regions` entry has an `sfu` URL, or `default_region` does not name one. |
 | Build cannot find `telium-protocol` | Keep `telium-protocol/` next to `sfu/`. |
 
-Calls themselves are described in [Voice and video](/docs/features/voice-and-video/).
+Calls themselves are described in [Voice and video](/features/voice-and-video/).

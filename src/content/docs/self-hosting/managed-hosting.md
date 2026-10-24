@@ -23,7 +23,7 @@ In **Add a guild → Create my own**:
 - A provider's screen shows its description, regions, every plan, and links to its terms, privacy policy, website and contact, plus a statement that Telium takes no payment.
 - **Continue to <provider>** opens the signup URL. Nothing is created or sent.
 
-Each screen also tells the owner that a guild can be moved to another server later from **Guild settings → Moving this guild** (see [Migration](/docs/federation/migration/)).
+Each screen also tells the owner that a guild can be moved to another server later from **Guild settings → Moving this guild** (see [Migration](/federation/migration/)).
 
 ## Configuration
 

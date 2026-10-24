@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-This page lists what each component can observe from the data it handles, whether or not it chooses to look. For who learns your IP address, see [Network privacy](/docs/security/network-privacy/).
+This page lists what each component can observe from the data it handles, whether or not it chooses to look. For who learns your IP address, see [Network privacy](/security/network-privacy/).
 
 Message content in DMs and group DMs is end-to-end encrypted. Who is in a conversation, who sent each frame from which device, when, how large, and who is typing is visible to at least one server.
 
@@ -26,7 +26,7 @@ Guild channels are not end-to-end encrypted. The guild's server reads every guil
 | Presence | Whether you are connected, on how many devices and when, **including while Invisible**. Invisible shows you as offline to others. |
 | Media and links | Your uploads, remote media fetched through it, and URLs it unfurls or proxies for you, including links in encrypted DMs |
 
-It cannot see message, reaction, edit, pin or receipt content in DMs, DM call media, your password (OPAQUE) or your [sealed sync store](/docs/security/sync-encryption/).
+It cannot see message, reaction, edit, pin or receipt content in DMs, DM call media, your password (OPAQUE) or your [sealed sync store](/security/sync-encryption/).
 
 **A block does not stop a DM.** A blocked account can still start a conversation with you, and your homeserver still routes it. Message requests keep it out of your list with no unread count or notification, and your typing and call signalling are not sent before you accept. The sender cannot tell whether you declined, blocked or never looked.
 
@@ -66,7 +66,7 @@ Anyone can fetch your display name, avatar, pronouns, bio and creation date (`/_
 | Relay | Your homeserver's TURN operator |
 | SFU | The SFU operator, TURN if used, and STUN unless the SFU offered a relay |
 
-A mesh call uses relay if your posture is `relay` or stricter, or if another participant is stricter and your home has TURN. An SFU call uses relay only if your posture is `relay` or stricter and the SFU offered one. Your posture travels sealed in the call hello; only a derived `wants_sfu` bit reaches the server. Guild calls have no posture control. See [DM calls](/docs/features/dm-calls/).
+A mesh call uses relay if your posture is `relay` or stricter, or if another participant is stricter and your home has TURN. An SFU call uses relay only if your posture is `relay` or stricter and the SFU offered one. Your posture travels sealed in the call hello; only a derived `wants_sfu` bit reaches the server. Guild calls have no posture control. See [DM calls](/features/dm-calls/).
 
 ## Push
 

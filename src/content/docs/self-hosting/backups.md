@@ -73,7 +73,7 @@ timeout_secs = 60
 - The server generates one at startup if backups are on and no key exists, and logs it at `ERROR`.
 - `TELIUM_BACKUP_KEY` (base64 of 32 bytes) overrides the file.
 
-`backup.previous_key_files` lists old keys that still open older archives. See [Secrets](/docs/self-hosting/secrets/#backup-key) for rotation.
+`backup.previous_key_files` lists old keys that still open older archives. See [Secrets](/self-hosting/secrets/#backup-key) for rotation.
 
 ### Buckets
 
@@ -190,4 +190,4 @@ The restored database carries the federation signing-key history. Do not create 
 
 With `pre_migration_backup = true`, a start with pending migrations reuses a recent archive at the old schema or takes one first. If that fails, the server logs an `ERROR` and continues, or refuses to start when `require_backup_before_migration = true`. The result is recorded in `status.json` under `pre_migration`.
 
-See [Upgrades](/docs/self-hosting/upgrades/) and [Disaster recovery](/docs/self-hosting/disaster-recovery/).
+See [Upgrades](/self-hosting/upgrades/) and [Disaster recovery](/self-hosting/disaster-recovery/).

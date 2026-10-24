@@ -38,11 +38,11 @@ request_timeout_secs = 15
 # "guilds.example" = "http://guilds.lan:8080"
 ```
 
-See [Relocation](/docs/self-hosting/relocation/), [Sunset](/docs/self-hosting/sunset/) and [Warm standby](/docs/self-hosting/warm-standby/) for the discovery fields those features add.
+See [Relocation](/self-hosting/relocation/), [Sunset](/self-hosting/sunset/) and [Warm standby](/self-hosting/warm-standby/) for the discovery fields those features add.
 
 ## Server keys and signed requests
 
-Every server signs federation requests and documents with Ed25519 keys published at `/_telium/v1/keys`. TLS proves you reached the host on the certificate. The Telium signature proves which logical server authored the request or record. A peer checks the claimed origin against discovered key material before accepting signed data. The canonical JSON signing rules are in [Signing](/docs/reference/protocol/signing/).
+Every server signs federation requests and documents with Ed25519 keys published at `/_telium/v1/keys`. TLS proves you reached the host on the certificate. The Telium signature proves which logical server authored the request or record. A peer checks the claimed origin against discovered key material before accepting signed data. The canonical JSON signing rules are in [Signing](/reference/protocol/signing/).
 
 Telium uses two kinds of trust:
 
@@ -98,7 +98,7 @@ A guild that has moved away answers `moved`, even if its rows remain. A `moved` 
 
 Disabling the vanity address closes address-based joining immediately. Invite links are unaffected.
 
-When a guild migrates, its live address becomes a forward to the destination in the same transaction that writes the tombstone, and the name is re-adopted at the destination if it is free there. A deleted guild's names are released. See [Migration](/docs/federation/migration/).
+When a guild migrates, its live address becomes a forward to the destination in the same transaction that writes the tombstone, and the name is re-adopted at the destination if it is free there. A deleted guild's names are released. See [Migration](/federation/migration/).
 
 ## External emoji
 
@@ -133,17 +133,17 @@ Receiving:
 - `deactivated` and `deleted` trigger a signed status fetch from the home, and the server acts on that answer.
 - `moved` applies only if the home's status says `moved` with `moved_to` equal to `new_id`. Otherwise the reply is `409 try_again`.
 
-A dropped session receives a `SESSION_REVOKED` gateway event and is closed. Cryptographic device revocation is separate: it is signed by the account root and published in `GET /_telium/v1/users/{id}/devices` under `revocations`. See [Account security](/docs/security/account-security/) and [Identity continuity](/docs/security/identity-continuity/).
+A dropped session receives a `SESSION_REVOKED` gateway event and is closed. Cryptographic device revocation is separate: it is signed by the account root and published in `GET /_telium/v1/users/{id}/devices` under `revocations`. See [Account security](/security/account-security/) and [Identity continuity](/security/identity-continuity/).
 
 ## Delivery and temporary disagreement
 
 Federation does not use cross-server transactions. The local authority commits what it owns and queues a signed fact for the peer, retrying until it lands. A friendship, for example, is two halves on two homes, and one half can exist briefly while the other server is down.
 
-DM conversations have one sequencer (a member's home) that orders frames, with signed gap repair and signed handoffs when the sequencer moves. See [DM encryption](/docs/security/dm-encryption/) and the [federation protocol](/docs/reference/protocol/federation/).
+DM conversations have one sequencer (a member's home) that orders frames, with signed gap repair and signed handoffs when the sequencer moves. See [DM encryption](/security/dm-encryption/) and the [federation protocol](/reference/protocol/federation/).
 
 ## Errors between peers
 
-Every signed request carries the sender's protocol window. A peer outside your window gets `400 incompatible_protocol`; this is never retried and never counted as the peer being down. See [Compatibility](/docs/reference/compatibility/).
+Every signed request carries the sender's protocol window. A peer outside your window gets `400 incompatible_protocol`; this is never retried and never counted as the peer being down. See [Compatibility](/reference/compatibility/).
 
 If your server calls a peer on a client's behalf and gets no usable answer, the client sees:
 
@@ -173,8 +173,8 @@ Defederation stops new interactions with the domain. It does not remove messages
 
 ## Relocation and failover
 
-- **Relocation** moves a whole server to a new domain with a record both names sign. See [Relocation](/docs/self-hosting/relocation/).
-- **Warm standby** keeps a read-only replica that can be promoted when the primary fails. Promotion writes a sequenced signed authority record, so peers can verify the replacement and a returning primary fences itself. See [Warm standby](/docs/self-hosting/warm-standby/).
+- **Relocation** moves a whole server to a new domain with a record both names sign. See [Relocation](/self-hosting/relocation/).
+- **Warm standby** keeps a read-only replica that can be promoted when the primary fails. Promotion writes a sequenced signed authority record, so peers can verify the replacement and a returning primary fences itself. See [Warm standby](/self-hosting/warm-standby/).
 
 :::caution
 A brand-new peer can only trust a promoted standby if some trustworthy discovery and key history for the original name still exists. Keep the discovery document reachable independently of the primary machine.
@@ -189,4 +189,4 @@ A brand-new peer can only trust a promoted standby if some trustworthy discovery
 - `server/src/revocation.rs`: revocation notices
 - `server/src/emoji.rs`: external emoji entitlement
 
-For the full route list, see the [API reference](/docs/reference/api/).
+For the full route list, see the [API reference](/reference/api/).

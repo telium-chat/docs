@@ -8,7 +8,7 @@ sidebar:
 DMs and group DMs are RFC 9420 groups. The homeserver relays ciphertext only. This page fixes the ciphersuite, encoding, policy extension and application frame layout.
 
 - Ciphersuite: `MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519`, the only one.
-- MLS frames use **standard base64, padded** (RFC 4648 §4), unlike every other surface ([Signing](/docs/reference/protocol/signing/#general-rules)).
+- MLS frames use **standard base64, padded** (RFC 4648 §4), unlike every other surface ([Signing](/reference/protocol/signing/#general-rules)).
 
 ## Membership-policy extension
 

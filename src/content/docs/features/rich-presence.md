@@ -48,7 +48,7 @@ Telium reads `org.mpris.MediaPlayer2` players on your session D-Bus: title, arti
 | Artwork | Handling |
 | --- | --- |
 | Discord application assets | resolved to Discord's public asset images |
-| Other HTTPS artwork URLs | shown to other viewers through Telium's [camo proxy](/docs/features/media/#link-previews-and-camo), so they never contact the artwork host |
+| Other HTTPS artwork URLs | shown to other viewers through Telium's [camo proxy](/features/media/#link-previews-and-camo), so they never contact the artwork host |
 | Local MPRIS album art (`file://`) | uploaded as short-lived profile media (six hours); your filesystem path is never published |
 
 ## What other people see

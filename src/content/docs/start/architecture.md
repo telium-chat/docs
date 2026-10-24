@@ -38,11 +38,11 @@ There is no multi-master replication. Each permission check runs once, against o
 
 ### Media origin
 
-A media origin stores content-addressed files and issues capability-bearing references. A guild stores the reference, not another copy of the file. See [Media](/docs/features/media/).
+A media origin stores content-addressed files and issues capability-bearing references. A guild stores the reference, not another copy of the file. See [Media](/features/media/).
 
 ### SFU
 
-The SFU forwards voice, video and screen-share media. It makes no permission decisions. The guild server decides who may join, publish, subscribe or stream, and mints a short-lived signed token with those rights. The SFU verifies the token and moves media. See [Voice and video](/docs/features/voice-and-video/) and [SFU](/docs/self-hosting/sfu/).
+The SFU forwards voice, video and screen-share media. It makes no permission decisions. The guild server decides who may join, publish, subscribe or stream, and mints a short-lived signed token with those rights. The SFU verifies the token and moves media. See [Voice and video](/features/voice-and-video/) and [SFU](/self-hosting/sfu/).
 
 ## Connections
 
@@ -94,20 +94,20 @@ A disabled role does not mount its routes. In a single process, `POST /_telium/v
 
 When authorization depends on which server is asking, servers sign their requests. TLS protects the transport. The Telium signature identifies the logical server that sent the request. Discovery (`/.well-known/telium/server`) maps a server name to its current endpoint and published keys, so a server can move hosts or fail over without changing identity. Public lookups such as profiles and keys return signed documents instead of requiring a signed request.
 
-Details: [Federation overview](/docs/federation/overview/) and [Signing](/docs/reference/protocol/signing/).
+Details: [Federation overview](/federation/overview/) and [Signing](/reference/protocol/signing/).
 
 ## Who can read what
 
 | Data | Readable by |
 | --- | --- |
 | Guild messages | The guild server |
-| DM and group-conversation content | Only participants' devices (MLS). Home servers route ciphertext and keep delivery metadata. See [DM encryption](/docs/security/dm-encryption/). |
-| Passwords | Not sent to the server as a reusable secret (OPAQUE). See [Account security](/docs/security/account-security/). |
+| DM and group-conversation content | Only participants' devices (MLS). Home servers route ciphertext and keep delivery metadata. See [DM encryption](/security/dm-encryption/). |
+| Passwords | Not sent to the server as a reusable secret (OPAQUE). See [Account security](/security/account-security/). |
 | Media | Anyone holding its capability reference |
 | Presence and activity | The audience you share it with, subject to your privacy settings |
 
 :::caution
-A web client served by a malicious origin can read anything the page can read. Encryption cannot protect plaintext from JavaScript already running in the client. If your threat model includes a malicious home server, use a packaged client or a web origin you trust independently. See [Threat model](/docs/security/threat-model/).
+A web client served by a malicious origin can read anything the page can read. Encryption cannot protect plaintext from JavaScript already running in the client. If your threat model includes a malicious home server, use a packaged client or a web origin you trust independently. See [Threat model](/security/threat-model/).
 :::
 
 ## Caches and failure
@@ -117,7 +117,7 @@ Every cache in Telium can be dropped and rebuilt from the authority: the client'
 The system expects partial failure:
 
 - Federation deliveries queue and retry, so both servers need not be online at once.
-- A warm standby serves reads and refuses writes until you promote it. See [Warm standby](/docs/self-hosting/warm-standby/).
+- A warm standby serves reads and refuses writes until you promote it. See [Warm standby](/self-hosting/warm-standby/).
 - A demoted primary refuses new writes and points at the new authority.
 
 ## Repository
@@ -133,4 +133,4 @@ The system expects partial failure:
 | `sdk/` | Bot SDK |
 | `site/` | Public website and server registry |
 
-See [Development](/docs/reference/development/) to build and test each part, and [API](/docs/reference/api/) for the endpoint surface.
+See [Development](/reference/development/) to build and test each part, and [API](/reference/api/) for the endpoint surface.

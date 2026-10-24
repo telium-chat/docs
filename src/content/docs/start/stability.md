@@ -8,7 +8,7 @@ sidebar:
 Telium is at release stage **alpha**, protocol version **1 (provisional)**. The protocol is not frozen.
 
 :::caution
-Expect breaking changes. Keep backups, and test that you can restore them. See [Backups](/docs/self-hosting/backups/).
+Expect breaking changes. Keep backups, and test that you can restore them. See [Backups](/self-hosting/backups/).
 :::
 
 ## What may break in alpha
@@ -20,7 +20,7 @@ Expect breaking changes. Keep backups, and test that you can restore them. See [
 
 ## Upgrades and downgrades
 
-Schema changes are forward-only. A server binary refuses to open a database written by a newer release, so you cannot downgrade across a migration. The way back is the backup you took before upgrading. See [Upgrades](/docs/self-hosting/upgrades/).
+Schema changes are forward-only. A server binary refuses to open a database written by a newer release, so you cannot downgrade across a migration. The way back is the backup you took before upgrading. See [Upgrades](/self-hosting/upgrades/).
 
 Keys and MLS state have no other copy. The project treats losing them as unacceptable at every stage, alpha included.
 
@@ -33,4 +33,4 @@ Keys and MLS state have no other copy. The project treats losing them as unaccep
 | Stable | Breaking changes come with notice, security fixes on a timetable, and a published support window. |
 | Protocol v1 stable | Version 1 wire bytes are frozen. Later changes follow the compatible-change rules. |
 
-Compatible and incompatible wire changes are defined in [Compatibility](/docs/reference/compatibility/).
+Compatible and incompatible wire changes are defined in [Compatibility](/reference/compatibility/).

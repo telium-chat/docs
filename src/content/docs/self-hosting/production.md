@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-This page takes one homeserver from a binary to a public HTTPS domain: installing it, the settings you must change, the startup audit, the reverse proxy, storage and shutdown. Voice and video media run on a separate SFU, covered in [SFU](/docs/self-hosting/sfu/).
+This page takes one homeserver from a binary to a public HTTPS domain: installing it, the settings you must change, the startup audit, the reverse proxy, storage and shutdown. Voice and video media run on a separate SFU, covered in [SFU](/self-hosting/sfu/).
 
 ```text
 chat.example.com ── HTTPS ──> reverse proxy ──> telium-server (127.0.0.1:8448)
@@ -48,7 +48,7 @@ chmod 600 /opt/telium/tunnel.env
 docker login ghcr.io -u <user> --password-stdin
 ```
 
-`telium-update.service` runs as the account that ran `docker login`, so the pull finds that account's `~/.docker/config.json`. Automatic updates are covered in [Updates](/docs/self-hosting/updates/).
+`telium-update.service` runs as the account that ran `docker login`, so the pull finds that account's `~/.docker/config.json`. Automatic updates are covered in [Updates](/self-hosting/updates/).
 
 ### Native (systemd)
 
@@ -98,7 +98,7 @@ dir = "/var/backups/telium/archives"
 key_file = "/var/backups/telium/backup.key"
 ```
 
-`server_name` and `public_base_url` can differ: the first is an identity, the second is where the server is reached. See [Configuration](/docs/self-hosting/configuration/) for the rest.
+`server_name` and `public_base_url` can differ: the first is an identity, the second is where the server is reached. See [Configuration](/self-hosting/configuration/) for the rest.
 
 :::caution
 `registration.open` defaults to `true`, and with `registration.admins` empty the first account registered becomes the server administrator. Register your own account as soon as the server is reachable, then set `open = false` (or list your localpart in `registration.admins`) and restart.
@@ -163,7 +163,7 @@ The example also redirects HTTP to HTTPS, disables response buffering and adds p
 A tunnel carries HTTP and WebSockets, which is all the homeserver needs. Map `chat.example.com` to the server's address and run `cloudflared` on the same host or, as `deploy/compose.yml` does, as a container on the server's private network. List the tunnel container's address in `trusted_proxies`.
 
 :::caution
-A tunnel cannot carry SFU or TURN media, which is UDP. Give the SFU its own public address and keep its DNS record unproxied. See [SFU](/docs/self-hosting/sfu/).
+A tunnel cannot carry SFU or TURN media, which is UDP. Give the SFU its own public address and keep its DNS record unproxied. See [SFU](/self-hosting/sfu/).
 :::
 
 The server does not watch certificate expiry. Monitor it yourself.
@@ -176,11 +176,11 @@ The server does not watch certificate expiry. Monitor it yourself.
 | `/var/backups/telium` | archives, backup key | On a different mount from the data, plus `[backup.remote]`. |
 | `/etc/telium/telium.toml` | config | Mode 600. |
 
-Point `backup.dir` and `backup.key_file` outside the data. A backup inside the data volume disappears with it. See [Backups](/docs/self-hosting/backups/).
+Point `backup.dir` and `backup.key_file` outside the data. A backup inside the data volume disappears with it. See [Backups](/self-hosting/backups/).
 
 ## Secrets
 
-Any string value in `telium.toml` can be `"${file:/run/secrets/name}"` (preferred) or `"${env:NAME}"`. See [Secrets](/docs/self-hosting/secrets/).
+Any string value in `telium.toml` can be `"${file:/run/secrets/name}"` (preferred) or `"${env:NAME}"`. See [Secrets](/self-hosting/secrets/).
 
 ## Web client
 
@@ -224,4 +224,4 @@ Then open a Telium client, register on `chat.example.com`, and create a guild.
 | Every user shares one rate limit | the proxy is missing from `rate_limit.trusted_proxies` |
 | Uploads fail with 413 | the proxy's body limit |
 | Discovery fails | `server_name` must match in the config, the SFU trust entry and the discovery document |
-| A second process will not start | one process per database is enforced; see [Configuration](/docs/self-hosting/configuration/#one-process-per-database) |
+| A second process will not start | one process per database is enforced; see [Configuration](/self-hosting/configuration/#one-process-per-database) |

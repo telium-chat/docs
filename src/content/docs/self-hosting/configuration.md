@@ -17,13 +17,13 @@ All commands take `--config <path>` (default `telium.toml`).
 |---|---|
 | `serve` | Run the server (the default). |
 | `init` | Write a starter config. |
-| `check [--strict]` | Audit the config; see [Running in production](/docs/self-hosting/production/#audit-the-config-telium-server-check). |
+| `check [--strict]` | Audit the config; see [Running in production](/self-hosting/production/#audit-the-config-telium-server-check). |
 | `version` | Print the build as `key=value` lines. |
-| `backup`, `restore` | See [Backups](/docs/self-hosting/backups/). |
-| `keys`, `mfa`, `rotations` | See [Secrets](/docs/self-hosting/secrets/). |
-| `admin list`, `admin recover <account> --reason "…"`, `admin claims`, `admin cancel <id>` | Server administrators. Read [Server ownership](/docs/self-hosting/server-ownership/) before `recover`. |
-| `standby status`, `pair <domain>`, `sync`, `promote <origin>` | See [Warm standby](/docs/self-hosting/warm-standby/). |
-| `updates check` | Read the release manifest; used by the native updater. See [Updates](/docs/self-hosting/updates/). |
+| `backup`, `restore` | See [Backups](/self-hosting/backups/). |
+| `keys`, `mfa`, `rotations` | See [Secrets](/self-hosting/secrets/). |
+| `admin list`, `admin recover <account> --reason "…"`, `admin claims`, `admin cancel <id>` | Server administrators. Read [Server ownership](/self-hosting/server-ownership/) before `recover`. |
+| `standby status`, `pair <domain>`, `sync`, `promote <origin>` | See [Warm standby](/self-hosting/warm-standby/). |
+| `updates check` | Read the release manifest; used by the native updater. See [Updates](/self-hosting/updates/). |
 
 The `admin` and `standby` commands work on the database directly, so they still work when nobody can sign in.
 
@@ -52,7 +52,7 @@ media = true      # file hosting
 relay = false     # forward "Protect my IP" users' guild traffic; needs identity
 ```
 
-Relay budgets live in `[relay]`. See [Network privacy](/docs/security/network-privacy/).
+Relay budgets live in `[relay]`. See [Network privacy](/security/network-privacy/).
 
 ## Capabilities
 
@@ -73,7 +73,7 @@ min_password_len = 8
 admins = []        # localparts granted admin on registration
 ```
 
-With `admins` empty, the first account registered becomes the administrator. Close registration once your account exists. `[registration.recommendations]` controls onboarding referrals; see [Onboarding](/docs/federation/onboarding/).
+With `admins` empty, the first account registered becomes the administrator. Close registration once your account exists. `[registration.recommendations]` controls onboarding referrals; see [Onboarding](/federation/onboarding/).
 
 An administrator gets a **Control plane** entry in user settings with panes for overview, statistics, storage, settings, accounts, guilds, moderation, federation, continuity and the audit log. Every endpoint behind it checks admin status per request against the accounts table. Destructive actions ask for your password again, and every admin action or refusal is written to the server audit log. The console shows aggregates only: no per-account traffic and no message content.
 
@@ -102,7 +102,7 @@ At startup the server claims an `instance_lease` row and heartbeats it every 30 
 
 `TELIUM_INSTANCE_LOCK=off` skips the check. Use it only to clear a lease held by a machine that no longer exists. The rate limiter is in-process, so it relies on this rule too.
 
-A process handles roughly 16,000 gateway events per second of fanout. See [Scaling](/docs/self-hosting/scaling/).
+A process handles roughly 16,000 gateway events per second of fanout. See [Scaling](/self-hosting/scaling/).
 
 ## Media
 
@@ -114,7 +114,7 @@ max_file_bytes = 104857600
 profile_asset_carveout_bytes = 524288
 ```
 
-`disabled` still allows small avatars and banners. External media hosts and curators are configured in `[media_registry]`. Uploaded media can live in an S3-compatible bucket with `[media_store] store = "s3"` and `[media_store.s3]`. See [Media](/docs/features/media/).
+`disabled` still allows small avatars and banners. External media hosts and curators are configured in `[media_registry]`. Uploaded media can live in an S3-compatible bucket with `[media_store] store = "s3"` and `[media_store.s3]`. See [Media](/features/media/).
 
 ### Upload scanning
 
@@ -163,25 +163,25 @@ name = "local"
 sfu = "https://sfu.example.com"
 ```
 
-Without a region that has an `sfu` URL, calls use peer-to-peer mesh up to `mesh_max_participants`. TURN needs both `turn` and `turn_secret`, and setting only one does nothing. See [SFU](/docs/self-hosting/sfu/).
+Without a region that has an `sfu` URL, calls use peer-to-peer mesh up to `mesh_max_participants`. TURN needs both `turn` and `turn_secret`, and setting only one does nothing. See [SFU](/self-hosting/sfu/).
 
 ## Other sections
 
 | Section | Covers | Page |
 |---|---|---|
-| `[web]` | `dir` for a built client, `client_url` | [Running in production](/docs/self-hosting/production/#web-client) |
-| `[backup]`, `[backup.remote]` | archives | [Backups](/docs/self-hosting/backups/) |
-| `[archive]`, `[archive.s3]` | cold history segments (off by default) | [Data lifecycle](/docs/self-hosting/data-lifecycle/) |
-| `[retention]`, `[integrity]` | housekeeping, startup DB checks | [Data lifecycle](/docs/self-hosting/data-lifecycle/) |
-| `[metrics]` | console metrics, `/metrics` scrape | [Observability](/docs/self-hosting/observability/) |
-| `[updates]`, `[usage]` | version check, deployment count | [Updates](/docs/self-hosting/updates/) |
-| `[failover]` | warm standby | [Warm standby](/docs/self-hosting/warm-standby/) |
-| `[hosting]` | guild-hosting directory | [Managed hosting](/docs/self-hosting/managed-hosting/) |
-| `[sessions]`, `[mfa]`, `[ownership]` | session lifetimes, MFA key, admin recovery delay | [Secrets](/docs/self-hosting/secrets/), [Server ownership](/docs/self-hosting/server-ownership/) |
-| `[push]`, `[mail]` | FCM/APNs credentials, outbound mail webhook | [Notifications](/docs/features/notifications/) |
+| `[web]` | `dir` for a built client, `client_url` | [Running in production](/self-hosting/production/#web-client) |
+| `[backup]`, `[backup.remote]` | archives | [Backups](/self-hosting/backups/) |
+| `[archive]`, `[archive.s3]` | cold history segments (off by default) | [Data lifecycle](/self-hosting/data-lifecycle/) |
+| `[retention]`, `[integrity]` | housekeeping, startup DB checks | [Data lifecycle](/self-hosting/data-lifecycle/) |
+| `[metrics]` | console metrics, `/metrics` scrape | [Observability](/self-hosting/observability/) |
+| `[updates]`, `[usage]` | version check, deployment count | [Updates](/self-hosting/updates/) |
+| `[failover]` | warm standby | [Warm standby](/self-hosting/warm-standby/) |
+| `[hosting]` | guild-hosting directory | [Managed hosting](/self-hosting/managed-hosting/) |
+| `[sessions]`, `[mfa]`, `[ownership]` | session lifetimes, MFA key, admin recovery delay | [Secrets](/self-hosting/secrets/), [Server ownership](/self-hosting/server-ownership/) |
+| `[push]`, `[mail]` | FCM/APNs credentials, outbound mail webhook | [Notifications](/features/notifications/) |
 | `[klipy]` | GIF search; the key is public by design | |
-| `[shutdown]` | `grace_secs`, `settle_ms` | [Running in production](/docs/self-hosting/production/#stopping) |
+| `[shutdown]` | `grace_secs`, `settle_ms` | [Running in production](/self-hosting/production/#stopping) |
 
 ## Health
 
-`GET /_telium/v1/health` answers whether the HTTP server is up, and nothing about the SFU, peers, backups or standbys. Admin endpoints give more: `/admin/status` (backups, protocol window, peers), `/admin/health` (warnings with a cause and next step), and `/admin/version`. Log targets and Prometheus are in [Observability](/docs/self-hosting/observability/).
+`GET /_telium/v1/health` answers whether the HTTP server is up, and nothing about the SFU, peers, backups or standbys. Admin endpoints give more: `/admin/status` (backups, protocol window, peers), `/admin/health` (warnings with a cause and next step), and `/admin/version`. Log targets and Prometheus are in [Observability](/self-hosting/observability/).

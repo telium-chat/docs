@@ -40,7 +40,7 @@ Bot intents are `GUILD_MESSAGES`, `MESSAGE_CONTENT`, `GUILD_MEMBERS`, `GUILD_PRE
 
 Without `MESSAGE_CONTENT`, message events arrive with empty `content` and `content_redacted: true`. `MESSAGE_CONTENT` must be granted twice: on the application under **User Settings > Developer**, and in the guild under **Guild Settings > Bots**.
 
-Installing, changing and removing a bot needs `MANAGE_GUILD`. Each is recorded in the audit log as `bot.install`, `bot.update` or `bot.uninstall`. Installation data lives on the guild membership row, so it moves with the guild on migration and is covered by backups. See [Guilds and moderation](/docs/features/guilds/).
+Installing, changing and removing a bot needs `MANAGE_GUILD`. Each is recorded in the audit log as `bot.install`, `bot.update` or `bot.uninstall`. Installation data lives on the guild membership row, so it moves with the guild on migration and is covered by backups. See [Guilds and moderation](/features/guilds/).
 
 ## API
 
@@ -91,7 +91,7 @@ await bot.login();
 
 The SDK polls the installation list while running, so installing, removing or reinstalling the bot needs no restart. It keeps one gateway connection per guild server domain for all guilds there, and reconnects that domain when its guilds or grants change.
 
-To answer buttons and other components, see [Interactivity](/docs/features/interactivity/).
+To answer buttons and other components, see [Interactivity](/features/interactivity/).
 
 ### Failures and reconnects
 

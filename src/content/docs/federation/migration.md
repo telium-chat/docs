@@ -10,7 +10,7 @@ You can move an account or a guild from one Telium server to another. This page 
 A move runs in a fixed order: grant, transfer, acknowledge, tombstone, stand down. The source destroys nothing until the destination has acknowledged a complete import.
 
 :::caution[Account moves start a new cryptographic identity]
-An account move does not yet carry the source account's `tid:` [identity continuity](/docs/security/identity-continuity/) chain. The destination account keeps its own immutable identity. Contacts' clients treat the moved account as a new identity and must verify it again. The identities you have pinned for your contacts (`identity.pins.v1`) do travel, sealed, in the sync store.
+An account move does not yet carry the source account's `tid:` [identity continuity](/security/identity-continuity/) chain. The destination account keeps its own immutable identity. Contacts' clients treat the moved account as a new identity and must verify it again. The identities you have pinned for your contacts (`identity.pins.v1`) do travel, sealed, in the sync store.
 :::
 
 ## Authorization
@@ -126,7 +126,7 @@ A subject moves once. A move is refused if it already has a `moved` tombstone.
 | Sessions, password hash, OPAQUE record, escrow key | Sign in normally |
 | DM history | Conversations re-anchor; no plaintext moves |
 
-Synced keys that travel: `prefs.v1` (without `voiceRegion` and the per-device rich presence switches), `emoji.recent.v1`, `emoji.tone.v1`, `gif.favorites.v1`, and, when sealed, `stickers.saved.v1`, `drafts.v2` and `identity.pins.v1`. `drafts.v1` and unknown keys stay. Each value counts against the destination's `limits.max_sync_store_bytes`. See [Sync encryption](/docs/security/sync-encryption/).
+Synced keys that travel: `prefs.v1` (without `voiceRegion` and the per-device rich presence switches), `emoji.recent.v1`, `emoji.tone.v1`, `gif.favorites.v1`, and, when sealed, `stickers.saved.v1`, `drafts.v2` and `identity.pins.v1`. `drafts.v1` and unknown keys stay. Each value counts against the destination's `limits.max_sync_store_bytes`. See [Sync encryption](/security/sync-encryption/).
 
 The vault's custody mode at the destination:
 
@@ -140,7 +140,7 @@ The vault's custody mode at the destination:
 On first sign-in at the destination, the client reports the vault locked. Enter your recovery key when the client asks for it in Settings. Do not use **Forgot password?** for this: a reset there uses the recovery key the destination issued, and your moved vault is sealed under the old one.
 :::
 
-Uploads keep their hash and capability, so links work with the host swapped. The old origin answers `GET /_telium/v1/media/{hash}` with `307` to the new origin. Objects over the budget are pulled afterwards through `POST /_telium/v1/migrate/media/fetch` and `/confirm`. Encrypted DM bodies are never rewritten. See [Media](/docs/features/media/).
+Uploads keep their hash and capability, so links work with the host swapped. The old origin answers `GET /_telium/v1/media/{hash}` with `307` to the new origin. Objects over the budget are pulled afterwards through `POST /_telium/v1/migrate/media/fetch` and `/confirm`. Encrypted DM bodies are never rewritten. See [Media](/features/media/).
 
 ### Guild bundle
 
@@ -156,7 +156,7 @@ At import:
 
 Your home keeps a registry of guilds you belong to on other servers, fed by signed notices from guild servers (`POST /_telium/v1/users/{user_id}/memberships`) and by your client after each `READY` (`POST /_telium/v1/memberships`).
 
-After an account import, the destination tells each guild server about the move with a signed `POST /_telium/v1/users/{old_id}/moved`. The guild server checks the old home's signed status before rewriting anything, and answers `409 try_again` until the old home says `moved`. The old home separately sends a `moved` revocation notice. See [Federation](/docs/federation/overview/#identity-revocation-notices).
+After an account import, the destination tells each guild server about the move with a signed `POST /_telium/v1/users/{old_id}/moved`. The guild server checks the old home's signed status before rewriting anything, and answers `409 try_again` until the old home says `moved`. The old home separately sends a `moved` revocation notice. See [Federation](/federation/overview/#identity-revocation-notices).
 
 Retries start 30 seconds after import and back off to a one-hour cap, for 40 attempts (about two days). Check and retry from the destination:
 
@@ -216,4 +216,4 @@ A moved guild's rows stay on the source as a read-only archive, and deleting it 
 
 ## Whole-server moves
 
-Renaming or shutting down a whole server is separate from per-account migration. See [Relocation](/docs/self-hosting/relocation/), [Sunset](/docs/self-hosting/sunset/) and [Warm standby](/docs/self-hosting/warm-standby/).
+Renaming or shutting down a whole server is separate from per-account migration. See [Relocation](/self-hosting/relocation/), [Sunset](/self-hosting/sunset/) and [Warm standby](/self-hosting/warm-standby/).

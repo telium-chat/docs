@@ -15,7 +15,7 @@ All application endpoints below live under `/_telium/v1` unless shown with a ful
 | --- | --- | --- |
 | Home session | Account-home API | `Authorization: Bearer <home token>` |
 | Guild session | Guild API and guild gateway | `Authorization: Bearer <guild token>`, or the gateway `IDENTIFY` token |
-| Signed server request | Server-to-server operations | Federation request signature ([Signing](/docs/reference/protocol/signing/#family-c-federation-requests)) |
+| Signed server request | Server-to-server operations | Federation request signature ([Signing](/reference/protocol/signing/#family-c-federation-requests)) |
 | Signed public document | Public lookups (account status, profile, keys) | None; trust the verified signature on the returned document |
 | Media capability | Object fetch | Unguessable capability carried with the media reference |
 | Public | Discovery, invite previews, failover status | None, with route-specific information limits |
@@ -35,7 +35,7 @@ GET /_telium/v1/hosting/publication
 GET /metrics
 ```
 
-Discovery names the logical server and its current API and gateway endpoints. `/keys` publishes signing keys and `/health` checks reachability and authority. `/capabilities` publishes enabled features and selected operator policy for client feature gating. `/hosting/*` lists managed guild-hosting providers, the signed catalogue this server publishes, and the key to pin for it ([Managed hosting](/docs/self-hosting/managed-hosting/)). `/metrics` is the Prometheus endpoint ([Observability](/docs/self-hosting/observability/)).
+Discovery names the logical server and its current API and gateway endpoints. `/keys` publishes signing keys and `/health` checks reachability and authority. `/capabilities` publishes enabled features and selected operator policy for client feature gating. `/hosting/*` lists managed guild-hosting providers, the signed catalogue this server publishes, and the key to pin for it ([Managed hosting](/self-hosting/managed-hosting/)). `/metrics` is the Prometheus endpoint ([Observability](/self-hosting/observability/)).
 
 ## Account and identity
 
@@ -79,11 +79,11 @@ GET    /sync
 GET|PUT|DELETE /sync/{key}
 ```
 
-See [Account security](/docs/security/account-security/) and [Identity continuity](/docs/security/identity-continuity/).
+See [Account security](/security/account-security/) and [Identity continuity](/security/identity-continuity/).
 
 ### Sync store
 
-Current clients write only sealed envelopes (`{"sealed": "v1", "kid", "iv", "ct"}`), which the server stores and quotas without opening ([Sync encryption](/docs/security/sync-encryption/)).
+Current clients write only sealed envelopes (`{"sealed": "v1", "kid", "iv", "ct"}`), which the server stores and quotas without opening ([Sync encryption](/security/sync-encryption/)).
 
 - Reads omit sealed values unless the client passes `?sealed=1`.
 - The first sealed write marks the account's store sealed. After that a plaintext `PUT` returns `409`.
@@ -114,7 +114,7 @@ GET         /notifications
 POST        /notifications/ack
 ```
 
-See [Notifications](/docs/features/notifications/).
+See [Notifications](/features/notifications/).
 
 ## Guild sessions
 
@@ -170,7 +170,7 @@ GET               /guilds/{guild_id}/audit-log
 
 In the browser, `/invite/gaming` is the HTTPS spelling of `#gaming:host`. Generated invite codes start with `~` (for example `/invite/~abcdefgh`), which vanity names cannot contain. The web landing tries an invite first and falls back to vanity resolution on not-found.
 
-See [Guilds](/docs/features/guilds/).
+See [Guilds](/features/guilds/).
 
 ## Messages and channel state
 
@@ -201,7 +201,7 @@ POST|PATCH /interactions/{id}/{token}/callback
 POST       /interactions/{id}/modal
 ```
 
-See [Interactivity](/docs/features/interactivity/).
+See [Interactivity](/features/interactivity/).
 
 ## Bots and applications
 
@@ -217,7 +217,7 @@ POST              /guilds/{guild_id}/bots/preview
 PATCH|DELETE      /guilds/{guild_id}/bots/{bot_user_id}
 ```
 
-Applications and bot assertions live on the identity role; bot sessions and installations on the guild role. See [Bots](/docs/features/bots/).
+Applications and bot assertions live on the identity role; bot sessions and installations on the guild role. See [Bots](/features/bots/).
 
 ## Moderation
 
@@ -305,7 +305,7 @@ Measurement responses are aggregates only (whole-server or per-route), never sco
 - Destructive or authority-changing routes return `403` with `"error": "step_up_required"` until you call `POST /admin/step-up` (password or OPAQUE reauth). That opens a 5-minute window; `GET` shows it and `DELETE` ends it. Step-up uses the strict login rate bucket.
 - Every mutating admin call, and every refusal, is appended to `server_audit_log` (`GET /admin/audit`, filters `before`, `action`, `actor`). This is separate from the guild audit log.
 
-See [Server ownership](/docs/self-hosting/server-ownership/) and [Observability](/docs/self-hosting/observability/).
+See [Server ownership](/self-hosting/server-ownership/) and [Observability](/self-hosting/observability/).
 
 ## Friends and presence
 
@@ -317,7 +317,7 @@ PUT|DELETE  /friends/{user_id}/block
 GET         /friends/mutual/{user_id}
 ```
 
-Signed server-to-server routes `friends/relay`, `friends/presence` and `friends/mutual-check` relay friendship and presence facts. See [Friends](/docs/features/friends/).
+Signed server-to-server routes `friends/relay`, `friends/presence` and `friends/mutual-check` relay friendship and presence facts. See [Friends](/features/friends/).
 
 ## Direct messages and vaults
 
@@ -344,7 +344,7 @@ POST           /vault/mode
 GET|PUT|DELETE /vault/backup
 ```
 
-The server treats MLS application content as opaque. Server-to-server delivery uses the `dm/*` routes in [Federation](/docs/reference/protocol/federation/#signed-routes). See [DM encryption](/docs/security/dm-encryption/).
+The server treats MLS application content as opaque. Server-to-server delivery uses the `dm/*` routes in [Federation](/reference/protocol/federation/#signed-routes). See [DM encryption](/security/dm-encryption/).
 
 ## Voice, video and screenshare
 
@@ -370,7 +370,7 @@ GET  /conversations/{id}/voice
 POST /conversations/{id}/voice/join | leave | state | signal | server
 ```
 
-See [Voice and video](/docs/features/voice-and-video/) and [DM calls](/docs/features/dm-calls/).
+See [Voice and video](/features/voice-and-video/) and [DM calls](/features/dm-calls/).
 
 ## Media
 
@@ -411,7 +411,7 @@ POST /media/external/gofile/playback      # only when gofile_playback_proxy is e
 GET  /media/external/gofile/play          # only when gofile_playback_proxy is enabled
 ```
 
-See [Media](/docs/features/media/).
+See [Media](/features/media/).
 
 ## Migration, relocation, sunset and failover
 
@@ -441,7 +441,7 @@ GET      /failover/status/{origin}
 
 Warm-standby replication reads (`failover/head`, `log`, `snapshot`, `media/{hash}`) require a signed standby request. `GET /failover/status/{origin}` is unauthenticated so a client can find a promoted authority when it has no working session against the failed primary. Promotion is an authenticated admin action.
 
-This area is continuity-sensitive. Build against `routes/mod.rs` and the procedure pages: [Migration](/docs/federation/migration/), [Relocation](/docs/self-hosting/relocation/), [Sunset](/docs/self-hosting/sunset/), [Warm standby](/docs/self-hosting/warm-standby/).
+This area is continuity-sensitive. Build against `routes/mod.rs` and the procedure pages: [Migration](/federation/migration/), [Relocation](/self-hosting/relocation/), [Sunset](/self-hosting/sunset/), [Warm standby](/self-hosting/warm-standby/).
 
 ## Gateway
 
@@ -454,8 +454,8 @@ HELLO    { d: { heartbeat_interval_ms, gateway_version, protocol } }
   -> DISPATCH ...
 ```
 
-A client may hold gateway connections to several servers at once. A reconnect or degraded state belongs to that one connection, not the whole account. The full contract, opcodes, intents and close codes are in [Gateway](/docs/reference/protocol/gateway/).
+A client may hold gateway connections to several servers at once. A reconnect or degraded state belongs to that one connection, not the whole account. The full contract, opcodes, intents and close codes are in [Gateway](/reference/protocol/gateway/).
 
 ## Errors
 
-Handlers return structured JSON errors (`error`, `code`, `message`); the full table is in [Federation errors](/docs/reference/protocol/federation/#errors). Branch on `code`, never on the English `message`. Some statuses hide information: a channel you cannot view returns not found rather than confirming it exists.
+Handlers return structured JSON errors (`error`, `code`, `message`); the full table is in [Federation errors](/reference/protocol/federation/#errors). Branch on `code`, never on the English `message`. Some statuses hide information: a channel you cannot view returns not found rather than confirming it exists.

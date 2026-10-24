@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-This page covers who learns your IP address for each connection Telium makes, and how the **Protect my IP** relay works. For what each component can read once a request arrives, see [Privacy](/docs/security/privacy/).
+This page covers who learns your IP address for each connection Telium makes, and how the **Protect my IP** relay works. For what each component can read once a request arrives, see [Privacy](/security/privacy/).
 
 :::note
 None of these options provide anonymity. Each one decides which party holds your address.
@@ -18,7 +18,7 @@ None of these options provide anonymity. Each one decides which party holds your
 | Guild REST and gateway | The guild server (plus timing, volume and TLS SNI) | Yes |
 | Protected guild transport | The relay (your account home by default). The guild sees the relay's address. | This is the setting |
 | Account home traffic | Your account home | No |
-| [Calls](/docs/features/voice-and-video/) | `direct`: every participant. `relay`: your home's TURN. `sfu`: the SFU operator. | No, calls have their own posture |
+| [Calls](/features/voice-and-video/) | `direct`: every participant. `relay`: your home's TURN. `sfu`: the SFU operator. | No, calls have their own posture |
 | External upload hosts (Gofile) | The provider | No |
 | External playback (Gofile) | The provider in native apps. Your home in the browser when `media_registry.gofile_playback_proxy = true`. | No |
 | GIF search and media (Klipy) | The provider, plus your search terms | No |
@@ -26,11 +26,11 @@ None of these options provide anonymity. Each one decides which party holds your
 | Emoji CDN (`cdn.jsdelivr.net`) | jsDelivr, plus which emoji rendered | No |
 | Push (FCM, UnifiedPush, Web Push) | The push provider, continuously | No |
 | Media from another Telium origin | That origin | No |
-| Version check and deployment count | Your homeserver makes these itself, so the endpoints see the server's IP ([Updates](/docs/self-hosting/updates/)) | Not applicable |
+| Version check and deployment count | Your homeserver makes these itself, so the endpoints see the server's IP ([Updates](/self-hosting/updates/)) | Not applicable |
 
 ## Modes
 
-Your choice is stored in the [sealed sync store](/docs/security/sync-encryption/) as:
+Your choice is stored in the [sealed sync store](/security/sync-encryption/) as:
 
 ```json
 { "mode": "direct", "guilds": { "<guildId>": "protected" }, "autoFallback": false }

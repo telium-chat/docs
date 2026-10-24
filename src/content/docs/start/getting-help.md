@@ -41,4 +41,4 @@ For federation problems, include logs from both servers if you can.
 
 ## Contributing a fix
 
-Start at [CONTRIBUTING.md](https://github.com/telium-chat/telium/blob/main/CONTRIBUTING.md) and [Development](/docs/reference/development/).
+Start at [CONTRIBUTING.md](https://github.com/telium-chat/telium/blob/main/CONTRIBUTING.md) and [Development](/reference/development/).

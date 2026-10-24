@@ -52,4 +52,4 @@ A second process on the same database drops every live call at boot, doubles rat
 
 ## Storage beyond SQLite
 
-Media and cold history can already live in object storage (`[media_store]`, `[archive]`; see [Configuration](/docs/self-hosting/configuration/)). PostgreSQL and other databases are not supported or planned.
+Media and cold history can already live in object storage (`[media_store]`, `[archive]`; see [Configuration](/self-hosting/configuration/)). PostgreSQL and other databases are not supported or planned.

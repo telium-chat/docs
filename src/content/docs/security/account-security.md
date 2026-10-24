@@ -5,13 +5,13 @@ sidebar:
   order: 2
 ---
 
-This page covers how your account home authenticates you and protects your account: password login, MFA, devices, the recovery key, password reset and account deletion. Identity roots and guardians are on [Identity continuity](/docs/security/identity-continuity/). DM key custody is on [DM encryption](/docs/security/dm-encryption/).
+This page covers how your account home authenticates you and protects your account: password login, MFA, devices, the recovery key, password reset and account deletion. Identity roots and guardians are on [Identity continuity](/security/identity-continuity/). DM key custody is on [DM encryption](/security/dm-encryption/).
 
 ## Account ids
 
 Account ids have the form `@localpart:server.name`. Registration lowercases the localpart, so `Alice` and `alice` are the same account. The capitalization you typed can become your initial display name.
 
-The account id is a routing address. Your cryptographic identity is the immutable `tid:`, described on [Identity continuity](/docs/security/identity-continuity/).
+The account id is a routing address. Your cryptographic identity is the immutable `tid:`, described on [Identity continuity](/security/identity-continuity/).
 
 ## Password login (OPAQUE)
 
@@ -62,7 +62,7 @@ The server checks the signature against the account's current root before changi
 
 On success the server stores the statement, ends every session carrying that key, clears the device's cross-signature, deletes its KeyPackages and sends the revocation notice. Afterwards it answers `403` to a KeyPackage upload, cross-signature, message or rejoin from that key.
 
-The server serves the statements in `revocations` on `GET /_telium/v1/crosssigning` and `GET /_telium/v1/users/{id}/devices`. Clients keep only statements signed by a root in the account's verified chain and enforce them themselves (see [Revoked devices](/docs/security/dm-encryption/#revoked-devices)). The server can withhold a statement but cannot forge one.
+The server serves the statements in `revocations` on `GET /_telium/v1/crosssigning` and `GET /_telium/v1/users/{id}/devices`. Clients keep only statements signed by a root in the account's verified chain and enforce them themselves (see [Revoked devices](/security/dm-encryption/#revoked-devices)). The server can withhold a statement but cannot forge one.
 
 A `DELETE` without a body still works. It ends the session and enforces nothing cryptographically. Clients send it when they have no unlocked root or the device never had a signed key.
 
@@ -101,7 +101,7 @@ The server deletes the challenge before checking the proof, so a failed attempt 
 
 A reset changes how you log in. It does not change your `tid:`, root history, guardian policy or cross-signing rows. After the reset, the client opens the recovery key's copy of your keyring and re-wraps it under the new password.
 
-Guardians cannot reset a password. They authorize identity-root transitions only (see [Identity continuity](/docs/security/identity-continuity/#threshold-recovery)).
+Guardians cannot reset a password. They authorize identity-root transitions only (see [Identity continuity](/security/identity-continuity/#threshold-recovery)).
 
 ## Recovery email
 

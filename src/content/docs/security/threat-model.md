@@ -47,7 +47,7 @@ A valid credential identifies the speaker. It grants nothing on its own.
 
 The web client keeps the session in `localStorage` and MLS state and the DM recovery keyring in IndexedDB, unencrypted at rest. Anyone who can run code in the client's origin or read the browser profile has the account.
 
-An [account move](/docs/federation/migration/) does not carry the `tid:` continuity chain. Contacts see the moved account as a new cryptographic identity and must verify it again.
+An [account move](/federation/migration/) does not carry the `tid:` continuity chain. Contacts see the moved account as a new cryptographic identity and must verify it again.
 
 ## Invariants
 

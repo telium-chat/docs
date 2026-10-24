@@ -24,7 +24,7 @@ Prebuilt packages are attached to GitHub releases:
 | Linux | [`Telium_x86_64.AppImage`](https://github.com/telium-chat/telium/releases/download/desktop-latest/Telium_x86_64.AppImage) |
 | Android | [`Telium_arm64.apk`](https://github.com/telium-chat/telium/releases/download/android-latest/Telium_arm64.apk) |
 
-Desktop releases are tagged `desktop-v<version>` and ship with a signed client manifest and updater metadata. Android releases are tagged `android-v<version>`. See [Updates](/docs/self-hosting/updates/).
+Desktop releases are tagged `desktop-v<version>` and ship with a signed client manifest and updater metadata. Android releases are tagged `android-v<version>`. See [Updates](/self-hosting/updates/).
 
 ## Browser
 
@@ -43,7 +43,7 @@ bun run build    # writes web/dist
 
 Point `[web] dir` at `web/dist` and the homeserver serves the client after its API and discovery routes.
 
-The web build includes a service worker that precaches assets and supports Web Push where the browser offers it. Allowing notifications and enabling background push are separate choices. See [Notifications](/docs/features/notifications/).
+The web build includes a service worker that precaches assets and supports Web Push where the browser offers it. Allowing notifications and enabling background push are separate choices. See [Notifications](/features/notifications/).
 
 :::caution
 A web origin is executable code. If the server that hands you the client is malicious, its JavaScript can read anything the page can. For a threat model that distrusts your home server, use a packaged client or a web origin you trust independently.
@@ -63,7 +63,7 @@ bun run desktop:build:windows    # NSIS installer
 
 Output goes to `web/dist-electron/`.
 
-The renderer runs with `contextIsolation`, `sandbox` and `webSecurity` on and `nodeIntegration` off. Native features go through narrow preload methods that the main process validates: opening external links, native notifications, window focus events, and [Rich Presence](/docs/features/rich-presence/) (game and media activity via arRPC and MPRIS on Linux, and a media helper on Windows).
+The renderer runs with `contextIsolation`, `sandbox` and `webSecurity` on and `nodeIntegration` off. Native features go through narrow preload methods that the main process validates: opening external links, native notifications, window focus events, and [Rich Presence](/features/rich-presence/) (game and media activity via arRPC and MPRIS on Linux, and a media helper on Windows).
 
 Microphone, camera, WebRTC and screen capture stay in Chromium, so desktop calls use the same media code as the browser. On Linux, screen sharing goes through the system picker (PipeWire portals where available).
 
@@ -111,10 +111,10 @@ Each server connection is tracked separately, and the client tells you which one
 
 The client retries only requests that are safe to repeat, and only on network errors or 502, 503 and 504. Channel messages carry a nonce the server remembers for 5 minutes, so a retry does not post twice. DM sends are not retried automatically.
 
-To reset a misbehaving client, the recovery action clears the cached snapshot and the local settings mirror and keeps your session, drafts and keys. For a bug report, use **Settings → Connected servers → Copy diagnostics**. The output contains no messages, drafts, names or credentials. See [Getting help](/docs/start/getting-help/).
+To reset a misbehaving client, the recovery action clears the cached snapshot and the local settings mirror and keeps your session, drafts and keys. For a bug report, use **Settings → Connected servers → Copy diagnostics**. The output contains no messages, drafts, names or credentials. See [Getting help](/start/getting-help/).
 
 ## Synced and local settings
 
 Some settings follow your account. Each value is sealed on your device under a key derived from your recovery keyring before upload, so your home server sees key names, padded sizes and write times, not contents. Synced values include preferences, recent emoji and skin tone, GIF favorites, saved stickers and drafts.
 
-Voice region and Rich Presence toggles stay on each device. Details: [Sync encryption](/docs/security/sync-encryption/).
+Voice region and Rich Presence toggles stay on each device. Details: [Sync encryption](/security/sync-encryption/).

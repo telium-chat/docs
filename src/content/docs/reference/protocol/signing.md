@@ -11,7 +11,7 @@ Every Telium signature is Ed25519 (RFC 8032). There is no algorithm negotiation 
 
 - Verify strictly (`verify_strict`): a verifier **MUST** reject non-canonical `S` (`S + L`) and small-order public keys, identity keys included.
 - A signer **MUST NOT** sign JSON containing a non-integer number at any depth. It returns the document unchanged, without `signature`/`key_id`. A verifier **MUST** reject an unsigned document. `i64`/`u64` integers are fine.
-- Base64 is **base64url unpadded** (RFC 4648 §5) everywhere except MLS frames ([MLS](/docs/reference/protocol/mls/)). `decode_any_b64` (identity input) accepts all variants and re-encodes to base64url unpadded before signing or comparing.
+- Base64 is **base64url unpadded** (RFC 4648 §5) everywhere except MLS frames ([MLS](/reference/protocol/mls/)). `decode_any_b64` (identity input) accepts all variants and re-encodes to base64url unpadded before signing or comparing.
 
 ## Family A: signed JSON documents
 
@@ -66,7 +66,7 @@ The verifier checks, in order:
 Authorization: X-Telium-Federation origin=…,destination=…,key=…,ts=…,sig=…
 ```
 
-Optional parameters `signer=` and `authority=` mark [delegated signing](/docs/reference/protocol/federation/#authentication-classes).
+Optional parameters `signer=` and `authority=` mark [delegated signing](/reference/protocol/federation/#authentication-classes).
 
 The query string is unsigned, so a federation endpoint **MUST NOT** accept a query argument that changes what the request does.
 
@@ -118,4 +118,4 @@ To verify, check the outer signature, then rename the fields back and check the 
 | Live request | now (`verify_key`) |
 | Durable record (tombstone, promotion proof, relocation record) | at the record's timestamp (`verify_key_at`) |
 
-Vectors for every family are listed in [Conformance](/docs/reference/protocol/conformance/).
+Vectors for every family are listed in [Conformance](/reference/protocol/conformance/).

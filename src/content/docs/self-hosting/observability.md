@@ -35,7 +35,7 @@ scrape_configs:
     authorization: { type: Bearer, credentials_file: /etc/telium/metrics-token }
 ```
 
-To rotate the token, set `scrape_token_previous` to the old value while the scraper moves over, then clear it. See [Secrets](/docs/self-hosting/secrets/).
+To rotate the token, set `scrape_token_previous` to the old value while the scraper moves over, then clear it. See [Secrets](/self-hosting/secrets/).
 
 ## Suggested alerts
 

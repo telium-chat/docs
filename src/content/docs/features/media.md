@@ -101,7 +101,7 @@ The profile-asset carveout keeps avatars and banners working on a server that ho
 
 ### Registry: suggested hosts and external providers
 
-`GET /_telium/v1/media/registry` publishes the tier-2 origins you recommend, the external providers you enable, the Gofile playback policy and the [watch-together](/docs/features/watch-together/) allowlist.
+`GET /_telium/v1/media/registry` publishes the tier-2 origins you recommend, the external providers you enable, the Gofile playback policy and the [watch-together](/features/watch-together/) allowlist.
 
 ```toml
 [media_registry]
@@ -234,7 +234,7 @@ Moving an account carries its Telium-hosted media to the new home with the same 
 - archived history may rely on the redirect;
 - tier-3 attachments are not owned by your home and do not move.
 
-See [Migration](/docs/federation/migration/).
+See [Migration](/federation/migration/).
 
 ## Link previews and camo
 
@@ -266,4 +266,4 @@ The fetcher resolves the destination and refuses private and special addresses. 
 | `GET /_telium/v1/media/registry/feeds` | hosts vouched for by your guilds' feeds |
 | `GET /_telium/v1/media/curators` | this server's signed curator directory |
 
-Read each fact from the endpoint that owns it. For the full route list see the [API reference](/docs/reference/api/).
+Read each fact from the endpoint that owns it. For the full route list see the [API reference](/reference/api/).

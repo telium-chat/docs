@@ -9,15 +9,15 @@ These pages define the wire contract an independent server or client must follow
 
 | Page | Covers |
 | --- | --- |
-| [Signing](/docs/reference/protocol/signing/) | Canonicalisation and the five signing families. Read first. |
-| [Federation](/docs/reference/protocol/federation/) | Discovery, server-to-server authentication, signed routes, errors |
-| [Gateway](/docs/reference/protocol/gateway/) | The realtime WebSocket |
-| [MLS](/docs/reference/protocol/mls/) | Telium's RFC 9420 profile |
-| [Conformance](/docs/reference/protocol/conformance/) | Test vectors and the conformance suite |
+| [Signing](/reference/protocol/signing/) | Canonicalisation and the five signing families. Read first. |
+| [Federation](/reference/protocol/federation/) | Discovery, server-to-server authentication, signed routes, errors |
+| [Gateway](/reference/protocol/gateway/) | The realtime WebSocket |
+| [MLS](/reference/protocol/mls/) | Telium's RFC 9420 profile |
+| [Conformance](/reference/protocol/conformance/) | Test vectors and the conformance suite |
 
 Precedence when sources disagree: [test vectors](https://github.com/telium-chat/telium/tree/main/docs/spec/vectors), then code, then these pages.
 
-Versioning, capabilities and negotiation are normative in [Compatibility](/docs/reference/compatibility/). Stability promises are in [Stability](/docs/start/stability/), and federation behaviour in [Federation overview](/docs/federation/overview/).
+Versioning, capabilities and negotiation are normative in [Compatibility](/reference/compatibility/). Stability promises are in [Stability](/start/stability/), and federation behaviour in [Federation overview](/federation/overview/).
 
 Two rules apply everywhere:
 

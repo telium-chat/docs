@@ -106,7 +106,7 @@ Your home server routes the notification without seeing its text. The guild serv
 
 The notification-only credential can pull and acknowledge this device's inbox and nothing else. Your home stores only its hash. Revoking the device removes the key, the credential and the push endpoint. Inbox rows expire after seven days by default.
 
-Account migration does not move notification registrations. After a move, each device enrolls again on the new home. See [Migration](/docs/federation/migration/).
+Account migration does not move notification registrations. After a move, each device enrolls again on the new home. See [Migration](/federation/migration/).
 
 ## Android notification channels
 
