@@ -1,0 +1,13 @@
+:root {
+  --sl-color-accent-low: #2a1b52;
+  --sl-color-accent: #8b5fe8;
+  --sl-color-accent-high: #ddd2fb;
+  --sl-font: 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e6ddfb;
+  --sl-color-accent: #6740c7;
+  --sl-color-accent-high: #2f1a6b;
+}

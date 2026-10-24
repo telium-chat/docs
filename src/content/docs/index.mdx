@@ -1,0 +1,35 @@
+---
+title: Telium docs
+description: Run a Telium server, use its features, and build against its protocol.
+template: splash
+hero:
+  tagline: Self-hosted chat with guilds, DMs, voice and video. Your account lives on your server, and you can join guilds hosted anywhere.
+  image:
+    dark: ../../assets/telium-lockup-light.svg
+    light: ../../assets/telium-lockup-dark.svg
+  actions:
+    - text: Quick start
+      link: /docs/start/quick-start/
+      icon: right-arrow
+    - text: GitHub
+      link: https://github.com/telium-chat/telium
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Self-hosting" icon="laptop">
+    Install a server, put it behind TLS, back it up and keep it updated. [Production setup](/docs/self-hosting/production/)
+  </Card>
+  <Card title="Security" icon="approve-check">
+    OPAQUE sign-in, MLS for DMs, and what each server can see. [Threat model](/docs/security/threat-model/)
+  </Card>
+  <Card title="Federation" icon="random">
+    Join guilds on other servers and move your account between them. [How federation works](/docs/federation/overview/)
+  </Card>
+  <Card title="Protocol" icon="document">
+    The HTTP API, the gateway and the signed wire formats. [API reference](/docs/reference/api/)
+  </Card>
+</CardGrid>
