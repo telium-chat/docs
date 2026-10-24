@@ -9,13 +9,8 @@ A warm standby is a second Telium server that holds a live, read-only copy of yo
 
 Your data-loss window is the replication lag at the moment of failure. With the default poll that is about 5 seconds.
 
-```text
-a.example (primary)                         b.example (standby)
-triggers -> repl_log  -- signed S2S pull -->  applied to a copy
-                         every 5s                  |
-                                      /_telium/standby/a.example
-                                      (read-only until promoted)
-```
+<img class="diagram diagram-light" src="/diagrams/warm_standby-light.svg" alt="On the primary, write triggers fill repl_log. The standby pulls it with signed requests every 5 seconds into a read-only copy, served at /_telium/standby/a.example." />
+<img class="diagram diagram-dark" src="/diagrams/warm_standby-dark.svg" alt="On the primary, write triggers fill repl_log. The standby pulls it with signed requests every 5 seconds into a read-only copy, served at /_telium/standby/a.example." />
 
 ## Consent on both sides
 

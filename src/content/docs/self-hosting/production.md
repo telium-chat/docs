@@ -7,11 +7,8 @@ sidebar:
 
 This page takes one homeserver from a binary to a public HTTPS domain: installing it, the settings you must change, the startup audit, the reverse proxy, storage and shutdown. Voice and video media run on a separate SFU, covered in [SFU](/self-hosting/sfu/).
 
-```text
-chat.example.com ── HTTPS ──> reverse proxy ──> telium-server (127.0.0.1:8448)
-                                                   │
-                                                   └── signed join tokens ──> telium-sfu (UDP media)
-```
+<img class="diagram diagram-light" src="/diagrams/production-light.svg" alt="Clients reach a reverse proxy over HTTPS on port 443. The proxy forwards HTTP to telium-server on 127.0.0.1:8448, which keeps its data in a SQLite data dir and signs join tokens for telium-sfu. Call media flows over UDP between clients and the SFU." />
+<img class="diagram diagram-dark" src="/diagrams/production-dark.svg" alt="Clients reach a reverse proxy over HTTPS on port 443. The proxy forwards HTTP to telium-server on 127.0.0.1:8448, which keeps its data in a SQLite data dir and signs join tokens for telium-sfu. Call media flows over UDP between clients and the SFU." />
 
 ## Install
 

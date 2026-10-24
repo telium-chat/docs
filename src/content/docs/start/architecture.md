@@ -48,32 +48,8 @@ The SFU forwards voice, video and screen-share media. It makes no permission dec
 
 A client holds one connection to its home server and one per guild server it uses. To reach a guild server, the client gets a short-lived, audience-bound identity assertion from the home server and exchanges it for a guild-local session. After that, the home server is off the guild's hot path.
 
-```text
-             +---------------------+
-             | home server         |
-             | home.example        |
-             | auth, devices, DMs  |
-             +----------+----------+
-                        |
-                 signed assertion
-                        |
-          +-------------+-------------+
-          |                           |
-          v                           v
-+-------------------+       +-------------------+
-| guild server      |       | guild server      |
-| guilds.example    |       | other.example     |
-+---------+---------+       +---------+---------+
-          |                           |
-       REST + WS                   REST + WS
-          \                           /
-           +-------------------------+
-           | browser, desktop or     |
-           | Android client          |
-           +-------------------------+
-
-guild server --signed token--> SFU <--media--> client
-```
+<img class="diagram diagram-light" src="/diagrams/architecture-light.svg" alt="The home server signs identity assertions for guild servers. The client talks REST and gateway to each guild server. A guild server issues join tokens to the SFU, which carries call media to the client." />
+<img class="diagram diagram-dark" src="/diagrams/architecture-dark.svg" alt="The home server signs identity assertions for guild servers. The client talks REST and gateway to each guild server. A guild server issues join tokens to the SFU, which carries call media to the client." />
 
 If one guild server goes down, only the guilds on it stop working. Your home server and other guilds keep running.
 
@@ -97,6 +73,9 @@ When authorization depends on which server is asking, servers sign their request
 Details: [Federation overview](/federation/overview/) and [Signing](/reference/protocol/signing/).
 
 ## Who can read what
+
+<img class="diagram diagram-light" src="/diagrams/who_reads-light.svg" alt="Your devices read everything. The guild server reads guild messages and guild calls. The SFU reads guild-call media and sees only metadata for DM calls. The home server stores DM ciphertext and sealed settings but cannot read them. No server receives your password." />
+<img class="diagram diagram-dark" src="/diagrams/who_reads-dark.svg" alt="Your devices read everything. The guild server reads guild messages and guild calls. The SFU reads guild-call media and sees only metadata for DM calls. The home server stores DM ciphertext and sealed settings but cannot read them. No server receives your password." />
 
 | Data | Readable by |
 | --- | --- |

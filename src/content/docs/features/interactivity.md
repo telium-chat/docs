@@ -11,16 +11,8 @@ Only a bot, or an application hosted by the same server, can attach non-empty `c
 
 ## Round trip
 
-```text
-person                server                          bot
-  | press              |                                |
-  |------------------->| re-check standing              |
-  |                    | create interaction + token     |
-  |                    |------- INTERACTION_CREATE ---->|
-  |<--- 200 {id} ------|                                |
-  |                    |<-- POST .../{id}/{token}/callback
-  |<-- MESSAGE_CREATE -|                                |
-```
+<img class="diagram diagram-light" src="/diagrams/interactivity-light.svg" alt="1: a person presses a button. 2: the guild server re-checks standing and mints a token. 3: it sends INTERACTION_CREATE to the bot. 4: it answers the person with 200 and an id. 5: the bot posts the callback. 6: the server sends MESSAGE_CREATE." />
+<img class="diagram diagram-dark" src="/diagrams/interactivity-dark.svg" alt="1: a person presses a button. 2: the guild server re-checks standing and mints a token. 3: it sends INTERACTION_CREATE to the bot. 4: it answers the person with 200 and an id. 5: the bot posts the callback. 6: the server sends MESSAGE_CREATE." />
 
 The token goes to the bot only. The person who pressed never sees it.
 

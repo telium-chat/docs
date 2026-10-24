@@ -11,3 +11,15 @@
   --sl-color-accent: #6740c7;
   --sl-color-accent-high: #2f1a6b;
 }
+
+.sl-markdown-content img.diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-block: 1.75rem;
+}
+
+:root[data-theme='light'] .diagram-dark,
+:root[data-theme='dark'] .diagram-light {
+  display: none;
+}

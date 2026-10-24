@@ -11,14 +11,8 @@ The sync store (`/_telium/v1/sync`) carries preferences, recent emoji, GIF favou
 
 The sync key comes from your MLS recovery keyring ([DM encryption](/security/dm-encryption/#key-custody)):
 
-```text
-OPAQUE export key ─┐
-recovery key (k1.) ├─> vault ─> recovery keyring R (32 random bytes, + up to 8 retired)
-trusted device  ───┘                 │
-                                     └─ HKDF-SHA256(IKM = R, salt = "telium/sealed-sync/v1")
-                                          ├─ info "aead"   -> sync key, AES-256-GCM, non-extractable
-                                          └─ info "key-id" -> kid (first 8 bytes, base64url)
-```
+<img class="diagram diagram-light" src="/diagrams/sync_encryption-light.svg" alt="The password (through the OPAQUE export key), the recovery key or a trusted device opens the vault. The vault holds keyring R. HKDF-SHA256 derives the AES-256-GCM sync key with info aead and the key id with info key-id." />
+<img class="diagram diagram-dark" src="/diagrams/sync_encryption-dark.svg" alt="The password (through the OPAQUE export key), the recovery key or a trusted device opens the vault. The vault holds keyring R. HKDF-SHA256 derives the AES-256-GCM sync key with info aead and the key id with info key-id." />
 
 The HKDF label is used for nothing else, so the sync key cannot open the vault or the history mirror. You recover it by the same paths that recover the keyring: password sign-in on an OPAQUE home, the recovery key, a trusted device, or a legacy recovery passphrase.
 

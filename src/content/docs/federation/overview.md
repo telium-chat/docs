@@ -62,6 +62,9 @@ A client never sends its home bearer token to a guild server. The sequence is:
 5. The guild server verifies it against the home's published key and mints its own guild-session token.
 6. Guild REST and gateway traffic uses that local token.
 
+<img class="diagram diagram-light" src="/diagrams/session-light.svg" alt="1: the client signs in to its home server with OPAQUE. 2: it requests an assertion for the guild server. 3: the home returns a signed assertion. 4: the client posts it to the guild server. 5: the guild server fetches the home's keys to verify it. 6: it returns a guild-session token. 7: later traffic uses that token." />
+<img class="diagram diagram-dark" src="/diagrams/session-dark.svg" alt="1: the client signs in to its home server with OPAQUE. 2: it requests an assertion for the guild server. 3: the home returns a signed assertion. 4: the client posts it to the guild server. 5: the guild server fetches the home's keys to verify it. 6: it returns a guild-session token. 7: later traffic uses that token." />
+
 The home is not on the hot path for each guild request. When identity and guild roles share one server, `POST /_telium/v1/sessions/local` performs the same exchange internally.
 
 Guild servers revalidate foreign sessions against each account's home on a schedule. Revocation notices (below) make the common case immediate.
@@ -122,8 +125,11 @@ POST /_telium/v1/users/{user_id}/revoked      (signed)
 Sending:
 
 - Queued in the `identity_notices` outbox, one row per user, device, kind and guild server. A repeated event re-arms the existing row.
-- Sent immediately, then retried with backoff from one minute, doubling, capped at six hours, for 12 attempts.
+- Sent immediately, then retried with backoff from one minute, doubling up to 256 minutes, for 12 attempts in all (about 17 hours).
 - Fan-out is capped at 256 guild servers. Anything past that is left to scheduled revalidation.
+
+<img class="diagram diagram-light" src="/diagrams/revocation_retries-light.svg" alt="The notice is sent at once. Retry gaps double from 1 minute to 256 minutes, then stay at 256 minutes. The 12th and last attempt lands about 17 hours after the first." />
+<img class="diagram diagram-dark" src="/diagrams/revocation_retries-dark.svg" alt="The notice is sent at once. Retry gaps double from 1 minute to 256 minutes, then stay at 256 minutes. The 12th and last attempt lands about 17 hours after the first." />
 
 Receiving:
 

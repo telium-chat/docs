@@ -7,6 +7,15 @@ sidebar:
 
 This page gets a homeserver and the web client running locally, then shows the minimum changes to serve it on your own domain. For a hardened deployment, continue with [Production](/self-hosting/production/).
 
+## How it compares
+
+Telium has Discord's guild model on servers you run, federated like Matrix, with DMs encrypted end to end.
+
+<img class="diagram diagram-light" src="/diagrams/compare-light.svg" alt="Feature comparison of Telium, Discord, Element (Matrix), Signal, Telegram and Mattermost: self-hosting, federation, communities, end-to-end encrypted DMs and channels, calls, bots, account migration, phone-free sign-up, open source and maturity." />
+<img class="diagram diagram-dark" src="/diagrams/compare-dark.svg" alt="Feature comparison of Telium, Discord, Element (Matrix), Signal, Telegram and Mattermost: self-hosting, federation, communities, end-to-end encrypted DMs and channels, calls, bots, account migration, phone-free sign-up, open source and maturity." />
+
+Telium is alpha. The others have years of production use, audits and polished apps. If you need encrypted community channels today, use Matrix or Signal groups.
+
 ## Requirements
 
 - Rust 1.85 or newer

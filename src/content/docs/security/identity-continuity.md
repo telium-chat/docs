@@ -23,9 +23,8 @@ After anchoring, `PUT /_telium/v1/crosssigning` can update the encrypted storage
 
 A new root is accepted only as the next link in the chain:
 
-```text
-R0 --authorized--> R1 --authorized--> R2
-```
+<img class="diagram diagram-light" src="/diagrams/identity_chain-light.svg" alt="The tid is the SHA-256 of the genesis cross-signing key, which is root R0. Each rotation is signed by the previous root and the new root: R0 to R1, R1 to R2. Two of three guardians can stand in for the previous root." />
+<img class="diagram diagram-dark" src="/diagrams/identity_chain-dark.svg" alt="The tid is the SHA-256 of the genesis cross-signing key, which is root R0. Each rotation is signed by the previous root and the new root: R0 to R1, R1 to R2. Two of three guardians can stand in for the previous root." />
 
 The sequence must increase by exactly one, and `previous_key` must equal the verified head. A rotation is signed by the previous root (or by guardians, below) and also by the new root over the same payload (`new_key_signature`), so the chain can only extend to a key the account holds. Clients accept a transition without `new_key_signature` only at or below a sequence they had already pinned. The same request re-signs the devices that stay ([Account security](/security/account-security/#root-rotation)).
 
