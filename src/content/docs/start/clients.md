@@ -1,13 +1,11 @@
 ---
 title: Clients
-description: The Telium browser, desktop and Android clients, how to get or build each one, and how they differ — plus Rhein, a custom third-party client for Linux.
+description: The Telium browser, desktop and Android clients, how to get or build each one, and how they differ — plus custom third-party clients.
 sidebar:
   order: 3
 ---
 
-Telium has one React client that runs in three shells. The protocol, state and UI code under `web/src/` is shared, so permissions and features come from the server, not the platform.
-
-[Rhein](https://github.com/alpwrk/rhein) is a custom third-party client, built and maintained outside this project. It is listed below for completeness; it is not part of Telium and is not covered by Telium's releases or support.
+Telium has one React client that runs in three shells. The protocol, state and UI code under `web/src/` is shared, so permissions and features come from the server, not the platform. Clients built outside this project exist too — see [Custom clients](#custom-clients).
 
 | Runtime | Shell | Package |
 | --- | --- | --- |
@@ -15,7 +13,6 @@ Telium has one React client that runs in three shells. The protocol, state and U
 | Linux desktop | Electron | AppImage, x86_64 |
 | Windows desktop | Electron | NSIS installer, x64 |
 | Android | Tauri 2 | APK, ARM64 |
-| Linux (native) | Rust + GPUI | Third-party: [Rhein](https://github.com/alpwrk/rhein) |
 
 ## Downloads
 
@@ -105,11 +102,15 @@ bun run tauri:android:build:debug    # debug APK
 
 APKs land under `web/src-tauri/gen/android/app/build/outputs/apk/`.
 
-## Rhein (third-party)
+## Custom clients
 
-[Rhein](https://github.com/alpwrk/rhein) is a custom, third-party Telium client for Linux, built and maintained independently by [@alpwrk](https://github.com/alpwrk). It is not part of the Telium project. It is a native desktop app written in Rust with GPUI, covering chat, encrypted direct messages, and voice and video calls.
+Clients in this section are custom, third-party software: built and maintained outside the Telium project, shipped on their own schedule, and not covered by Telium's releases or support. Anything that speaks the Telium protocol can connect to a homeserver; for questions, issues and contributions, go to each client's own tracker.
 
-Rhein connects to Telium homeservers like any other client, but it ships from its [own repository](https://github.com/alpwrk/rhein) and [website](https://rheinium.cc) on its own schedule. Questions, issues and contributions about Rhein belong on its tracker, not Telium's.
+### Rhein
+
+[Rhein](https://github.com/alpwrk/rhein) is a third-party Telium client for Linux, built and maintained independently by [@alpwrk](https://github.com/alpwrk). It is a native desktop app written in Rust with GPUI, covering chat, encrypted direct messages, and voice and video calls.
+
+Get it from its [repository](https://github.com/alpwrk/rhein) or [website](https://rheinium.cc).
 
 ## Connection problems
 
