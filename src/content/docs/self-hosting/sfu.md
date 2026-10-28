@@ -2,7 +2,7 @@
 title: SFU
 description: Run telium-sfu, the LiveKit-backed media relay for guild voice, video and screen sharing, and point your homeserver at it.
 sidebar:
-  order: 3
+  order: 6
 ---
 
 This page sets up `telium-sfu` and connects it to your homeserver. Without an SFU, guild calls fall back to peer-to-peer mesh, capped at `voice.mesh_max_participants` (4).

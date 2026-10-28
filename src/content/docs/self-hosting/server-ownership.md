@@ -2,7 +2,7 @@
 title: Server administrators
 description: Grant and revoke server admin rights, and recover admin access from the host when nobody can sign in.
 sidebar:
-  order: 11
+  order: 14
 ---
 
 This page covers who counts as a server administrator, the routes and commands that manage them, and how to regain admin access from the host's shell.

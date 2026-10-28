@@ -2,7 +2,7 @@
 title: Secrets
 description: Every long-lived secret a Telium deployment holds, where it lives, and how to rotate it.
 sidebar:
-  order: 4
+  order: 7
 ---
 
 This page lists the secrets a Telium deployment holds, where each one lives, and the rotation steps. It ends with what to do after a compromise.

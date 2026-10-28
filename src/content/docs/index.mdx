@@ -11,6 +11,9 @@ hero:
     - text: Quick start
       link: /start/quick-start/
       icon: right-arrow
+    - text: Use it at telium.chat
+      link: https://telium.chat
+      icon: external
     - text: GitHub
       link: https://github.com/telium-chat/telium
       icon: external
@@ -23,13 +26,13 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <Card title="Self-hosting" icon="laptop">
     Install a server, put it behind TLS, back it up and keep it updated. [Production setup](/self-hosting/production/)
   </Card>
-  <Card title="Security" icon="approve-check">
+  <Card title="Architecture" icon="puzzle">
+    How home servers, guild servers, media origins and SFUs divide authority. [How the pieces fit](/start/architecture/)
+  </Card>
+  <Card title="Clients" icon="download">
+    One client for web, desktop and Android — grab a prebuilt package or build your own. [Get a client](/start/clients/)
+  </Card>
+  <Card title="Security" icon="padlock">
     OPAQUE sign-in, MLS for DMs, and what each server can see. [Threat model](/security/threat-model/)
-  </Card>
-  <Card title="Federation" icon="random">
-    Join guilds on other servers and move your account between them. [How federation works](/federation/overview/)
-  </Card>
-  <Card title="Protocol" icon="document">
-    The HTTP API, the gateway and the signed wire formats. [API reference](/reference/api/)
   </Card>
 </CardGrid>

@@ -9,7 +9,7 @@ Telium has one React client that runs in three shells. The protocol, state and U
 
 | Runtime | Shell | Package |
 | --- | --- | --- |
-| Web | Any modern browser | Served by your homeserver from `web/dist`, or hosted separately |
+| Web | Any modern browser | Hosted at [telium.chat](https://telium.chat), or a build served by your homeserver from `web/dist` |
 | Linux desktop | Electron | AppImage, x86_64 |
 | Windows desktop | Electron | NSIS installer, x64 |
 | Android | Tauri 2 | APK, ARM64 |
@@ -28,6 +28,12 @@ Desktop releases are tagged `desktop-v<version>` and ship with a signed client m
 
 ## Browser
 
+The web client is hosted at [telium.chat](https://telium.chat). It works with every Telium server: open it and sign in with your address (`@alice:your-server.example`). There is nothing to install, updates land without action on your side, and it is built from the same shared `web/src/` code as the desktop and Android shells. No server has to serve a web client for this to work.
+
+### Self-hosted or development
+
+You can also run the client yourself — to keep off Telium's hosting entirely, or to develop it.
+
 Development, from `web/`:
 
 ```sh
@@ -41,12 +47,12 @@ Production:
 bun run build    # writes web/dist
 ```
 
-Point `[web] dir` at `web/dist` and the homeserver serves the client after its API and discovery routes.
+Point `[web] dir` at `web/dist` and the homeserver serves the client after its API and discovery routes, or host the build anywhere else and name it with `[web] client_url`. Both keys are optional; see [Web client](/self-hosting/configuration/#web-client).
 
 The web build includes a service worker that precaches assets and supports Web Push where the browser offers it. Allowing notifications and enabling background push are separate choices. See [Notifications](/features/notifications/).
 
 :::caution
-A web origin is executable code. If the server that hands you the client is malicious, its JavaScript can read anything the page can. For a threat model that distrusts your home server, use a packaged client or a web origin you trust independently.
+A web origin is executable code. If the server that hands you the client is malicious, its JavaScript can read anything the page can. For a threat model that distrusts your home server, use a packaged client or a web origin you trust independently of it — telium.chat is one for a self-hosted server.
 :::
 
 ## Desktop (Electron)

@@ -2,7 +2,7 @@
 title: Supply chain
 description: What Telium releases ship, how to verify them, and how the release manifest is signed.
 sidebar:
-  order: 17
+  order: 20
 ---
 
 This page lists every release artifact, what protects its integrity, and how to verify a download or pin the release-manifest key on your server.

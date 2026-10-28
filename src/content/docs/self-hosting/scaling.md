@@ -2,7 +2,7 @@
 title: Scaling and capacity
 description: Capacity targets for a single Telium process, what happens under overload, and why only one process may serve a database.
 sidebar:
-  order: 9
+  order: 12
 ---
 
 A Telium server is one process and one SQLite database in WAL mode. The rate limiter, presence, gateway subscriber maps and background loops all live in that process's memory. This page gives the capacity you can expect and what the server does when you exceed it.
