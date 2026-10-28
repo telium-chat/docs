@@ -2,7 +2,7 @@
 title: Updates
 description: How a Telium homeserver learns about new releases, how the container and native updaters install them, and how clients update.
 sidebar:
-  order: 7
+  order: 10
 ---
 
 This page covers the server's version check, the two box-side updaters in `deploy/`, how releases are numbered, and how clients find their own updates. The server never installs anything itself. An updater script, your config manager or a person does the installing.
@@ -93,7 +93,7 @@ Neither updater writes `telium.toml`. Both drop the release's `telium.example.to
 
 ### Container updater
 
-`deploy/install.sh` installs it (see [Running in production](/self-hosting/production/#container)). `compose.yml` follows the `server-latest` tag. Each run pulls, stops if the digest did not move, reconciles `compose.yml`, then restarts the server.
+`deploy/install.sh` installs it (see [Install with Compose](/self-hosting/install-docker/)). `compose.yml` follows the `server-latest` tag. Each run pulls, stops if the digest did not move, reconciles `compose.yml`, then restarts the server.
 
 A release can ship a new `compose.yml`. The updater keeps the last shipped copy in `/opt/telium/.baseline/` and compares three files:
 

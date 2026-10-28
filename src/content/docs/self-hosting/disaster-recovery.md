@@ -2,7 +2,7 @@
 title: Disaster recovery
 description: Step-by-step responses for a lost primary, a corrupted database, stolen keys, compromised admins and other incidents.
 sidebar:
-  order: 12
+  order: 15
 ---
 
 This page is a set of runbooks, one per incident. Commands assume `-c /etc/telium/telium.toml` and data in `/var/lib/telium`. `$TOKEN` is your own admin session token, and `a.example` is your server.

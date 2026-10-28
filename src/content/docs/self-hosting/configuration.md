@@ -2,7 +2,7 @@
 title: Configuration
 description: The telium.toml settings and server commands that matter most when you operate a Telium homeserver.
 sidebar:
-  order: 2
+  order: 5
 ---
 
 This page covers the parts of `telium.toml` and the `telium-server` command line that change how your server behaves for users and peers. Every key has a compiled-in default. The fully annotated list is [`server/telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml), and `telium-server init` writes it for you.
@@ -17,7 +17,7 @@ All commands take `--config <path>` (default `telium.toml`).
 |---|---|
 | `serve` | Run the server (the default). |
 | `init` | Write a starter config. |
-| `check [--strict]` | Audit the config; see [Running in production](/self-hosting/production/#audit-the-config-telium-server-check). |
+| `check [--strict]` | Audit the config; see [Checking a config](#checking-a-config). |
 | `version` | Print the build as `key=value` lines. |
 | `backup`, `restore` | See [Backups](/self-hosting/backups/). |
 | `keys`, `mfa`, `rotations` | See [Secrets](/self-hosting/secrets/). |
@@ -26,6 +26,35 @@ All commands take `--config <path>` (default `telium.toml`).
 | `updates check` | Read the release manifest; used by the native updater. See [Updates](/self-hosting/updates/). |
 
 The `admin` and `standby` commands work on the database directly, so they still work when nobody can sign in.
+
+## Checking a config
+
+```sh
+telium-server --config /etc/telium/telium.toml check [--strict]
+```
+
+`check` parses and audits the config without opening the database, binding a port or writing anything, so it is safe beside a running server. It exits `1` on any danger finding, and with `--strict` on warnings too. `serve` runs the same audit at startup and only logs it.
+
+The `profile` key (`auto`, `production`, `development`) sets how loud the audit is and changes no behaviour. `auto` infers the profile from `public_base_url`. Several findings below apply only in the production profile.
+
+| Level | Finding |
+|---|---|
+| Danger | `server_name` is `localhost` or has no dot |
+| Danger | `public_base_url` is unparseable, loopback, or `http://` |
+| Danger | `bind` is a wildcard and `public_base_url` is not `https` |
+| Danger | `federation.allow_http = true` |
+| Danger | `registration.open` with no `registration.admins` |
+| Danger | `rate_limit.enabled = false` |
+| Danger | `backup.dir` is inside the database directory or `media_dir` |
+| Danger | the process runs as uid 0 |
+| Danger | the backup key file, or a config holding literal secrets, is readable by others |
+| Warning | wildcard bind behind an https proxy with no `rate_limit.trusted_proxies` |
+| Warning | `registration.min_password_len` below 8 with open registration |
+| Warning | `backup.enabled` or `backup.remote.enabled` is off |
+| Warning | no web client (`web.dir` or `web.client_url`) |
+| Notice | `updates.check = false`, literal secrets in the file, leftover rotation keys |
+
+Startup also refuses group- or world-writable config, database and key files, and refuses any value still equal to an example placeholder such as `change-me`.
 
 ## Identity
 
@@ -165,11 +194,35 @@ sfu = "https://sfu.example.com"
 
 Without a region that has an `sfu` URL, calls use peer-to-peer mesh up to `mesh_max_participants`. TURN needs both `turn` and `turn_secret`, and setting only one does nothing. See [SFU](/self-hosting/sfu/).
 
+## Web client
+
+Running one is optional: [telium.chat](https://telium.chat) is a full Telium web client that works with every server, and the packaged desktop and Android clients work the same way. Leaving both `[web]` keys unset is a supported setup — it changes nothing for people using telium.chat or a packaged client — but `check` warns about it, since somebody typing your server's address into a browser gets a 404 there.
+
+Two keys decide what your server advertises in its discovery document:
+
+```toml
+[web]
+# Name a client page for this server. The hosted client works for every
+# server, so pointing at telium.chat needs nothing on your side. The guided
+# account-move flow opens this page to receive a move.
+client_url = "https://telium.chat"
+
+# Or serve a built client from this process. It mounts after the API and
+# discovery routes, so a file in the web root cannot shadow /_telium paths.
+# dir = "../web/dist"
+```
+
+```sh
+cd web && bun install && bun run build   # only for a served copy
+```
+
+`dir` takes the directory `bun run build` writes, relative to the process's working directory. With `dir` set and `client_url` left out, the client is taken to live at `public_base_url`. A server guiding an account move to you falls back to an import code when neither key is set.
+
 ## Other sections
 
 | Section | Covers | Page |
 |---|---|---|
-| `[web]` | `dir` for a built client, `client_url` | [Running in production](/self-hosting/production/#web-client) |
+| `[web]` | `client_url` named in discovery, `dir` to serve a built client | [Web client](#web-client) |
 | `[backup]`, `[backup.remote]` | archives | [Backups](/self-hosting/backups/) |
 | `[archive]`, `[archive.s3]` | cold history segments (off by default) | [Data lifecycle](/self-hosting/data-lifecycle/) |
 | `[retention]`, `[integrity]` | housekeeping, startup DB checks | [Data lifecycle](/self-hosting/data-lifecycle/) |
@@ -180,7 +233,11 @@ Without a region that has an `sfu` URL, calls use peer-to-peer mesh up to `mesh_
 | `[sessions]`, `[mfa]`, `[ownership]` | session lifetimes, MFA key, admin recovery delay | [Secrets](/self-hosting/secrets/), [Server ownership](/self-hosting/server-ownership/) |
 | `[push]`, `[mail]` | FCM/APNs credentials, outbound mail webhook | [Notifications](/features/notifications/) |
 | `[klipy]` | GIF search; the key is public by design | |
-| `[shutdown]` | `grace_secs`, `settle_ms` | [Running in production](/self-hosting/production/#stopping) |
+| `[shutdown]` | `grace_secs`, `settle_ms` | [Stopping](#stopping) |
+
+## Stopping
+
+On SIGTERM the server refuses new sockets, closes gateway sockets with code `4005`, waits `shutdown.settle_ms` (250), then gives in-flight HTTP requests up to `shutdown.grace_secs` (15) before exiting. Your supervisor must wait longer: the systemd unit uses `TimeoutStopSec=30` and `compose.yml` uses `stop_grace_period: 20s`. Raise those if you raise `grace_secs`.
 
 ## Health
 

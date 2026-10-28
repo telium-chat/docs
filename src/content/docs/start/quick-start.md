@@ -1,11 +1,11 @@
 ---
 title: Quick start
-description: Run a Telium homeserver and client on your machine, then put the server on a public domain.
+description: Run a Telium homeserver on your machine, then put the server on a public domain.
 sidebar:
   order: 1
 ---
 
-This page gets a homeserver and the web client running locally, then shows the minimum changes to serve it on your own domain. For a hardened deployment, continue with [Production](/self-hosting/production/).
+This page gets a homeserver running locally, then shows the minimum changes to serve it on your own domain. Running a web client is not part of it: people use the one hosted at [telium.chat](https://telium.chat), and hosting your own is optional. For a hardened deployment, continue with [Production](/self-hosting/production/).
 
 ## How it compares
 
@@ -19,8 +19,10 @@ Telium is alpha. The others have years of production use, audits and polished ap
 ## Requirements
 
 - Rust 1.85 or newer
-- [Bun](https://bun.sh)
 - Git
+- [Bun](https://bun.sh), only to run or build the web client yourself
+
+The client needs no setup. [telium.chat](https://telium.chat) is a full Telium web client that works with every server, including one on your own machine.
 
 ## Run it locally
 
@@ -33,7 +35,9 @@ cargo run -- init     # writes telium.toml
 cargo run -- serve    # listens on 127.0.0.1:8448
 ```
 
-In a second terminal, start the client:
+Open [telium.chat](https://telium.chat) and register an address on your server, such as `@alice:localhost:8448`. The first account on a fresh server becomes its administrator. To name administrators explicitly instead, list their localparts in `registration.admins`.
+
+To keep the client on your machine too, run it from the repository in a second terminal:
 
 ```sh
 cd telium/web
@@ -43,8 +47,6 @@ bun run dev           # http://localhost:5173
 
 The Vite dev server proxies API, discovery and gateway paths to `http://localhost:8448`. Set `TELIUM_ORIGIN` to point it at another homeserver.
 
-Open `http://localhost:5173` and register. The first account on a fresh server becomes its administrator. To name administrators explicitly instead, list their localparts in `registration.admins`.
-
 ## Go public
 
 You need a domain with DNS pointing at your host, and a TLS-terminating reverse proxy in front of the server.
@@ -52,8 +54,7 @@ You need a domain with DNS pointing at your host, and a TLS-terminating reverse 
 ### 1. Build
 
 ```sh
-cd web && bun run build
-cd ../server && cargo build --release --bin telium-server
+cd server && cargo build --release --bin telium-server
 ```
 
 ### 2. Configure
@@ -74,15 +75,19 @@ bind = "127.0.0.1:8448"
 database_url = "sqlite:///var/lib/telium/telium.db?mode=rwc"
 media_dir = "/var/lib/telium/media"
 
-[web]
-dir = "../web/dist"
-
 [rate_limit]
 # The proxy's address, so rate limits apply to the real client.
 trusted_proxies = ["127.0.0.1"]
 ```
 
-`web.dir` is relative to the process's working directory. Comment it out to run headless. If you host the client on a different origin, set `web.client_url`.
+No web client is required. People open [telium.chat](https://telium.chat) and sign in with addresses on your server, or use the desktop and Android clients. If you want the server's discovery document to name a client page — the guided account-move flow sends people there — set one:
+
+```toml
+[web]
+client_url = "https://telium.chat"    # or your own hosted build
+```
+
+To serve your own build from this server instead, run `bun run build` in `web/` and set `[web] dir` to the `dist` it writes, relative to the process's working directory. Leaving both keys out changes nothing for users on telium.chat or packaged clients; `telium-server check` notes it as a warning. See [Web client](/self-hosting/configuration/#web-client).
 
 Any string value can be `"${env:NAME}"` or `"${file:/path}"`. Use that for secrets. See [Secrets](/self-hosting/secrets/).
 
