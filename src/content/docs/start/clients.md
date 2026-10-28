@@ -1,11 +1,11 @@
 ---
 title: Clients
-description: The Telium browser, desktop and Android clients, how to get or build each one, and how they differ.
+description: The Telium browser, desktop and Android clients, how to get or build each one, and how they differ — plus custom third-party clients.
 sidebar:
   order: 3
 ---
 
-Telium has one React client that runs in three shells. The protocol, state and UI code under `web/src/` is shared, so permissions and features come from the server, not the platform.
+Telium has one React client that runs in three shells. The protocol, state and UI code under `web/src/` is shared, so permissions and features come from the server, not the platform. Clients built outside this project exist too — see [Custom clients](#custom-clients).
 
 | Runtime | Shell | Package |
 | --- | --- | --- |
@@ -101,6 +101,16 @@ bun run tauri:android:build:debug    # debug APK
 ```
 
 APKs land under `web/src-tauri/gen/android/app/build/outputs/apk/`.
+
+## Custom clients
+
+Clients in this section are custom, third-party software: built and maintained outside the Telium project, shipped on their own schedule, and not covered by Telium's releases or support. Anything that speaks the Telium protocol can connect to a homeserver; for questions, issues and contributions, go to each client's own tracker.
+
+### Rhein
+
+[Rhein](https://github.com/alpwrk/rhein) is a third-party Telium client for Linux, built and maintained independently by [@alpwrk](https://github.com/alpwrk). It is a native desktop app written in Rust with GPUI, covering chat, encrypted direct messages, and voice and video calls.
+
+Get it from its [repository](https://github.com/alpwrk/rhein) or [website](https://rheinium.cc).
 
 ## Connection problems
 
