@@ -2,7 +2,7 @@
 title: SFU
 description: Run telium-sfu, the LiveKit-backed media relay for guild voice, video and screen sharing, and point your homeserver at it.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 This page sets up `telium-sfu` and connects it to your homeserver. Without an SFU, guild calls fall back to peer-to-peer mesh, capped at `voice.mesh_max_participants` (4).
@@ -39,6 +39,12 @@ sudo bash sfu/install.sh
 It installs nginx, Certbot, Rust if needed, `livekit-server` and `telium-sfu`, creates a `telium-sfu` system user and service, and opens the ports above when UFW is active. It then prints a one-time setup URL. In the browser you set the admin password, enter the SFU and LiveKit signalling hostnames, choose public or private mode, and the dashboard configures nginx and Let's Encrypt.
 
 The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted servers** (`/admin/trust`) you add a homeserver by its `server_name`. The SFU discovers it, verifies its key and starts accepting its tokens without a restart. Removing one stops new sessions from it; calls already connected are left alone.
+
+## Install with Compose
+
+The standalone Compose kit can run the SFU beside the homeserver on one host. Its installer asks *"carry voice calls from this box?"* and does everything the answer implies: adds the SFU container — which launches and supervises LiveKit itself — writes the two extra domain names into the kit's config, routes both through the same front, and points the homeserver's `[voice]` region at the result. The answer lives as `COMPOSE_PROFILES` in the kit's `.env`, so adding or removing the SFU later is an edit and a `docker compose up -d`. See [Install with Compose](/self-hosting/install-docker/).
+
+Container or not, two things do not change: the SFU sits behind Docker's NAT, so `livekit.rtc.use_external_ip` stays `true`, and the media ports in the table above must be open on the host firewall. Trust is wired as always — the SFU fetches the homeserver's key from `/_telium/v1/keys` and follows rotation on its own.
 
 ## Install by hand
 

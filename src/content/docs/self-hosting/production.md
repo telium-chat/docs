@@ -23,7 +23,7 @@ No client to host: [telium.chat](https://telium.chat) and the packaged desktop a
 | Install | Recommended when | Guide |
 |---|---|---|
 | **Native (systemd)** | Default. Telium is one static binary with a SQLite database; there is nothing else to install. | [Install natively](/self-hosting/install-systemd/) |
-| **Docker Compose** | The box already runs Docker, or you want the shipped tunnel stack: the server, a Cloudflare tunnel and the update timer as one Compose project. | [Install with Compose](/self-hosting/install-docker/) |
+| **Docker Compose** | The box already runs Docker. One installer, three questions; the kit's Caddy or your own front, voice calls optional, updates on by default. A tunnel-only variant needs no open ports. | [Install with Compose](/self-hosting/install-docker/) · [(tunnel)](/self-hosting/install-docker-tunnel/) |
 | **From source** | You are developing the server, not hosting it. | [Development](/reference/development/#homeserver) |
 
 Both install guides are one command with your domain as the argument; everything the config needs is derived from it.

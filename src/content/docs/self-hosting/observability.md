@@ -2,7 +2,7 @@
 title: Observability
 description: Enable the Prometheus endpoint, set up alerts, and filter Telium's log categories.
 sidebar:
-  order: 13
+  order: 14
 ---
 
 Telium exposes a Prometheus scrape endpoint at `/metrics` and writes logs under a fixed set of categories. Metrics are aggregates only, with no per-user, per-guild or per-peer labels.

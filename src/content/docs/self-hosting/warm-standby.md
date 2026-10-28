@@ -2,7 +2,7 @@
 title: Warm standby
 description: Stream a live copy of your server to a second server and promote it by hand if the primary is lost.
 sidebar:
-  order: 11
+  order: 12
 ---
 
 A warm standby is a second Telium server that holds a live, read-only copy of your primary. If the primary dies, an operator promotes the standby and it takes over the domain's authority. There is no quorum or automatic election: a human decides.

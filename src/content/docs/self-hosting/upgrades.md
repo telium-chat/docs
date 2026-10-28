@@ -2,7 +2,7 @@
 title: Upgrades
 description: Upgrade a Telium homeserver, what the downgrade guard refuses, and when you can roll back.
 sidebar:
-  order: 9
+  order: 10
 ---
 
 This page covers moving a homeserver to a new release and back. A newer binary migrates an older database forward at startup. An older binary refuses to open a newer database, names the release that wrote it, and exits.

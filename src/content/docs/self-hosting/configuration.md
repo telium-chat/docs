@@ -2,7 +2,7 @@
 title: Configuration
 description: The telium.toml settings and server commands that matter most when you operate a Telium homeserver.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 This page covers the parts of `telium.toml` and the `telium-server` command line that change how your server behaves for users and peers. Every key has a compiled-in default. The fully annotated list is [`server/telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml), and `telium-server init` writes it for you.
