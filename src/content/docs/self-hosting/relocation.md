@@ -2,7 +2,7 @@
 title: Domain relocation
 description: Move a Telium server to a new domain while keeping its database, accounts, guilds and history.
 sidebar:
-  order: 17
+  order: 18
 ---
 
 A relocation renames your server from `old.example` to `new.example`. The operator, database, accounts, passwords, devices, guilds and history stay the same. The server and its peers rewrite every reference to the old name.

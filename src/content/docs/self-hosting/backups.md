@@ -2,7 +2,7 @@
 title: Backups
 description: Configure Telium's encrypted scheduled backups, copy them off the box, verify them and restore from them.
 sidebar:
-  order: 8
+  order: 9
 ---
 
 The server takes encrypted backups on a schedule, can copy them to an S3-compatible bucket, rehearses a restore daily, and restores with one command. This page covers configuration, checking, restoring and the restore drill.

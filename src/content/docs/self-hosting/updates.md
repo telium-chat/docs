@@ -2,7 +2,7 @@
 title: Updates
 description: How a Telium homeserver learns about new releases, how the container and native updaters install them, and how clients update.
 sidebar:
-  order: 10
+  order: 11
 ---
 
 This page covers the server's version check, the two box-side updaters in `deploy/`, how releases are numbered, and how clients find their own updates. The server never installs anything itself. An updater script, your config manager or a person does the installing.
@@ -93,7 +93,7 @@ Neither updater writes `telium.toml`. Both drop the release's `telium.example.to
 
 ### Container updater
 
-`deploy/install.sh` installs it (see [Install with Compose](/self-hosting/install-docker/)). `compose.yml` follows the `server-latest` tag. Each run pulls, stops if the digest did not move, reconciles `compose.yml`, then restarts the server.
+`deploy/install.sh` installs it (see [Install with Compose (tunnel)](/self-hosting/install-docker-tunnel/)). `compose.yml` follows the `server-latest` tag. Each run pulls, stops if the digest did not move, reconciles `compose.yml`, then restarts the server.
 
 A release can ship a new `compose.yml`. The updater keeps the last shipped copy in `/opt/telium/.baseline/` and compares three files:
 
@@ -118,6 +118,12 @@ journalctl -u telium-update.service -n 50   # what each run did
 ```
 
 On the container path `--now` does not bypass the update window. Old images are pruned after a week, so pin an older digest within that time for a quick rollback.
+
+### Standalone Compose
+
+The [standalone kit](/self-hosting/install-docker/) ships the third updater, and the installer enables it before it prints anything else: `update.sh` and `telium-update.timer` in `/opt/telium`. It reads the same `update.conf` fields as the container updater — automatic or manual, a pin, a window — and applies them to the whole project, so the server and, when the voice profile is on, the SFU image move together on one release.
+
+What it does not do is reconcile shipped config files. A release that changes the kit's `compose.yml` or its like says so in its notes: re-run the installer, which upgrades the scripts and units and leaves every file you could have edited alone.
 
 ### Native updater
 

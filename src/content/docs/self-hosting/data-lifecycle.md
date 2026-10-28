@@ -2,7 +2,7 @@
 title: Data lifecycle
 description: What account and guild deletion remove, what survives, data export, and retention settings.
 sidebar:
-  order: 16
+  order: 17
 ---
 
 This page lists what the server deletes when an account or guild goes away, what it keeps, and the settings that control retention and integrity checks.

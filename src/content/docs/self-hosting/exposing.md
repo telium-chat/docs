@@ -2,10 +2,10 @@
 title: Exposing your server
 description: DNS, TLS and the reverse proxy or tunnel that put a homeserver on a public domain.
 sidebar:
-  order: 4
+  order: 5
 ---
 
-The server binds loopback; whatever sits in front of it is the public side. Pick one front and follow its section — Caddy if the box has open ports and you want the least moving parts, a Cloudflare Tunnel if you want none at all, nginx if you already run it. The Compose kit already includes the tunnel, so this page is mostly for the native install.
+The server binds loopback; whatever sits in front of it is the public side. Pick one front and follow its section — Caddy if the box has open ports and you want the least moving parts, a Cloudflare Tunnel if you want none at all, nginx if you already run it. The tunnel kit includes the tunnel, and the standalone kit can run this page's Caddy as a container (its `proxy` profile), so this page is mostly for the native install and for fronts the box already runs.
 
 Whatever you use, the front must:
 

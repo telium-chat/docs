@@ -2,7 +2,7 @@
 title: Managed hosting
 description: List paid Telium hosting providers in the create-a-guild flow, subscribe to signed provider catalogues, and publish your own.
 sidebar:
-  order: 19
+  order: 20
 ---
 
 Your server can show a list of hosting providers in the create-a-guild flow, with each provider's prices, limits and terms. You can curate providers yourself, subscribe to signed catalogues other operators publish, or both. Your own curated list is also published as a signed catalogue others can subscribe to.

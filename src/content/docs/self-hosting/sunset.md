@@ -2,7 +2,7 @@
 title: Planned shutdown
 description: Announce that a Telium server is closing, let users move or save their accounts, and finish with signed tombstones.
 sidebar:
-  order: 18
+  order: 19
 ---
 
 A planned shutdown gives your users notice, lets them move or download their accounts, and ends with signed tombstones so peers and clients stop retrying. The server never moves anyone: each user decides where to go and starts their own [migration](/federation/migration/).
