@@ -143,7 +143,12 @@ max_file_bytes = 104857600
 profile_asset_carveout_bytes = 524288
 ```
 
-`disabled` still allows small avatars and banners. External media hosts and curators are configured in `[media_registry]`. Uploaded media can live in an S3-compatible bucket with `[media_store] store = "s3"` and `[media_store.s3]`. See [Media](/features/media/).
+`disabled` still allows small avatars and banners. Two retention knobs default to off:
+
+- `default_expiry_secs` — a lifetime applied when a client uploads without asking for one. Zero keeps such uploads until something reclaims them; a client's own choice is never widened, and a channel or guild cap still narrows both.
+- `attachment_max_age_days` — attachment media older than this is swept whether or not a message still refers to it. Destructive by design (live messages will lose their files past the age); startup warns that it is set. With both knobs off, the [unreferenced sweep](/self-hosting/data-lifecycle/) reclaims exactly what deletions free.
+
+External media hosts and curators are configured in `[media_registry]`. Uploaded media can live in an S3-compatible bucket with `[media_store] store = "s3"` and `[media_store.s3]`. See [Media](/features/media/).
 
 ### Upload scanning
 
