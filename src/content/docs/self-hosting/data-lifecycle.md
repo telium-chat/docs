@@ -38,7 +38,17 @@ UPDATE account_erasures SET attempts = 0, next_at = 0, last_error = NULL WHERE u
 
 ## Guild deletion
 
-`DELETE /_telium/v1/guilds/{id}`, owner only. The server removes channels, messages, roles, members, the audit log and related rows. The orphan sweep reclaims attachment blobs later.
+`DELETE /_telium/v1/guilds/{id}`, owner only. The server removes channels, messages, roles, members, the audit log and related rows. The unreferenced sweep reclaims attachment blobs later.
+
+## Attachment reclamation
+
+An upload aimed at a channel or guild on the server counts the messages that refer to it. When those messages are deleted — one by one, with their channel, thread, or with the whole guild — the references are released, and an hourly sweep reclaims the object once it has been unreferenced for 24 hours. Deleting a message therefore eventually frees its file, where before the bytes stayed until a TTL, an explicit delete, or account erasure.
+
+Conservative by construction:
+
+- Uploads whose destination the server cannot vouch for — ciphertext for an end-to-end-encrypted conversation, or bytes stored on behalf of a foreign origin — are never reference-reclaimed, because this server cannot see who still refers to them.
+- Cold-archived history keeps its references: archiving never releases, so archived attachments stay readable. A deleted guild's archived segments are removed without releasing their references, so those attachment rows stay; the [Storage pane](/self-hosting/production/) shows what nothing refers to and the sweep button covers the rest.
+- A staged upload the client never sent is reclaimed too, 24 hours after it was uploaded.
 
 ## Encryption bookkeeping
 
