@@ -143,7 +143,16 @@ max_file_bytes = 104857600
 profile_asset_carveout_bytes = 524288
 ```
 
-`disabled` still allows small avatars and banners. External media hosts and curators are configured in `[media_registry]`. Uploaded media can live in an S3-compatible bucket with `[media_store] store = "s3"` and `[media_store.s3]`. See [Media](/features/media/).
+`disabled` still allows small avatars and banners. `quota_bytes` on its own does nothing: it is only enforced when `default = "quota"` (and for users on the `allowlist`). With the default `default = "enabled"`, uploads are unlimited and the client shows no usage line — startup says so, because a ceiling that looks configured but is not enforced is easy to wonder about.
+
+Two retention knobs default to off:
+
+- `default_expiry_secs` — a lifetime applied when a client uploads without asking for one. Zero keeps such uploads until something reclaims them; a client's own choice is never widened, and a channel or guild cap still narrows both.
+- `attachment_max_age_days` — attachment media older than this is swept whether or not a message still refers to it. Destructive by design (live messages will lose their files past the age); startup warns that it is set. With both knobs off, the [unreferenced sweep](/self-hosting/data-lifecycle/) reclaims exactly what deletions free.
+
+A guild — and any channel within it — may narrow what it accepts with `media_max_file_bytes` (set through the guild or channel settings/API). An attachment takes the narrowest cap on its path; profile assets are untouched. The server's own `max_file_bytes` always applies underneath.
+
+External media hosts and curators are configured in `[media_registry]`. Uploaded media can live in an S3-compatible bucket with `[media_store] store = "s3"` and `[media_store.s3]`. See [Media](/features/media/).
 
 ### Upload scanning
 

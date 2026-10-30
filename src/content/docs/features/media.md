@@ -41,7 +41,7 @@ Tiers 1 and 2 produce a content-addressed object:
 }
 ```
 
-- `hash` is the BLAKE3 digest of the stored bytes. Identical uploads share one refcounted object.
+- `hash` is the BLAKE3 digest of the stored bytes. Identical uploads share one refcounted object; deleting your upload of shared content is refused while another upload still holds it.
 - `origin` is the server authoritative for the bytes.
 - `capability` is an unguessable fetch token. Holding the descriptor is what makes the file fetchable, so deleting a message does not revoke a capability someone already copied.
 - `mime`, `size` and dimensions come from the origin, not from the message author.
@@ -59,7 +59,7 @@ X-Telium-Purpose: attachment | profile | expression
 <raw bytes>
 ```
 
-The server enforces size and policy. Client-side resizing is only an optimization.
+The server enforces size and policy. A profile asset past the server's `max_profile_asset_bytes` is downscaled and re-encoded in the client until it fits; for every other upload the client checks the published caps before the first byte moves, so an oversized file is refused with the limit named instead of uploaded and bounced. Client-side resizing is only an optimization.
 
 ### Tier 2: another Telium media origin
 
@@ -81,6 +81,16 @@ Gofile's free download path needs a cookie that a browser `<video>` element cann
 
 Turning the proxy off removes the playback routes and publishes `gofile_playback_proxy: false` in the registry. Uploads keep working and stay client-direct.
 
+## Attachment lifetime and deletion
+
+Every attachment can carry a lifetime. When you attach a file, the composer offers presets — an hour, a day, a week, 30 days, never — narrowed by whatever the destination allows: a channel or guild may cap both the size and the lifetime of what it accepts, and your server may cap both again. The narrowest limit wins, and if a room's cap falls between presets, the cap itself appears as the choice. The attachment card shows what an upload's life will be — **Hosted on files.example, expires in 6 days** — and counts down where the file lives, so a file that will be swept never looks permanent.
+
+Your server can also apply a default lifetime to uploads whose sender chose none (`[media_policy] default_expiry_secs`, off by default), and can sweep attachment media past an age regardless of references (`attachment_max_age_days`, also off by default). Both are operator decisions described in [Configuration](/self-hosting/configuration/); when a file's time is up, the origin deletes the bytes, tells the peers that cached copies, and the attachment reads **This file was deleted or has expired** instead of pretending to fail.
+
+You can delete a file you uploaded from the message menu (**Delete file**). The message stays; the file is removed from the origin and every peer that cached it. If the same bytes were uploaded more than once on that origin, the object is shared and the delete is refused rather than breaking someone else's copy — an operator can still remove it outright.
+
+Smaller comforts of the same surface: removing a staged file cancels its upload outright (nothing is stored, nothing counts against any quota), a failed upload stays in the tray with the server's explanation and a Retry button instead of vanishing, up to three staged files upload at once, and **Settings -> Account -> Where your uploads go** shows how much of your quota you have used when your server enforces one.
+
 ## Operator configuration
 
 ### Media policy
@@ -95,9 +105,11 @@ allowlist = []               # user ids that always get tier-1 upload
 blocklist = []               # user ids that never do
 profile_asset_carveout_bytes = 524288
 max_file_bytes = 104857600
+default_expiry_secs = 0      # lifetime for uploads whose sender chose none; 0 keeps them
+attachment_max_age_days = 0  # sweep attachment media past this age; 0 never ages anything out
 ```
 
-The profile-asset carveout keeps avatars and banners working on a server that hosts nothing else.
+The profile-asset carveout keeps avatars and banners working on a server that hosts nothing else. A guild — and any channel within it — can narrow what it accepts with `media_max_file_bytes`; an attachment takes the narrowest cap on its path. What happens to bytes after deletion is [reclamation](/self-hosting/data-lifecycle/): attachments whose messages are gone leave the disk after a grace window, without either knob.
 
 ### Registry: suggested hosts and external providers
 
