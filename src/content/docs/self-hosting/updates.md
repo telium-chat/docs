@@ -5,7 +5,18 @@ sidebar:
   order: 11
 ---
 
-This page covers the server's version check, the two box-side updaters in `deploy/`, how releases are numbered, and how clients find their own updates. The server never installs anything itself. An updater script, your config manager or a person does the installing.
+## In short
+
+| Question | Answer |
+|---|---|
+| Do I need to run updates manually? | The native and Compose production installers enable update timers by default. |
+| Will updating overwrite my `telium.toml`? | No. The updater leaves your config alone. |
+| Can I pause an update? | Yes. Use manual mode, a pin or a maintenance window in `update.conf`. |
+| Where do I see what happened? | Use the update script's `--status` command or the updater's systemd journal. |
+
+**If you're just setting up a server, you can stop here.** Read on for the release manifest, signatures, update windows and rollback details.
+
+The server only *checks* for updates. Separate scripts or your deployment tooling install them.
 
 ## Server version check
 
