@@ -5,7 +5,16 @@ sidebar:
   order: 5
 ---
 
-This page covers calls in **guild voice channels**: joining, mesh and SFU modes, end-to-end encryption, regions, permissions, camera and screen sharing. Calls in DMs and group chats work differently; see [DM calls](/features/dm-calls/). Running an SFU is covered in [SFU](/self-hosting/sfu/).
+This page covers calls in **guild voice channels**. For DMs and group chats, see [DM calls](/features/dm-calls/). Want to run a relay yourself? See [Voice relays (SFUs)](/self-hosting/sfu/).
+
+## The short version
+
+- **No SFU to configure?** In Automatic mode (the default), your guild can use a usable relay from Telium's signed public directory. If none is available, small calls use peer-to-peer mesh (up to four people by default).
+- **Want to control where calls go?** Configure your own private SFU on the homeserver or in **Guild Settings → Voice / SFU**. A configured region takes priority over directory suggestions.
+- **Want to avoid other people's relays?** Choose **Fixed** (configured regions only) or **Direct** (no directory) in guild voice settings. Configured regions are still available in Direct mode.
+- **Who can hear a call?** SFU guild calls use end-to-end encrypted media; an SFU operator can still see traffic and connection metadata.
+
+**You don't have to host or publicly list an SFU to run a homeserver.**
 
 ## Who decides what
 
@@ -47,7 +56,7 @@ The server checks `CONNECT`, records a voice state (device, session id, region, 
 
 | | Mesh | SFU |
 | --- | --- | --- |
-| Used when | no usable SFU region is configured | a region resolves |
+| Used when | no configured or eligible directory SFU can be used | a configured region or public directory relay resolves |
 | `voice_server.mode` | `"mesh"` | `"sfu"` |
 | Media path | peer to peer WebRTC, signalled through the guild server | each client sends once to the SFU (LiveKit) |
 | Size | capped by `voice.mesh_max_participants` (default 4) | as large as the SFU handles |
@@ -78,9 +87,11 @@ Limits:
 
 ## Regions
 
-A voice channel stores a region name, usually `auto`. Candidates come from the server's `[[voice.regions]]` and from regions a guild adds for itself.
+A voice channel usually uses `auto`. **If the homeserver or guild has configured SFUs**, those are the candidates: the guild's healthy default, the server's healthy default, then another healthy configured region. A known-unhealthy configured relay is not selected for a new call just because it is the only one.
 
-For `auto` the server picks, in order: the guild's healthy default, the server's healthy default, the first healthy candidate, then the first candidate if none are healthy. A named region is used when it exists and is healthy; otherwise selection falls back to `auto`.
+**If no SFU regions were configured**, a guild in **Automatic** mode can select from the signed public directory. **Fixed** and **Direct** skip the directory. If no usable relay can be selected, small calls use mesh.
+
+This distinction matters if you self-host: **adding your private SFU does not automatically configure failover to the public list**. Existing calls pin their relay so people joining later don't split across different SFUs.
 
 ### Latency probing
 
