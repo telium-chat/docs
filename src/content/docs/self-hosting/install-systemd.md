@@ -5,7 +5,9 @@ sidebar:
   order: 2
 ---
 
-The recommended install. Telium is a single static binary with a SQLite database, so there is nothing else to install and no container runtime to maintain. This page takes a fresh box to a server running on `127.0.0.1:8448` with automatic updates enabled; the public side is [Exposing your server](/self-hosting/exposing/).
+**Recommended for a straightforward homeserver.** One binary, SQLite and a systemd service; no Docker required.
+
+**Quick path:** run [the installer](#one-command), [verify the health endpoint](#verify), then [configure HTTPS](/self-hosting/exposing/). Automatic updates are enabled. You don't need an SFU to start: a public guild can use eligible community relays automatically or mesh for small calls. You may [run your own private SFU](/self-hosting/sfu/#run-a-private-sfu-for-your-community) later.
 
 ## What you need
 
