@@ -11,6 +11,8 @@ cd telium
 sudo ./deploy/install.sh chat.example.com
 ```
 
+**This setup hosts the homeserver, not a media relay.** The tunnel carries Telium's HTTP/WebSocket traffic, but it cannot carry SFU UDP media. You can still use eligible public SFUs automatically. To run your own private SFU, put it on a public-IP host: [SFU guide](/self-hosting/sfu/).
+
 The domain is the argument. The installer puts the kit in `/opt/telium` — `compose.yml`, a `telium.toml` with your identity set, the update timer — and leaves exactly one thing only you can do: create the tunnel. Run it again any time; it upgrades the machinery and never overwrites `compose.yml`, `telium.toml`, `update.conf` or `tunnel.env`.
 
 ## What you need
@@ -38,7 +40,7 @@ cd /opt/telium && docker compose ps        # server and tunnel up
 curl -fsS https://chat.example.com/.well-known/telium/server
 ```
 
-Register your account — the first one becomes the administrator — then set `[registration] open = false` in `/opt/telium/telium.toml` and `docker compose up -d`. One line worth checking first: `[voice]` names the SFU this deployment was staged against; remove it unless it is yours, and calls mesh up to four people without it. Data is a named volume (`telium-data`) plus `/srv/telium-backups` for archives — see [Backups](/self-hosting/backups/).
+Register your account — the first one becomes the administrator — then set `[registration] open = false` in `/opt/telium/telium.toml` and `docker compose up -d`. One line worth checking first: if `[voice]` already names a particular SFU you do not operate, remove that region. With no configured region, eligible public-directory relays can be chosen automatically; otherwise small calls use mesh (four participants by default). Data is a named volume (`telium-data`) plus `/srv/telium-backups` for archives — see [Backups](/self-hosting/backups/).
 
 ## Troubleshooting
 
