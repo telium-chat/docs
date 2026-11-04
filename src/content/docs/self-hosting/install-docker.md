@@ -1,9 +1,13 @@
 ---
 title: Install with Compose
-description: The standalone container kit — one interactive installer, three questions, a homeserver that updates itself.
+description: Run a Telium homeserver in Docker; add a private SFU only if you want to carry your own calls.
 sidebar:
   order: 3
 ---
+
+## Install
+
+On a Linux host with Docker and the Compose plugin:
 
 ```sh
 git clone https://github.com/telium-chat/telium.git
@@ -11,57 +15,58 @@ cd telium
 sudo bash deploy/standalone/install.sh
 ```
 
-Answer three questions — your domain, who fronts it (the kit's Caddy with automatic certificates, or whatever already runs on the box), and whether it carries voice calls — and the installer writes the config, starts the stack, and turns on a timer that keeps every container current. Updates are on by default; `TELIUM_UPDATES=manual` in `/opt/telium/update.conf` is how you decline. Re-run the installer any time to upgrade the machinery; it never overwrites a file you could have edited.
+Answer three prompts: your domain, whether to use the kit's Caddy or your own reverse proxy, and whether **this machine should carry voice calls**.
 
-No clone wanted? Fetch the installer on its own:
+:::tip
+**Unsure about the voice question? Answer No.** Telium can use available public SFUs automatically, or mesh for small calls. Answer Yes only if you want to run an SFU for your own community. **Yes does not list your SFU publicly:** the generated `sfu.toml` defaults to `trust.public = false` and trusts only your homeserver.
+:::
+
+The installer writes the config, starts the stack and enables automatic updates. Re-running it updates the installer machinery without overwriting your edited config files.
+
+## Finish the setup
+
+1. Point `chat.example.com` (your actual domain) at the box and check `https://chat.example.com/.well-known/telium/server`.
+2. Register your account. The first user becomes the administrator.
+3. If you do not want public signups, set `[registration] open = false` in `/opt/telium/telium.toml` and restart the stack:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/telium-chat/telium/main/deploy/standalone/install.sh -o install.sh
-sudo bash install.sh
+cd /opt/telium
+docker compose up -d
 ```
 
-## What you need
+If you answered **Yes** to voice, the installer also prompts for the **SFU API** and **LiveKit signaling** hostnames. Point both DNS records at the box and open the media ports: TCP `7881`, UDP `3478` and UDP `50000–60000`.
 
-- A Linux box with Docker and the compose plugin
-- A domain whose DNS record points at the box
-- Ports 80 and 443 free (or an existing front). Voice adds TCP 7881, UDP 3478 and UDP 50000–60000.
+A Cloudflare Tunnel or HTTP proxy alone cannot carry those UDP media ports. Keep media DNS records **DNS-only** if using Cloudflare, and use a public-IP host for the relay. If you selected your own reverse proxy, configure HTTPS and WebSockets for both media hostnames yourself. [SFU networking steps](/self-hosting/sfu/#network-requirements).
 
-## What it asks
+## Change your mind later
 
-| Question | Answers |
+The install lives at `/opt/telium`. The `COMPOSE_PROFILES` setting in `/opt/telium/.env` decides whether Caddy (`proxy`) and the SFU (`voice`) run. Re-run the installer to have it configure voice domains and wiring, rather than enabling `voice` without an `sfu.toml`.
+
+- **No SFU:** the homeserver can still use healthy public directory relays when available.
+- **Private SFU:** calls for this homeserver use your own relay. Other Telium homeservers cannot use it unless you approve them.
+- **Public volunteer:** a separate, intentional choice. [How public SFUs work](/self-hosting/sfu/#volunteer-a-public-relay).
+
+Updates are on by default. Use `TELIUM_UPDATES=manual` in `/opt/telium/update.conf` to disable automatic application of updates; see [Updates](/self-hosting/updates/).
+
+## Requirements and internals
+
+| Piece | Notes |
 |---|---|
-| Your domain | `chat.example.com` — the identity in every user id, so get it right first |
-| Who fronts it | **1** the kit's Caddy (default) · **2** your own proxy or tunnel, pointed at `127.0.0.1:8448` |
-| Voice calls? | Adds the [SFU](/self-hosting/sfu/) container and asks for two more domain names, suggested for you |
+| Docker + Compose | On a Linux host; requires sudo to install |
+| DNS and HTTPS | Ports 80/443 for bundled Caddy, or use your existing front |
+| Server listener | Host loopback `127.0.0.1:8448` only |
+| Config | `/opt/telium/.env` and `/opt/telium/telium.toml` |
+| Optional private voice | `sfu.toml`, additional DNS and public media ports |
 
-The whole stack is one Compose project in `/opt/telium`. The server publishes nothing but `127.0.0.1:8448`; what is public is the front's decision. Your answers live in one file, `/opt/telium/.env` — switch the front or add voice later by editing `COMPOSE_PROFILES` there and running `docker compose up -d` again.
-
-## After it finishes
-
-```sh
-# 1. DNS: your domain (and the SFU names, if you took voice) -> the box.
-#    On Cloudflare, DNS-only for the SFU names -- media cannot ride the proxy.
-curl -fsS https://chat.example.com/.well-known/telium/server
-
-# 2. Register your account. The first one becomes the administrator.
-
-# 3. Close the door: set [registration] open = false in /opt/telium/telium.toml, then
-cd /opt/telium && docker compose up -d
-```
-
-With voice, calls bigger than four people now run through your SFU; its dashboard is at `https://sfu.example.com/admin`. Everything about regions, public mode and TURN works exactly as on a native install — see [SFU](/self-hosting/sfu/).
-
-## The manual route
-
-The installer only does what you can: put [these five files](https://github.com/telium-chat/telium/tree/main/deploy/standalone) in a directory, write your domains into `.env`, and `docker compose up -d`. `telium.toml` reads its identity from `.env`, so there is one place to edit; `sfu.toml` has three marked lines for the voice profile. The kit's README explains what each file is for.
+For a manual installation, see the [standalone Compose kit](https://github.com/telium-chat/telium/tree/main/deploy/standalone).
 
 ## Troubleshooting
 
 | Symptom | Check |
 |---|---|
-| Nothing answers on your domain | DNS first, then `docker compose ps` in `/opt/telium`; Caddy's certificate needs DNS to resolve before it can be issued |
-| Port 80 or 443 already in use | You picked the kit's Caddy while the box already runs a front — re-run the installer and answer 2, or retire the old one |
-| Every user shares one rate limit | `trusted_proxies` in `telium.toml` must name your front: `172.31.241.2` for the kit's Caddy, `172.31.241.1` for a front on the host — the installer sets the right one |
-| Calls mesh instead of using the SFU | `COMPOSE_PROFILES` lacks `voice`, or the `[voice]` block in `telium.toml` is still commented |
-| Calls connect but carry no audio | The SFU's media ports — TCP 7881, UDP 3478, UDP 50000–60000 — are firewalled, or the SFU names are Cloudflare-proxied instead of DNS-only |
-| The server refuses to start, logs an unresolvable `${env:…}` | `.env` is missing a variable |
+| Domain not reachable | DNS, Caddy certificate, and `docker compose ps` in `/opt/telium` |
+| 80/443 already in use | Choose your existing front instead of the included Caddy |
+| Every user shares a rate limit | Configure `rate_limit.trusted_proxies` for the front |
+| Calls use mesh unexpectedly | Check the [public directory or private SFU selection](/self-hosting/sfu/#if-you-dont-want-to-host-a-relay) |
+| SFU connects but carries no audio | UDP media ports, NAT, public DNS-only records and mic permissions |
+| Config reports a missing `${env:…}` | A required value is missing in `/opt/telium/.env` |
