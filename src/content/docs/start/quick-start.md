@@ -1,58 +1,61 @@
 ---
 title: Quick start
-description: Run a Telium homeserver on your machine to try it out. For a publicly reachable one, start with Running in production.
+description: Run a local Telium homeserver and connect a client in a few commands.
 sidebar:
   order: 1
 ---
 
-This page gets a homeserver running on your machine so you can try Telium, and stops there. A publicly reachable server wants a production install, which sets up automatic updates: continue with [Running in production](/self-hosting/production/) when you are ready to move beyond loopback. Running a web client is not part of it: people use the one hosted at [telium.chat](https://telium.chat), and hosting your own is optional.
+**Want a public homeserver with a real domain?** Skip this local demo and use [Running in production](/self-hosting/production/). It includes HTTPS and automatic updates.
 
-## How it compares
+**Just trying Telium?** You can use the hosted client at [telium.chat](https://telium.chat). You do **not** need to host a web client, an SFU or a relay to run a homeserver.
 
-Telium has Discord's guild model on servers you run, federated like Matrix, with DMs encrypted end to end.
+## 1. Start a local homeserver
 
-<img class="diagram diagram-light" src="/diagrams/compare-light.svg" alt="Feature comparison of Telium, Discord, Element (Matrix), Signal, Telegram and Mattermost: self-hosting, federation, communities, end-to-end encrypted DMs and channels, calls, bots, account migration, phone-free sign-up, open source and maturity." />
-<img class="diagram diagram-dark" src="/diagrams/compare-dark.svg" alt="Feature comparison of Telium, Discord, Element (Matrix), Signal, Telegram and Mattermost: self-hosting, federation, communities, end-to-end encrypted DMs and channels, calls, bots, account migration, phone-free sign-up, open source and maturity." />
-
-Telium is alpha. The others have years of production use, audits and polished apps. If you need encrypted community channels today, use Matrix or Signal groups.
-
-## Requirements
-
-- Rust 1.85 or newer
-- Git
-- [Bun](https://bun.sh), only to run or build the web client yourself
-
-The client needs no setup. [telium.chat](https://telium.chat) is a full Telium web client that works with every server, including one on your own machine.
-
-## Try it locally
-
-Start the homeserver:
+You need **Git** and **Rust 1.85+**.
 
 ```sh
 git clone https://github.com/telium-chat/telium.git
 cd telium/server
-cargo run -- init     # writes telium.toml
-cargo run -- serve    # listens on 127.0.0.1:8448
+cargo run -- init
+cargo run -- serve
 ```
 
-Open [telium.chat](https://telium.chat) and register an address on your server, such as `@alice:localhost:8448`. The first account on a fresh server becomes its administrator. To name administrators explicitly instead, list their localparts in `registration.admins`.
+This creates `telium.toml` and starts Telium on `127.0.0.1:8448`.
 
-To keep the client on your machine too, run it from the repository in a second terminal:
+## 2. Open the client
+
+Go to [telium.chat](https://telium.chat) and register an account on your local server, for example `@alice:localhost:8448`. The first account on a fresh server becomes the administrator.
+
+If you also want to develop the web client, open another terminal:
 
 ```sh
 cd telium/web
 bun install
-bun run dev           # http://localhost:5173
+bun run dev
 ```
 
-The Vite dev server proxies API, discovery and gateway paths to `http://localhost:8448`. Set `TELIUM_ORIGIN` to point it at another homeserver.
+This requires [Bun](https://bun.sh). The local Vite client proxies Telium API and gateway requests to `http://localhost:8448`; set `TELIUM_ORIGIN` to point it at another homeserver.
 
-This server is for looking around and for development: it listens on loopback only and has no automatic updates. A publicly reachable server — even if you are its only user — comes from a production install.
+## 3. Decide what to do next
 
-## Go public
+| Your goal | Next page |
+|---|---|
+| Put your server on the internet | [Running in production](/self-hosting/production/) |
+| Run private voice/video infrastructure | [Voice relays (SFUs)](/self-hosting/sfu/) |
+| Learn how accounts and guilds work | [Architecture](/start/architecture/) |
+| Understand alpha limitations | [Stability](/start/stability/) |
 
-[Running in production](/self-hosting/production/) compares the two supported installs — native systemd and Docker Compose. Both are one command with your domain as the argument, and both ship an updater that installs new releases on its own. That matters in alpha: releases can change the wire format, and a server left behind will stop working with updated clients and federated servers. [Stability](/start/stability/) says what that means in practice.
+**Voice does not require you to run an SFU.** Publicly reachable guild servers can use available relays from the signed public directory automatically; otherwise small calls can use peer-to-peer mesh, up to four participants by default. You can run a **private** SFU for your community without volunteering it to the public network.
 
-## Voice and video
+:::caution
+This local server is for testing: it has no TLS, is only reachable on loopback and does not have automatic updates. Do not expose the dev command directly to the internet.
+:::
 
-Calls work without extra setup: with no SFU configured, the server uses peer-to-peer mesh for up to `voice.mesh_max_participants` people (default 4). Larger calls and TURN relays for restrictive networks are production concerns — see [SFU](/self-hosting/sfu/) and [DM calls](/features/dm-calls/).
+## What Telium is
+
+Telium combines Discord-style communities with federated, independently run homeservers and encrypted DMs.
+
+<img class="diagram diagram-light" src="/diagrams/compare-light.svg" alt="Feature comparison of Telium, Discord, Element (Matrix), Signal, Telegram and Mattermost: self-hosting, federation, communities, end-to-end encrypted DMs and channels, calls, bots, account migration, phone-free sign-up, open source and maturity." />
+<img class="diagram diagram-dark" src="/diagrams/compare-dark.svg" alt="Feature comparison of Telium, Discord, Element (Matrix), Signal, Telegram and Mattermost: self-hosting, federation, communities, end-to-end encrypted DMs and channels, calls, bots, account migration, phone-free sign-up, open source and maturity." />
+
+Telium is **alpha**. Other messaging platforms have years of production use and more mature security review. For established encrypted communities today, consider Matrix or Signal groups.
