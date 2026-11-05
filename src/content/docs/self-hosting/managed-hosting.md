@@ -1,6 +1,6 @@
 ---
 title: Hosting provider catalogues
-description: For operators: curate and publish third-party guild hosting offers in the create-a-guild flow.
+description: "For operators: curate and publish third-party guild hosting offers in the create-a-guild flow."
 sidebar:
   order: 20
 ---
