@@ -24,6 +24,8 @@ This page sets up `telium-sfu` and connects it to your homeserver. Without an SF
 
 An SFU can also serve several specific trusted homeservers without being public. If you are inviting other operators to use it, consider bandwidth and participant limits before making it available. [Post-installation checklist](/self-hosting/after-setup/#want-to-help-grow-the-network).
 
+## What runs where
+
 | Piece | Role |
 |---|---|
 | `telium-server` | Authorises calls and signs short-lived join tokens. |
