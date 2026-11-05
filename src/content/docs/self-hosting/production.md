@@ -38,3 +38,5 @@ Both install guides are one command with your domain as the argument; everything
 ## Finish
 
 Once your server answers on its domain, register your account — the first one on a fresh server becomes its administrator — then set `[registration] open = false` and restart. Voice and video mesh up to four participants with no extra setup; a bigger server wants an [SFU](/self-hosting/sfu/).
+
+**Next:** Work through [After setting up your server](/self-hosting/after-setup/) to verify sign-in, backups, updates, storage limits and whether your server should accept public signups.
