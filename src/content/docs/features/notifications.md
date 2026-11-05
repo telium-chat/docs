@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+**Using Telium?** Browser notifications work through Web Push, and the Android app supports UnifiedPush. The rest of this page is for readers who want to know what gets delivered, what notification providers can see, or how to set up optional push transports.
+
 This page covers push transports, what triggers a notification, the per-device encrypted inbox, and what each party learns.
 
 ## Push support today
