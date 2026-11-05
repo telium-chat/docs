@@ -8,7 +8,7 @@ sidebar:
 This page lists each principal in a Telium deployment, what it is trusted with, and what it can do if it turns hostile. Gaps where the code does not yet enforce a claim are listed at the end.
 
 :::caution[Limits]
-Guild channels, guild voice and guild video are not end-to-end encrypted. The guild's server reads them. Telium has not had an independent security audit.
+Guild text channels are not end-to-end encrypted; the guild server reads their messages. Guild SFU calls use end-to-end encrypted media under a per-call MLS group. Mesh calls have peer-to-peer transport encryption, but malicious signalling can compromise that path. Telium has not had an independent security audit.
 :::
 
 ## Assumptions and non-goals
@@ -32,10 +32,10 @@ A valid credential identifies the speaker. It grants nothing on its own.
 | Principal | Trusted with | If hostile |
 | --- | --- | --- |
 | Account homeserver | Login, identity assertions, OPAQUE record, encrypted vaults, KeyPackages, DM routing metadata | Can fully impersonate its own users. Can drop, delay or replay DM frames, add a device (visible to other members as an epoch change) and serve malicious JavaScript. Cannot read DMs, open server-blind vaults, silently replace a `tid:` or forge other servers. A legacy escrowed vault is readable by the server; leaving escrow rotates the recovery key. |
-| Guild homeserver | Permissions, membership, message order and content, guild sessions, SFU join tokens | Has full control inside its own guilds. Audience binding stops it replaying your identity assertion to another server. |
+| Guild homeserver | Permissions, membership, guild message order and plaintext content, call state, guild sessions, SFU join tokens | Has full control of guild policies, can read guild text and disrupt calls, but does not hold guild SFU media keys. Audience binding stops it replaying your identity assertion to another server. |
 | Federation peer | Being correctly identified | Can lie only about itself. The origin comes from the verified signature, and a valid signature does not authorize a route. |
 | Media origin | Storing bytes, reporting MIME type, size and dimensions, re-encoding, scanning | Can withhold media or log fetches. Substitution is caught by the BLAKE3 hash check. Media capabilities are unguessable but not revocable. SVG and other active formats are refused, and served media carries `nosniff` and a safe disposition. |
-| SFU | Forwarding call media | Sees participant IPs, room membership, timing and volume. Cannot read DM-call media or mint its own authorization. Reads guild-call media. |
+| SFU | Forwarding call media | Sees participant IPs, room membership, timing and volume. Cannot read DM-call or guild SFU-call media, or mint its own authorization. |
 | TURN | Relaying packets | Sees IPs and flows. It is your own home's TURN server. Server data cannot relax a client's `relay` posture. |
 | Fetch proxies (camo, unfurl, playback, avatars, feeds) | Outbound requests for users | An SSRF surface, covered by the remote-fetch rules below. |
 | Malicious client | Its own session's authority | Identity comes from the session, never the request body, and every object lookup is checked against its guild and channel. |
