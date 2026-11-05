@@ -1,38 +1,48 @@
 ---
 title: Telium docs
-description: Run a Telium server, use its features, and build against its protocol.
+description: Start chatting, set up a homeserver, or learn how Telium works.
 template: splash
 hero:
-  tagline: Self-hosted chat with guilds, DMs, voice and video. Your account lives on your server, and you can join guilds hosted anywhere.
+  tagline: Chat in communities across independent servers. Your account stays on the server you choose.
   image:
     dark: ../../assets/telium-lockup-light.svg
     light: ../../assets/telium-lockup-dark.svg
   actions:
-    - text: Quick start
-      link: /start/quick-start/
-      icon: right-arrow
-    - text: Use it at telium.chat
+    - text: Open Telium
       link: https://telium.chat
       icon: external
-    - text: GitHub
-      link: https://github.com/telium-chat/telium
-      icon: external
+    - text: Run a server
+      link: /self-hosting/production/
+      icon: right-arrow
+    - text: Get the app
+      link: /start/clients/
       variant: minimal
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+## What brings you here?
+
 <CardGrid>
-  <Card title="Self-hosting" icon="laptop">
-    Install a server, put it behind TLS, back it up and keep it updated. [Production setup](/self-hosting/production/)
+  <Card title="I want to use Telium" icon="chat">
+    Open [the web client](https://telium.chat) or [get a desktop or Android app](/start/clients/). Learn about [guilds and channels](/features/guilds/), [friends](/features/friends/) and [calls](/features/voice-and-video/).
   </Card>
-  <Card title="Architecture" icon="puzzle">
-    How home servers, guild servers, media origins and SFUs divide authority. [How the pieces fit](/start/architecture/)
+  <Card title="I want to host a server" icon="laptop">
+    Start with [Running in production](/self-hosting/production/) to choose your install. Already online? Follow the [after-setup checklist](/self-hosting/after-setup/) to secure it, test it and decide whether to welcome public users.
   </Card>
-  <Card title="Clients" icon="download">
-    One client for web, desktop and Android — grab a prebuilt package or build your own. [Get a client](/start/clients/)
-  </Card>
-  <Card title="Security" icon="padlock">
-    OPAQUE sign-in, MLS for DMs, and what each server can see. [Threat model](/security/threat-model/)
+  <Card title="I want to build or integrate" icon="puzzle">
+    Read [how the network works](/start/architecture/), [create a bot](/features/bots/), or explore the [API](/reference/api/) and [protocol](/reference/protocol/).
   </Card>
 </CardGrid>
+
+## The two things to know
+
+**Your home server** keeps your account and signs you into other Telium servers. **A guild** is a community with its own channels, roles and messages. You can join guilds hosted elsewhere without moving your account.
+
+You do **not** need to run your own server to use Telium. If you do host one, a small server can handle accounts, guilds and file storage in one process. Voice calls of more than a few people may need a separate [SFU media relay](/self-hosting/sfu/).
+
+:::caution[Telium is in alpha]
+Expect changes and rough edges. Direct messages are end-to-end encrypted, but **guild text channels are not**. Before relying on Telium for anything sensitive, read [Stability](/start/stability/) and [Privacy](/security/privacy/).
+:::
+
+Need a hand? [Getting help](/start/getting-help/) explains where to report a problem and what information to include.
