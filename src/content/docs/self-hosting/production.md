@@ -16,7 +16,7 @@ A production homeserver is one `telium-server` process behind TLS on a public do
 - A domain name
 - Its DNS record pointed at the machine
 
-No client to host: [telium.chat](https://telium.chat) and the packaged desktop and Android clients work with every server. And if you would rather not run a server at all, there is [managed hosting](/self-hosting/managed-hosting/).
+No client to host: [telium.chat](https://telium.chat) and the packaged desktop and Android clients work with every server. If you do not want to run a server, you can use an account home that accepts registrations instead. [How account homes and signups work](/federation/onboarding/).
 
 ## Pick an install
 
