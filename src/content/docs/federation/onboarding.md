@@ -7,6 +7,17 @@ sidebar:
 
 This page covers where a new account gets created: the default on your own server, the opt-in recommendation flow that spreads new accounts across community homeservers, and what an operator must do to receive referrals.
 
+## Which option do you want?
+
+| Goal | Action |
+| --- | --- |
+| **Just run my own server** | Do nothing here. Keep or close registration to suit your community. |
+| **Let people find my server** | Apply for the [public homeserver directory](#directory-and-recommended-pool). Listing makes you discoverable but does not put you in automated recommendations. |
+| **Volunteer to receive new account signups** | Join the directory, then [opt in](#opting-in) both in the registry and your live config. Additional age, uptime and availability checks apply. |
+| **Suggest another home to people using my signup page** | Configure `registration.recommendations.suggest_alternatives` and use a client build that verifies the signed catalogue. |
+
+**You control your own signups.** Being listed never overrides `registration.open`, and `recommendations.accepting = false` pauses automatic recommendations without deleting your directory entry. For what to do right after installing, see [After setting up your server](/self-hosting/after-setup/).
+
 ## Defaults
 
 A homeserver's own signup form creates the account on that homeserver and asks nothing. Two settings change this, and they are independent:
