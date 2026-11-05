@@ -10,7 +10,7 @@ This page lists what each component can observe from the data it handles, whethe
 Message content in DMs and group DMs is end-to-end encrypted. Who is in a conversation, who sent each frame from which device, when, how large, and who is typing is visible to at least one server.
 
 :::caution
-Guild channels are not end-to-end encrypted. The guild's server reads every guild message, and the SFU handles guild voice and video in the clear.
+Guild text channels are not end-to-end encrypted: the guild server can read their messages. **Guild calls through an SFU are end-to-end encrypted**, so the SFU cannot read their media. Mesh calls use peer-to-peer transport encryption, but a malicious guild server controlling the signalling could intercept them. See [Voice and video](/features/voice-and-video/#encryption-on-the-sfu).
 :::
 
 ## Your account homeserver
@@ -56,7 +56,7 @@ Anyone can fetch your display name, avatar, pronouns, bio and creation date (`/_
 ## Calls
 
 - **SFU, DM calls.** Media is end-to-end encrypted with a per-epoch key from the MLS exporter. The SFU sees the room name (which contains the conversation id), account ids, IPs, join and leave times, who speaks when, packet sizes and timing, and unencrypted frame headers (the Opus TOC byte, 3 to 10 VP8 header bytes).
-- **SFU, guild calls.** The SFU sees media in the clear.
+- **SFU, guild calls.** Media is end-to-end encrypted with a per-call MLS group. The SFU sees participant IPs, membership, timing, packet sizes and unencrypted transport/frame metadata, but cannot read the audio or video. The guild server still controls call admission and can disrupt the call.
 - **TURN** sees your account id (the credential username is `{expiry}:{user_id}`), your IP, your peer's relayed address and media volume and timing. Credentials are per user with a TTL.
 - **STUN.** The STUN list (`voice.stun_servers`, default `stun:stun.l.google.com:19302`) is contacted unless the ICE policy is `relay`.
 
