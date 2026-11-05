@@ -32,6 +32,7 @@ export default defineConfig({
         {
           label: 'Get started',
           items: [
+            { slug: 'start/first-steps', label: 'New here? Start here' },
             { slug: 'start/clients', label: 'Get the app' },
             { slug: 'start/quick-start', label: 'Try a local server' },
             { slug: 'start/architecture', label: 'How Telium works' },
@@ -121,7 +122,7 @@ export default defineConfig({
               label: 'Protocol reference',
               collapsed: true,
               items: [
-                { slug: 'reference/protocol/index', label: 'Protocol overview' },
+                { slug: 'reference/protocol', label: 'Protocol overview' },
                 { slug: 'reference/protocol/signing' },
                 { slug: 'reference/protocol/federation' },
                 { slug: 'reference/protocol/gateway' },
