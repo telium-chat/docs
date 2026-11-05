@@ -98,7 +98,7 @@ There are **two separate ways** to contribute. Neither happens automatically whe
 | **Host accounts for other people** | Keep registration available when you are ready, and apply for the [public homeserver directory](/federation/onboarding/#directory-and-recommended-pool). | Being listed does **not** automatically place you in the recommended signup pool. The recommendation pool has extra opt-in, age, uptime and health requirements. |
 | **Host voice calls** | [Install an SFU](/self-hosting/sfu/) and add your homeserver to its trusted list. | An SFU can stay **private**, serving only homeservers you trust. Set public mode only if you want other operators to use its capacity. |
 
-For an account-home listing, the directory is backed by [`site/registry/servers.json`](https://github.com/telium-chat/telium/blob/main/site/registry/servers.json). Follow the [onboarding checklist and eligibility rules](/federation/onboarding/#opting-in/) before opting into recommendations. You can be listed without accepting automatic beginner referrals.
+For an account-home listing, the directory is backed by [`site/registry/servers.json`](https://github.com/telium-chat/telium/blob/main/site/registry/servers.json). Follow the [onboarding checklist and eligibility rules](/federation/onboarding/#opting-in) before opting into recommendations. You can be listed without accepting automatic beginner referrals.
 
 If you want to offer shared SFU capacity, plan limits and monitoring before you enable public trust. Publishing a public URL is not the same as committing to serve everyone.
 
