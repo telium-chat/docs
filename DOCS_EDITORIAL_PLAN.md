@@ -75,7 +75,7 @@ This is a working checklist for future docs passes. It is **not** a replacement 
 ## Verification and maintenance
 
 - [ ] Run `bun install --frozen-lockfile && bun run build` on any docs branch. Starlight's links validator checks local links.
-- [ ] Add a non-deploying CI workflow for docs branches and PRs so link checks do not require production deployment.
+- [x] Added a non-deploying CI workflow for docs branches and PRs so link checks do not require production deployment.
 - [ ] Spot-check renderings of the home page, the long self-hosting nav, the new first-steps page and the post-install guide on desktop and mobile.
 - [ ] Add lightweight prose/implementation checks for claims that have regressed: guild SFU E2EE, registration default, backup key, install paths, directory vs recommended eligibility and SFU trust.public.
 - [ ] Use issue/PR reviews to mark a page's **verified against code version** when a behavioral change touches it.
