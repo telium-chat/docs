@@ -44,7 +44,7 @@ Register your account — the first one becomes the administrator — then set `
 
 For a website on `example.com` (such as Cloudflare Pages) and a Telium API through a tunnel on `chat.example.com`, you can keep usernames like `@you:example.com`.
 
-1. **Install using the tunnel hostname**, not your website's root domain:
+1. **Install using the tunnel hostname**, not your website's root domain. Replace `chat.example.com` with the real subdomain you control:
 
    ```sh
    sudo ./deploy/install.sh chat.example.com
