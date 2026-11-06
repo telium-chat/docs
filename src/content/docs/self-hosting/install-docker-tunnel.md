@@ -40,6 +40,8 @@ curl -fsS https://chat.example.com/.well-known/telium/server
 
 Register your account — the first one becomes the administrator — then set `[registration] open = false` in `/opt/telium/telium.toml` and `docker compose up -d`. One line worth checking first: `[voice]` names the SFU this deployment was staged against; remove it unless it is yours, and calls mesh up to four people without it. Data is a named volume (`telium-data`) plus `/srv/telium-backups` for archives — see [Backups](/self-hosting/backups/).
 
+**Optional: low-disk VPS?** Use [S3-compatible storage for user uploads](/self-hosting/s3-media-storage/) instead of filling the server volume. This does not bypass Cloudflare Tunnel's HTTP upload-size limit or replace backups.
+
 ## Using your website domain for accounts
 
 For an existing website on `example.com` (hosted anywhere) and a Telium API through a tunnel on `chat.example.com`, you can keep usernames like `@you:example.com`.

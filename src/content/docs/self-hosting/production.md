@@ -39,6 +39,10 @@ Both install guides are one command with your domain as the argument; everything
 
 You can keep your existing website at `example.com` (on shared hosting, a site builder, static hosting, or elsewhere), host Telium on `chat.example.com`, and still issue account addresses like `@you:example.com`. The [website-domain guide](/self-hosting/domain-delegation/) shows how to publish a one-line `telium.txt` pointer with manual uploads, hosting panels or Git; each install method shows the extra config edit needed. Set the account domain **before the first signup**.
 
+## Optional: keep uploads off your VPS disk
+
+Telium can store attachments in a private [S3-compatible bucket](/self-hosting/s3-media-storage/). The guide covers provider setup, configuration and verification. This is separate from configuring remote [backups](/self-hosting/backups/), and is easiest to enable before hosting real uploads.
+
 ## Finish
 
 Once your server answers on its domain, register your account — the first one on a fresh server becomes its administrator — then set `[registration] open = false` and restart. Voice and video mesh up to four participants with no extra setup; a bigger server wants an [SFU](/self-hosting/sfu/).

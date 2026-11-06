@@ -124,6 +124,8 @@ If you use this split setup, the installer's generic instruction to point the su
 | `/var/backups/telium` | archives, backup key | On a different mount from the data if you can. |
 | `/etc/telium/telium.toml` | config | Mode 600. |
 
+**Optional: want attachments on remote storage instead of the VPS disk?** Follow [Store uploads in S3-compatible storage](/self-hosting/s3-media-storage/) after installing; this is separate from storing encrypted [backups](/self-hosting/backups/) off-box.
+
 See [Backups](/self-hosting/backups/) for what the archives protect against, and [Secrets](/self-hosting/secrets/) for `"${env:NAME}"` / `"${file:…}"` in the config.
 
 ## Troubleshooting
