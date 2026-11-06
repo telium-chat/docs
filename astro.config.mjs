@@ -51,6 +51,7 @@ export default defineConfig({
             { slug: 'self-hosting/domain-delegation', label: 'Use your website domain for accounts' },
             { slug: 'self-hosting/after-setup' },
             { slug: 'self-hosting/public-server', label: 'Run a public server' },
+            { slug: 'self-hosting/s3-media-storage', label: 'Store uploads in S3' },
             { slug: 'self-hosting/backups' },
             { slug: 'self-hosting/updates' },
             { slug: 'self-hosting/server-ownership' },

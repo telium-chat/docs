@@ -55,6 +55,8 @@ cd /opt/telium && docker compose up -d
 
 With voice, calls bigger than four people now run through your SFU; its dashboard is at `https://sfu.example.com/admin`. Everything about regions, public mode and TURN works exactly as on a native install — see [SFU](/self-hosting/sfu/).
 
+**Optional: want to keep user uploads off your VPS disk?** See [Store uploads in S3-compatible storage](/self-hosting/s3-media-storage/) for a copyable `telium.toml` example and a test checklist. This is separate from backing up your server.
+
 ## Using your website domain for accounts
 
 If your normal website is at `example.com` (wherever it is hosted) and you want the actual Telium server at `chat.example.com`, users can still register as `@you:example.com`.

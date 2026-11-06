@@ -84,6 +84,8 @@ A public server needs an explicit decision about who can create an account. Star
 
 Messages and attachments have different storage costs. Before opening registration, review the [media policy and quota settings](/features/media/#media-policy): maximum upload size, per-user quota, accepted media types, upload expiry, and retention. These are operator decisions; don't assume the defaults fit a public server.
 
+**Running out of space on your VPS?** Follow the [S3-compatible media storage setup](/self-hosting/s3-media-storage/) to store new attachments in a private bucket. It is optional; remote media needs its own backup/replication plan and switching an existing server requires a tested migration.
+
 If you use a tunnel, remember that its provider may enforce a smaller upload limit than Telium itself. Monitor disk space and use the [storage and metrics tools](/self-hosting/observability/) as the server grows.
 
 ### Get ready to moderate

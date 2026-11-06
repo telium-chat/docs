@@ -180,6 +180,8 @@ The curated origins this server offers users who upload elsewhere.
 
 ## Media store
 
+For step-by-step bucket creation, credentials, a complete example and upload testing, follow [Store uploads in S3-compatible storage](/self-hosting/s3-media-storage/). Switching an existing server from local to S3 does not itself migrate its old attachments.
+
 | Key | Default | Does |
 |---|---|---|
 | `store` | `"local"` | `"local"` writes uploads under `media_dir`; `"s3"` writes them to the bucket in `[media_store.s3]` (same shape as [backup.remote](#backup)). |

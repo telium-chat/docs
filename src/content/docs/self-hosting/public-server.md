@@ -67,6 +67,8 @@ At a 50 MiB file limit, a 1 GiB quota fits roughly twenty maximum-sized files **
 
 The server stores media under `media_dir` by default. For growth, Telium also supports **S3-compatible object storage** through `[media_store]` / `[media_store.s3]`. That can separate file capacity from your VPS disk, but it does **not** eliminate upload, download, request or backup costs. Keep bucket credentials private and check the provider's egress and API-request billing.
 
+**Want to set this up?** Start with the [step-by-step S3 media storage guide](/self-hosting/s3-media-storage/) for bucket permissions, a copyable config, restart instructions, and an upload test. Do not switch a populated local media store without a migration plan.
+
 See [Media store configuration](/self-hosting/configuration/#media-store), [Data lifecycle](/self-hosting/data-lifecycle/) and [Storage monitoring](/self-hosting/observability/). Test expiry and reclamation with actual attachments before putting real users on the service. For S3 in particular, do not assume the local-filesystem orphan-file sweep cleans up stray bucket objects.
 
 ### Upload problems to test
