@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-**Want usernames like `@alice:example.com` while keeping your website on `example.com` and running Telium at `chat.example.com`?** Follow [Use your website domain for Telium accounts](/self-hosting/domain-delegation/). It includes the `.well-known` file and steps for existing website hosts, manual uploads, Cloudflare Pages and reverse proxies.
+**Want usernames like `@alice:example.com` while keeping your website on `example.com` and running Telium at `chat.example.com`?** Follow [Use your website domain for Telium accounts](/self-hosting/domain-delegation/). It explains the one-line `telium.txt` pointer, how to upload it to an existing website, and how to check browser compatibility.
 
 The server binds loopback; whatever sits in front of it is the public side. Pick one front and follow its section — Caddy if the box has open ports and you want the least moving parts, a Cloudflare Tunnel if you want none at all, nginx if you already run it. The tunnel kit includes the tunnel, and the standalone kit can run this page's Caddy as a container (its `proxy` profile), so this page is mostly for the native install and for fronts the box already runs.
 
