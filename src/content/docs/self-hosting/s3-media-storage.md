@@ -56,7 +56,7 @@ path_style = true
 - **`endpoint` and `region`:** Use exactly what your provider gives you; they are not necessarily the AWS examples shown above. For example, Cloudflare R2 uses its account-specific S3 endpoint and `region = "auto"`. Some providers need `path_style = false` — use the provider's S3 compatibility instructions.
 - **`bucket`:** The private bucket you created.
 - **`prefix`:** Optional folder-like object-key prefix; keep it stable once you have uploaded files. If omitted or empty, Telium uses `telium/<server_name>/`.
-- **`access_key_id` and `secret_access_key`:** The restricted bucket credentials. **Never commit them to Git, put them in screenshots or paste them into bug reports.** Keep the config readable only by the server administrator and Telium service. For production, prefer [secret-file references](/self-hosting/secrets/) such as `"\${file:/path/to/secret}"`, with the path readable by the running server (and mounted into the container for Docker).
+- **`access_key_id` and `secret_access_key`:** The restricted bucket credentials. **Never commit them to Git, put them in screenshots or paste them into bug reports.** Keep the config readable only by the server administrator and Telium service. For production, prefer [secret-file references](/self-hosting/secrets/) such as `"${file:/path/to/secret}"`, with the path readable by the running server (and mounted into the container for Docker).
 - **`enabled = true`:** This turns on the S3 bucket configuration; `store = "s3"` chooses it for uploaded media.
 
 :::note[If you also use S3 for backups]
