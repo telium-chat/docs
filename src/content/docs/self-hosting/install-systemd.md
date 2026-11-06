@@ -7,10 +7,14 @@ sidebar:
 
 The recommended install. Telium is a single static binary with a SQLite database, so there is nothing else to install and no container runtime to maintain. This page takes a fresh box to a server running on `127.0.0.1:8448` with automatic updates enabled; the public side is [Exposing your server](/self-hosting/exposing/).
 
+:::tip[Already have a website on your domain?]
+You can leave `example.com` on Cloudflare Pages, run Telium at `chat.example.com`, and have user IDs like `@you:example.com`. Before anyone registers, follow [Using your website domain for accounts](#using-your-website-domain-for-accounts).
+:::
+
 ## What you need
 
 - A Linux box with systemd, `curl`, `tar` and `sha256sum` (a small VPS is plenty)
-- A domain whose DNS will point at it
+- A public hostname for the Telium HTTPS endpoint (for example, `chat.example.com`). Your account domain may stay on a separate website host.
 - sudo
 
 ## One command
