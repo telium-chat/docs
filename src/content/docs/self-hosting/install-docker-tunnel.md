@@ -42,7 +42,7 @@ Register your account — the first one becomes the administrator — then set `
 
 ## Using your website domain for accounts
 
-For a website on `example.com` (such as Cloudflare Pages) and a Telium API through a tunnel on `chat.example.com`, you can keep usernames like `@you:example.com`.
+For an existing website on `example.com` (hosted anywhere) and a Telium API through a tunnel on `chat.example.com`, you can keep usernames like `@you:example.com`.
 
 1. **Install using the tunnel hostname**, not your website's root domain. Replace `chat.example.com` with the real subdomain you control:
 
@@ -50,7 +50,7 @@ For a website on `example.com` (such as Cloudflare Pages) and a Telium API throu
    sudo ./deploy/install.sh chat.example.com
    ```
 
-2. In Cloudflare, route the tunnel's public hostname **`chat.example.com`** to this kit's Telium container (`http://172.31.240.3:8448`), as described above. Leave **`example.com`** assigned to the Cloudflare Pages website.
+2. In Cloudflare, route the tunnel's public hostname **`chat.example.com`** to this kit's Telium container (`http://172.31.240.3:8448`), as described above. Leave **`example.com`** with your existing website host.
 3. **Before creating your first Telium account**, edit `/opt/telium/telium.toml`:
 
    ```toml
@@ -65,9 +65,9 @@ For a website on `example.com` (such as Cloudflare Pages) and a Telium API throu
    sudo docker compose up -d --force-recreate server
    ```
 
-5. Confirm `https://chat.example.com/.well-known/telium/server` announces `server_name` as `example.com`. Then add the [`.well-known` discovery file to Cloudflare Pages](/self-hosting/domain-delegation/#cloudflare-pages-the-easy-way), and choose `example.com` when registering an account.
+5. Confirm `https://chat.example.com/.well-known/telium/server` announces `server_name` as `example.com`. Then [publish a `.well-known` discovery file on your website host](/self-hosting/domain-delegation/), and choose `example.com` when registering an account.
 
-Only the Telium subdomain needs a tunnel route; **your Pages website stays on the original domain**. A tunnel can carry the homeserver HTTP/WebSocket requests, but not an SFU's UDP media.
+Only the Telium subdomain needs a tunnel route; **your existing website stays on the original domain**. A tunnel can carry the homeserver HTTP/WebSocket requests, but not an SFU's UDP media.
 
 ## Troubleshooting
 
