@@ -114,7 +114,7 @@ Want your website at `example.com` (on any hosting provider), but your Telium se
 
 If you use this split setup, the installer's generic instruction to point the supplied domain at this box **does not apply to the website domain**. Your website keeps `example.com`; only the API hostname points to the Telium ingress. Both names must answer over HTTPS.
 
-**Do not change `server_name` on an established server.** [Why the account domain matters](/self-hosting/domain-delegation/#understand-the-two-domains).
+**Do not change `server_name` on an established server.** [Why the account domain matters](/self-hosting/domain-delegation/#how-it-works).
 
 ## Storage
 
