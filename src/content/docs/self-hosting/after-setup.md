@@ -25,7 +25,7 @@ If you have not installed a server yet, start with [Running in production](/self
 - [ ] **Try the client.** Sign in, create a guild (a community with text and voice channels), post a message, and invite a second test account. You can use the hosted client; you do **not** need to host a web app.
 
 :::tip[Private server or public community server?]
-For a personal or friends-only home server, it is fine to stop after the essentials below. Running a public account home adds responsibilities: abuse reports, storage, reliable contact information, and capacity for new users.
+For a personal or friends-only home server, it is fine to stop after the essentials below. Running a public account home adds responsibilities: abuse reports, storage, reliable contact information, and capacity for new users. Follow the full [Run a public homeserver](/self-hosting/public-server/) guide before opening signups.
 :::
 
 ## Protect the server before relying on it
@@ -73,6 +73,9 @@ A small voice call works in peer-to-peer **mesh** mode without a media server. F
 
 ## Before you welcome strangers
 
+**Planning a public service?** The [public homeserver walkthrough](/self-hosting/public-server/) has copyable size limits, per-user quotas, 30-day retention, a registration and moderation checklist, and the steps for [telium.chat/list](https://telium.chat/list). If your usernames use a different domain from your API, first configure [`.well-known` delegation](/self-hosting/domain-delegation/).
+
+
 ### Choose your registration policy
 
 A public server needs an explicit decision about who can create an account. Start closed while testing, open registration when you have the capacity and moderation process, and close it again if you are overwhelmed. The relevant switch is `registration.open` in [Configuration](/self-hosting/configuration/#registration).
@@ -98,7 +101,7 @@ There are **two separate ways** to contribute. Neither happens automatically whe
 | **Host accounts for other people** | Keep registration available when you are ready, and apply for the [public homeserver directory](/federation/onboarding/#directory-and-recommended-pool). | Being listed does **not** automatically place you in the recommended signup pool. The recommendation pool has extra opt-in, age, uptime and health requirements. |
 | **Host voice calls** | [Install an SFU](/self-hosting/sfu/) and add your homeserver to its trusted list. | An SFU can stay **private**, serving only homeservers you trust. Set public mode only if you want other operators to use its capacity. |
 
-For an account-home listing, the directory is backed by [`site/registry/servers.json`](https://github.com/telium-chat/telium/blob/main/site/registry/servers.json). Follow the [onboarding checklist and eligibility rules](/federation/onboarding/#opting-in) before opting into recommendations. You can be listed without accepting automatic beginner referrals.
+The easiest way to list your server is the [public listing wizard](https://telium.chat/list). For an account-home listing, the directory is backed by [`site/registry/servers.json`](https://github.com/telium-chat/telium/blob/main/site/registry/servers.json). Follow the [onboarding checklist and eligibility rules](/federation/onboarding/#opting-in) before opting into recommendations. You can be listed without accepting automatic beginner referrals.
 
 If you want to offer shared SFU capacity, plan limits and monitoring before you enable public trust. Publishing a public URL is not the same as committing to serve everyone.
 
