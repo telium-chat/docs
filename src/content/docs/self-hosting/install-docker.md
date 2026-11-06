@@ -13,6 +13,10 @@ sudo bash deploy/standalone/install.sh
 
 Answer three questions — your domain, who fronts it (the kit's Caddy with automatic certificates, or whatever already runs on the box), and whether it carries voice calls — and the installer writes the config, starts the stack, and turns on a timer that keeps every container current. Updates are on by default; `TELIUM_UPDATES=manual` in `/opt/telium/update.conf` is how you decline. Re-run the installer any time to upgrade the machinery; it never overwrites a file you could have edited.
 
+:::tip[Want accounts on your website domain?]
+You can host your website on `example.com` (Cloudflare Pages) and put the Telium server on `chat.example.com`, while still using addresses such as `@you:example.com`. See [Using your website domain for accounts](#using-your-website-domain-for-accounts) **before the first signup**.
+:::
+
 No clone wanted? Fetch the installer on its own:
 
 ```sh
@@ -23,14 +27,14 @@ sudo bash install.sh
 ## What you need
 
 - A Linux box with Docker and the compose plugin
-- A domain whose DNS record points at the box
+- A hostname for the Telium HTTPS endpoint (for example, `chat.example.com`). Your website and account identity domain can be different.
 - Ports 80 and 443 free (or an existing front). Voice adds TCP 7881, UDP 3478 and UDP 50000–60000.
 
 ## What it asks
 
 | Question | Answers |
 |---|---|
-| Your domain | `chat.example.com` — the identity in every user id, so get it right first |
+| Your domain | `chat.example.com` — normally both the API hostname and account identity; to use `@you:example.com` instead, [follow this extra setup](#using-your-website-domain-for-accounts) before registration |
 | Who fronts it | **1** the kit's Caddy (default) · **2** your own proxy or tunnel, pointed at `127.0.0.1:8448` |
 | Voice calls? | Adds the [SFU](/self-hosting/sfu/) container and asks for two more domain names, suggested for you |
 
