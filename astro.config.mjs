@@ -48,7 +48,7 @@ export default defineConfig({
             { slug: 'self-hosting/install-docker' },
             { slug: 'self-hosting/install-docker-tunnel' },
             { slug: 'self-hosting/exposing' },
-            { slug: 'self-hosting/domain-delegation', label: 'Use a separate API domain' },
+            { slug: 'self-hosting/domain-delegation', label: 'Website and Telium on different domains' },
             { slug: 'self-hosting/after-setup' },
             { slug: 'self-hosting/public-server', label: 'Run a public server' },
             { slug: 'self-hosting/backups' },
