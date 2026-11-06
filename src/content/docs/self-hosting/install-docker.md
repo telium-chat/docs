@@ -62,7 +62,7 @@ The standalone installer currently uses **one domain** for both the server's ide
 
    ```toml
    server_name = "example.com"
-   public_base_url = "https://`{env:TELIUM_CHAT_DOMAIN}"
+   public_base_url = "https://${env:TELIUM_CHAT_DOMAIN}"
    ```
 
    In `/opt/telium/.env`, keep `TELIUM_CHAT_DOMAIN=chat.example.com`. The kit uses this for its Caddy hostname, so changing it to `example.com` would incorrectly send its proxy to your website's domain.
@@ -77,7 +77,7 @@ The standalone installer currently uses **one domain** for both the server's ide
 4. Test `https://chat.example.com/.well-known/telium/server`: it should announce `server_name` of `example.com`.
 5. Leave `example.com` pointed at your website host. Add the [Cloudflare Pages `.well-known` file](/self-hosting/domain-delegation/#cloudflare-pages-the-easy-way) there, then register through the account domain `example.com`.
 
-**Do this before any accounts exist.** The domain in an account ID is not something you can change by editing a config file later.
+**Replace `example.com` and `chat.example.com` with your own domains.** Do this before any accounts exist. The domain in an account ID is not something you can change by editing a config file later.
 
 ## The manual route
 
