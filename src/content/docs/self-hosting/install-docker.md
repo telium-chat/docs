@@ -14,7 +14,7 @@ sudo bash deploy/standalone/install.sh
 Answer three questions — your domain, who fronts it (the kit's Caddy with automatic certificates, or whatever already runs on the box), and whether it carries voice calls — and the installer writes the config, starts the stack, and turns on a timer that keeps every container current. Updates are on by default; `TELIUM_UPDATES=manual` in `/opt/telium/update.conf` is how you decline. Re-run the installer any time to upgrade the machinery; it never overwrites a file you could have edited.
 
 :::tip[Want accounts on your website domain?]
-You can host your website on `example.com` (Cloudflare Pages) and put the Telium server on `chat.example.com`, while still using addresses such as `@you:example.com`. See [Using your website domain for accounts](#using-your-website-domain-for-accounts) **before the first signup**.
+You can keep your website on `example.com` with its existing provider and put Telium on `chat.example.com`, while still using addresses such as `@you:example.com`. See [Using your website domain for accounts](#using-your-website-domain-for-accounts) **before the first signup**.
 :::
 
 No clone wanted? Fetch the installer on its own:
@@ -57,7 +57,7 @@ With voice, calls bigger than four people now run through your SFU; its dashboar
 
 ## Using your website domain for accounts
 
-If your normal website is at `example.com` (perhaps on Cloudflare Pages) and you want the actual Telium server at `chat.example.com`, users can still register as `@you:example.com`.
+If your normal website is at `example.com` (wherever it is hosted) and you want the actual Telium server at `chat.example.com`, users can still register as `@you:example.com`.
 
 The standalone installer currently uses **one domain** for both the server's identity and its built-in HTTPS proxy. For this setup:
 
@@ -79,7 +79,7 @@ The standalone installer currently uses **one domain** for both the server's ide
    ```
 
 4. Test `https://chat.example.com/.well-known/telium/server`: it should announce `server_name` of `example.com`.
-5. Leave `example.com` pointed at your website host. Add the [Cloudflare Pages `.well-known` file](/self-hosting/domain-delegation/#cloudflare-pages-the-easy-way) there, then register through the account domain `example.com`.
+5. Leave `example.com` pointed at your website host. Add the [`.well-known` file using your website provider's normal publishing method](/self-hosting/domain-delegation/) there, then register through the account domain `example.com`.
 
 **Replace `example.com` and `chat.example.com` with your own domains.** Do this before any accounts exist. The domain in an account ID is not something you can change by editing a config file later.
 
