@@ -65,7 +65,7 @@ For an existing website on `example.com` (hosted anywhere) and a Telium API thro
    sudo docker compose up -d --force-recreate server
    ```
 
-5. Confirm `https://chat.example.com/.well-known/telium/server` announces `server_name` as `example.com`. Then [publish a `.well-known` discovery file on your website host](/self-hosting/domain-delegation/), and choose `example.com` when registering an account.
+5. Confirm `https://chat.example.com/.well-known/telium/server` announces `server_name` as `example.com`. Then [publish a one-line `telium.txt` file on your website host](/self-hosting/domain-delegation/), and choose `example.com` when registering an account.
 
 Only the Telium subdomain needs a tunnel route; **your existing website stays on the original domain**. A tunnel can carry the homeserver HTTP/WebSocket requests, but not an SFU's UDP media.
 
