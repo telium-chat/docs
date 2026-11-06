@@ -11,7 +11,7 @@ cd telium
 sudo ./deploy/install.sh chat.example.com
 ```
 
-The domain is the argument. The installer puts the kit in `/opt/telium` — `compose.yml`, a `telium.toml` with your identity set, the update timer — and leaves exactly one thing only you can do: create the tunnel. Run it again any time; it upgrades the machinery and never overwrites `compose.yml`, `telium.toml`, `update.conf` or `tunnel.env`.
+The argument is the public tunnel hostname. Normally it is also your account domain, but **if you keep a website on the root domain**, use the Telium subdomain (such as `chat.example.com`) and then follow [Using your website domain for accounts](#using-your-website-domain-for-accounts) before the first signup. The installer puts the kit in `/opt/telium` — `compose.yml`, a `telium.toml` with your identity set, the update timer — and leaves exactly one thing only you can do: create the tunnel. Run it again any time; it upgrades the machinery and never overwrites `compose.yml`, `telium.toml`, `update.conf` or `tunnel.env`.
 
 ## What you need
 
