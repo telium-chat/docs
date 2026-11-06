@@ -110,7 +110,7 @@ Want your website at `example.com` (on any hosting provider), but your Telium se
    Keep the database, `bind`, backups and other installed values as they were.
 
 3. Set up DNS and HTTPS for **`chat.example.com`** to reach your Telium server. Keep **`example.com`** pointed at your website host, not at your Telium VPS. Apply the edit with `sudo systemctl restart telium-server`.
-4. Put a small `.well-known` file **on your website domain** so clients entering `example.com` discover the server on `chat.example.com`. Follow the [website-domain setup guide](/self-hosting/domain-delegation/) and choose the instructions that match your host (file manager, manual upload, Git, or proxy).
+4. Put a one-line **`telium.txt`** file on your website with `chat.example.com` inside it, so clients entering `example.com` can find the server. Follow the [website-domain setup guide](/self-hosting/domain-delegation/) for file managers, manual uploads, Git and browser compatibility.
 
 If you use this split setup, the installer's generic instruction to point the supplied domain at this box **does not apply to the website domain**. Your website keeps `example.com`; only the API hostname points to the Telium ingress. Both names must answer over HTTPS.
 
