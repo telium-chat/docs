@@ -26,7 +26,7 @@ The part after the colon in `@alex:example.com` is your server's long-term ident
 
 ## Cloudflare Pages: the easy way
 
-These instructions assume you already have a Cloudflare Pages project serving `example.com` and want Telium on `chat.example.com`. If your website uses another static host, the idea is the same.
+These instructions assume you already have a Cloudflare Pages project serving `example.com` and want Telium on `chat.example.com`. **Replace both example names with domains you actually control in every command and file**; `example.com` is illustrative and the installer won't accept it literally. If your website uses another static host, the idea is the same.
 
 ### Step 1. Make Telium reachable on its subdomain
 
