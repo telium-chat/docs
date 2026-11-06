@@ -90,7 +90,7 @@ curl -fsS https://chat.example.com/_telium/v1/capabilities
 
 Want your website at `example.com` (for example, on Cloudflare Pages), but your Telium server at `chat.example.com`? Your account addresses can still be `@you:example.com`.
 
-1. **Run the installer with the account domain** so it creates the right long-term identity:
+1. **Run the installer with the account domain** so it creates the right long-term identity. Replace `example.com` with the real domain you own — the installer deliberately refuses example domains:
 
    ```sh
    sudo ./deploy/install-native.sh example.com
