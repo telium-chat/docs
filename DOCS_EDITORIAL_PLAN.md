@@ -19,6 +19,10 @@ This is a working checklist for future docs passes. It is **not** a replacement 
 - [x] Added [first steps](src/content/docs/start/first-steps.md) for someone who doesn't host a server.
 - [x] Added [after setting up your server](src/content/docs/self-hosting/after-setup.md), covering administrators, registration, backups, updates, testing, storage and directory/SFU decisions.
 - [x] Added skim-friendly introductions to guilds, media, public-home onboarding and SFU hosting.
+- [x] Added a [public homeserver walkthrough](src/content/docs/self-hosting/public-server.md): first-user experience, operator checks, 50 MiB upload example, quota, 30-day retention, listing wizard and referral opt-in.
+- [x] Added [domain delegation](src/content/docs/self-hosting/domain-delegation.md): permanent account identity versus API URL, `.well-known` route, live proxy and verification.
+- [x] Moved step-by-step user guidance to the top of voice, DM calls, friends, notifications, watch-together, rich presence and help pages.
+- [x] Made the privacy matrix and alpha-stability caveats understandable without reading protocol details.
 - [x] Verified in the implementation that SFU guild calls use MLS-based E2EE and corrected contradictory security prose.
 - [x] Removed the stale "who can read what" diagram from the architecture page pending regeneration; its outdated SVG assets are still in `public/diagrams/`.
 
@@ -27,15 +31,15 @@ This is a working checklist for future docs passes. It is **not** a replacement 
 - [ ] **Regenerate `who_reads-light.svg` and `who_reads-dark.svg`.** The visual said an SFU reads guild call media. The current `web/src/lib/guild-call-keys.js`, `server/src/routes/voice/mod.rs`, and `server/tests/api/voice.rs` demonstrate guild-call MLS E2EE on SFUs. Note that mesh calls use peer-to-peer DTLS-SRTP and signalling remains a trust boundary. Don't reintroduce a misleading image.
 - [ ] **Audit every security/privacy claim against current tests** (especially threat model, privacy, DMs, guild SFU calls, account recovery and the browser trust boundary). Keep precise distinctions between text, call media, and metadata.
 - [ ] **Verify production commands against the released installer**, not just `main`: native vs standalone Compose vs older tunnel kit, updater binary paths, admin commands, and where data and secrets actually land. The install pages were recently revised; preserve their style rather than rewriting them wholesale.
-- [ ] **Verify defaults/quotas/expiry** in media and config against the current `telium.example.toml`, since storage policy is visible to users and costly for operators.
+- [x] **Verify defaults/quotas/expiry** against the current `server/telium.example.toml`, `server/src/config.rs` and `server/src/routes/media.rs`. Reference defaults are 100 MiB per file with unlimited total storage when `default = "enabled"` and zero automatic expiry; public-server guide proposes explicit limits. Re-verify after implementation changes.
 
 ## Next pass — priority 2: teach use cases, not internals
 
 ### Getting started
 
 - [ ] Add screenshots or a short visual flow showing how to pick a home server, register, save a recovery key, join a guild and make a call. Keep UI screenshots versioned and easy to replace.
-- [ ] Give the alpha/stability page a prominent "What this means for my data" summary.
-- [ ] Turn getting-help into a short problem picker and ready-to-copy diagnostic checklist.
+- [x] Give the alpha/stability page a prominent "What this means for my data" summary.
+- [x] Turn getting-help into a short problem picker and ready-to-copy diagnostic checklist.
 
 ### Self-hosting
 
@@ -62,7 +66,7 @@ This is a working checklist for future docs passes. It is **not** a replacement 
 
 ### Security and privacy
 
-- [ ] Add a one-page beginner-facing privacy matrix: guild text, DM text, mesh calls, SFU calls, uploaded files, and metadata.
+- [x] Add a beginner-facing privacy matrix: guild text, DM text, mesh calls, SFU calls, uploaded files, and metadata.
 - [ ] Keep threat-model tables and protocol-specific details for readers who want to inspect guarantees; use plain-language explanations first.
 - [ ] Update light/dark diagrams together when encryption or trust assumptions change.
 
