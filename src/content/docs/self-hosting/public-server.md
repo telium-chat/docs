@@ -107,7 +107,7 @@ From a device **outside** the server's network:
 
 A homeserver can host accounts without hosting an SFU. Small calls work via direct mesh (up to four participants by default); larger guild calls benefit from an SFU. You can keep your SFU private to trusted homeservers or [offer public relay capacity](/self-hosting/sfu/). **The homeserver directory and SFU directory are separate.**
 
-## 5. Get onto the public server list
+## Get onto the public server list
 
 This is a short process; you do not need to learn Git.
 
