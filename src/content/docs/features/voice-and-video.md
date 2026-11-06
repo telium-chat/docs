@@ -7,6 +7,17 @@ sidebar:
 
 This page covers calls in **guild voice channels**: joining, mesh and SFU modes, end-to-end encryption, regions, permissions, camera and screen sharing. Calls in DMs and group chats work differently; see [DM calls](/features/dm-calls/). Running an SFU is covered in [SFU](/self-hosting/sfu/).
 
+## Your first voice call
+
+1. Open a guild and join one of its **voice channels**. If you cannot connect, ask a moderator whether your role has permission to join.
+2. Allow microphone access when your browser or app asks. Test your input and output devices in the client's audio settings.
+3. Start with two participants. Telium can connect small guild calls **directly** without a hosted voice relay.
+4. Use the in-call controls for microphone, camera and screen sharing. Whether those buttons are available depends on your guild role and channel settings.
+
+**Privacy in plain English:** In a mesh call, your device sends encrypted media directly to other participants, who may learn your IP address. For a larger call, an **SFU** forwards encrypted audio/video; guild SFU calls use per-call end-to-end encryption, so the SFU does not receive plaintext media. The guild server still manages membership, permissions and signalling. Read [Network privacy](/security/network-privacy/) for the tradeoffs.
+
+If calls connect but have no sound, check microphone permissions and audio devices first. If larger calls fail, the operator may need to check the [SFU and media ports](/self-hosting/sfu/). DM calls have different privacy settings; see [DM calls](/features/dm-calls/).
+
 ## Who decides what
 
 The guild server is the authority for a guild call, even when media flows through an SFU on another machine. It decides:
