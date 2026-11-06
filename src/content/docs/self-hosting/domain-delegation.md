@@ -1,70 +1,62 @@
 ---
 title: Use your website domain for Telium accounts
-description: Keep your website on Cloudflare Pages while Telium runs on a subdomain, using a simple .well-known file.
+description: Keep your existing website anywhere you host it, while running Telium on a subdomain.
 ---
 
-Want your website at `example.com`, your Telium server at `chat.example.com`, and usernames like `@alex:example.com`? **You can do that.** Your website and your Telium server do not have to run on the same machine or hosting provider.
+Already have a website at `example.com`? You can keep it there **and** run Telium at `chat.example.com`, while your users register addresses like `@alex:example.com`. Your website can be hosted on ordinary shared hosting, a website builder, Cloudflare Pages, Netlify, your own web server, or somewhere else.
 
-The trick is a small file at `https://example.com/.well-known/telium/server`. When someone enters `example.com` as their account server, Telium reads that file and discovers where your **actual server** lives.
+**You do not need Git, Cloudflare, or a special website framework.** You only need a way to make one URL on your existing website domain return a tiny JSON document.
 
-**Most people with an existing website should start with [Cloudflare Pages: the easy way](#cloudflare-pages-the-easy-way).** No Cloudflare Worker, DNS trick, or special Telium client installation is required for the basic setup.
+## Understand the two domains
 
-## What this looks like
-
-| Thing | Example | Where it lives |
+| | Example | What it does |
 | --- | --- | --- |
-| Your regular website | `https://example.com` | Cloudflare Pages |
-| Your Telium API | `https://chat.example.com` | VPS, home server or Cloudflare Tunnel |
-| Your Telium address | `@alex:example.com` | Uses **your website's domain**, not your API's hostname |
-| Tiny discovery file | `https://example.com/.well-known/telium/server` | Cloudflare Pages |
+| **Your account domain** | `example.com` | The name people see in `@alex:example.com` |
+| **Where Telium runs** | `chat.example.com` | The real server, which handles sign-in, messaging and uploads |
+| **The discovery address** | `https://example.com/.well-known/telium/server` | A small file that tells Telium how to find the real server |
 
-The file tells Telium: **“Accounts belong to example.com. Connect to chat.example.com.”** It is not an HTTP 301/302 redirect: the file itself returns JSON. Your normal website keeps working, and you do not route the rest of your traffic through the Telium server.
+Your website stays at `https://example.com/`. The discovery URL lives **on that same website domain** and contains `"api": "https://chat.example.com"`. This is often called `.well-known` discovery or domain delegation. Think of it as giving Telium directions, **not** sending every website visitor to the chat server.
 
-:::caution[Choose your account domain first]
-The part after the colon in `@alex:example.com` is your server's long-term identity. **Set this up before anyone creates an account.** Changing `server_name` on an established server is not a normal configuration edit. See [Relocation](/self-hosting/relocation/) if you already have users.
+:::caution[Do this before your first account]
+`server_name` becomes part of every user's address. Changing it after accounts exist is not a normal config edit. If you already have users on `@alice:chat.example.com`, see [Relocation](/self-hosting/relocation/) and [Migration](/federation/migration/), rather than changing the setting in place.
 :::
 
-## Cloudflare Pages: the easy way
+## 1. Configure your Telium server
 
-These instructions assume you already have a Cloudflare Pages project serving `example.com` and want Telium on `chat.example.com`. **Replace both example names with domains you actually control in every command and file**; `example.com` is illustrative and the installer won't accept it literally. If your website uses another static host, the idea is the same.
+Install Telium using [native Linux](/self-hosting/install-systemd/#using-your-website-domain-for-accounts), [Compose](/self-hosting/install-docker/#using-your-website-domain-for-accounts), or [Compose with Cloudflare Tunnel](/self-hosting/install-docker-tunnel/#using-your-website-domain-for-accounts). Each install page explains how to choose the account domain **before registering**.
 
-### Step 1. Make Telium reachable on its subdomain
-
-Set up the Telium server using any of the [production installation methods](/self-hosting/production/). Give the server a public HTTPS address such as `https://chat.example.com`, using Caddy, nginx, or a Cloudflare Tunnel.
-
-Your Telium configuration must distinguish the **account name** from the **connection address**:
+In `telium.toml`, the essential values are:
 
 ```toml
 server_name = "example.com"
 public_base_url = "https://chat.example.com"
 ```
 
-The local `bind` value can stay as the install guide provides (for example, `127.0.0.1:8448`). The [native](/self-hosting/install-systemd/#using-your-website-domain-for-accounts), [Compose](/self-hosting/install-docker/#using-your-website-domain-for-accounts), and [tunnel](/self-hosting/install-docker-tunnel/#using-your-website-domain-for-accounts) install pages tell you exactly where to edit these values.
+Replace these examples with the real domain and subdomain you control. Leave the other installed config settings in place.
 
-**First check the server itself** (not the Pages website):
+Give `chat.example.com` a working public HTTPS connection, using your normal reverse proxy or tunnel. **Do not change the DNS of `example.com` to point at your Telium VPS** if that domain already serves your website.
+
+Before continuing, check the Telium endpoint directly:
 
 ```sh
 curl -fsS https://chat.example.com/.well-known/telium/server
 ```
 
-The JSON response should include `"server_name": "example.com"` and `"api": "https://chat.example.com"`. If not, fix `telium.toml` or your server's HTTPS routing before continuing.
+It should report `"server_name": "example.com"` and `"api": "https://chat.example.com"`. Fix these first if they are wrong.
 
-### Step 2. Make the discovery file in your website repo
+## 2. Create the discovery file
 
-In the **website's Git repository**, create the following path:
+On your computer, make folders named `.well-known` and `telium`, then a plain text file named exactly `server`:
 
 ```text
-public/
-  .well-known/
-    telium/
-      server
+.well-known/
+  telium/
+    server
 ```
 
-**Important:** The file is literally named `server`, with **no `.json` extension**. The URL must be `/.well-known/telium/server`, not `/server.json`.
+**The file has no extension**: not `server.json`, not `server.txt`.
 
-For most frameworks used with Pages (including Astro and Vite), `public/` is the folder for files copied directly into the deployed website. If your Pages project deploys a plain HTML directory without a build, create `.well-known/telium/server` in that deployed directory instead. Your **built output** must contain the folder at its root.
-
-Open the new `server` file and paste:
+Paste this JSON into `server`:
 
 ```json
 {
@@ -75,15 +67,52 @@ Open the new `server` file and paste:
 }
 ```
 
-Replace both example domains with yours. Keep the `https://` and `wss://` schemes. Save the file.
+Replace the example domains with yours. Keep `https://` for the API and `wss://` for the gateway. Save it as UTF-8 text, not a word-processing document.
 
-**What the fields mean:** `server_name` controls the addresses people register under, `api` is the actual backend, `gateway` is its WebSocket connection, and `protocol_version` describes compatibility with the current v1 protocol. The Telium server must agree with these values.
+This is a **minimal example** for basic discovery. The live Telium server's own discovery response has more fields: federation keys, precise compatibility information, failover notices and operator settings. For a long-running public server, [serving the full live response](#for-public-servers-keep-discovery-current) is more future-proof. If you publish a static file, update it when your server's published discovery information changes.
 
-This is a **minimal static discovery document** intended to demonstrate basic account and server discovery. It does not automatically include the live server's signing keys, protocol capability list, failover or relocation notices, or onboarding preferences. Telium can fetch federation keys separately from its API, but some newer federation features depend on the additional discovery fields. For the **full, future-proof document** on a public server, use [the live Pages Function option](#optional-keep-the-discovery-file-up-to-date-automatically) below instead of maintaining this minimal file indefinitely.
+## 3. Put the file on your website
 
-### Step 3. Tell Pages that this file is JSON
+The final URL must be **exactly**:
 
-An extensionless file might otherwise be served with an unsuitable content type. Add a file named `public/_headers` (or put `_headers` in the root of your site's build output):
+```text
+https://example.com/.well-known/telium/server
+```
+
+Choose the instructions that match **how you already publish your website**. You do not need to switch hosts.
+
+### Website hosting panel, FTP or SFTP (no Git)
+
+For shared hosting or a conventional website server:
+
+1. Open your hosting provider's **File Manager**, or connect using FTP/SFTP.
+2. Find the website's **document root** — the directory whose contents appear at `https://example.com/`. On many cPanel-style setups this is `public_html/`, but yours may differ.
+3. **Inside that document root**, create `.well-known/telium/` and upload the extensionless `server` file.
+4. Make sure the file is public and readable, and that your web server sends it as `application/json`. If the host assigns `application/octet-stream`, ask the host how to set a content type for this URL.
+5. Visit the full HTTPS URL in a browser. If you see your site's home page, a 404, a redirect or a download, check your website's rewrite rules and file-serving settings.
+
+This works for many static sites and traditional PHP/WordPress hosts, **as long as the hosting provider lets you serve a custom file at that exact path**. The document root can contain WordPress or another website application; you don't need to replace it. Some managed website builders do not provide this capability.
+
+### Cloudflare Pages: the easy way
+
+Cloudflare Pages has **two different publishing workflows**. Both can serve this static file:
+
+**A. You upload your site manually (no Git)**
+
+1. Add the `.well-known/telium/server` path to the **folder of website files you upload**, alongside `index.html`. Do not put it in an unrelated Git repository.
+2. Add a `_headers` file at the **root of those uploaded website files** to declare the JSON content type (example below).
+3. In **Cloudflare Dashboard → Workers & Pages → your Pages project**, create a new **Direct Upload** deployment. Upload your complete built website folder or ZIP, including `.well-known` and `_headers`; choose production and deploy.
+4. Verify the file at `https://example.com/.well-known/telium/server`.
+
+A Pages project configured for **Git integration** cannot use the dashboard's drag-and-drop Direct Upload method. Use its existing Git deployment or Wrangler instead. Cloudflare's [Direct Upload guide](https://developers.cloudflare.com/pages/get-started/direct-upload/) covers dashboard uploads.
+
+**B. Your site is deployed from Git**
+
+1. In the website project, add `public/.well-known/telium/server` if your framework copies `public/` into the output (typical for Astro, Vite, and many others). For a plain static website, add `.well-known/telium/server` inside the folder that becomes the deployed site.
+2. Add `public/_headers`, or place `_headers` in the build output as appropriate.
+3. Commit and push the change through the Git workflow you **already use** for the website. Wait for the Pages deployment, then verify the URL.
+
+**Pages `_headers` example** — put this at the deployed website's root; if you already have `_headers`, append the rule:
 
 ```text
 /.well-known/telium/server
@@ -92,115 +121,59 @@ An extensionless file might otherwise be served with an unsuitable content type.
   Cache-Control: public, max-age=300
 ```
 
-This applies the headers only to the discovery URL. [Cloudflare documents `_headers` here](https://developers.cloudflare.com/pages/configuration/headers/).
+See [Cloudflare's custom-headers documentation](https://developers.cloudflare.com/pages/configuration/headers/). Keep `example.com` attached to your Pages website; only `chat.example.com` needs to reach the Telium server.
 
-If your site already has a `_headers` file, **append** this rule rather than replacing existing website headers.
+### Other static hosts (Netlify, Vercel, static site builders)
 
-### Step 4. Deploy the Pages website
+The same file works if your hosting provider serves files from a public output directory:
 
-1. Commit and push the new `server` and `_headers` files to the Git branch Cloudflare Pages deploys.
-2. Open **Cloudflare Dashboard → Workers & Pages → your Pages project → Deployments** and confirm the deployment finished.
-3. Under **Custom domains**, make sure `example.com` is connected to this Pages project. Your regular website should still load.
-4. Open `https://example.com/.well-known/telium/server` in a browser. You should see the JSON you wrote, not a 404 page or your site's normal HTML.
+1. Find the directory that becomes the **root of your published website**.
+2. Place `.well-known/telium/server` inside it. For a website built with a framework, that often means putting the file under `public/` or `static/` **before building**, so it is copied into the output.
+3. Deploy using the provider's **usual workflow**: upload a folder, use its dashboard, run your build/deploy command, or push to Git.
+4. Make sure your host serves the extensionless path directly as JSON. Set a route-specific `Content-Type: application/json` using the provider's supported header configuration if needed.
 
-You do **not** need to change the DNS record for `example.com` from Pages to your VPS. Only `chat.example.com` needs to point to your Telium API's HTTPS ingress.
+Some frameworks have a catch-all route that serves `index.html` for unknown paths. Exclude `/.well-known/telium/server` from that fallback if necessary. **Do not rename it to `server.json` to get around the issue**; Telium requests the extensionless path.
 
-### Step 5. Test the real signup path
+### Website builders that cannot upload arbitrary files
 
-From a machine outside your server's local network:
+Some hosted website builders don't expose a public file directory or custom route handling. In that case, look for a supported feature that makes **one exact HTTPS URL** return JSON (a static asset, custom endpoint, or reverse-proxy rule). If the platform cannot do that, this setup may not work on that domain without a separate DNS/edge routing arrangement.
+
+**A normal `301` or `302` redirect to `chat.example.com` is not a reliable substitute.** Telium and third-party clients may not follow discovery redirects; the result at the account domain needs to be a successful JSON response.
+
+## 4. Test it before registering anyone
+
+From a different machine, replacing the examples:
 
 ```sh
-# Must return 200 and JSON, not a redirect.
+# Check the website domain. We deliberately do not follow redirects.
 curl -i --max-redirs 0 https://example.com/.well-known/telium/server
 
-# Must answer from the actual Telium server.
+# Confirm that the actual Telium API is reachable.
 curl -fsS https://chat.example.com/_telium/v1/capabilities
+
+# Compare against Telium's own discovery document.
+curl -fsS https://chat.example.com/.well-known/telium/server
 ```
 
-Confirm that the first response has `Content-Type: application/json` and that `server_name` and `api` match your configuration.
+You want **HTTP 200**, valid JSON (preferably `Content-Type: application/json`), `server_name` matching your account domain, and `api` matching your server's public URL. Both domains must use valid HTTPS.
 
-Then open [telium.chat](https://telium.chat), choose your own server, **enter `example.com` (not `chat.example.com`)**, and create your first account. It should look like `@alex:example.com`.
+Next open [telium.chat](https://telium.chat), choose your own server, and enter **`example.com`** — not `chat.example.com`. Create the first account. The address should be `@you:example.com`. Test a second account or a friend on another home server to confirm federation.
 
-After that, test a login, a guild, and a friend or invited user on a **different** home server to check federation.
+**Joining the public directory?** Submit your **account domain** (`example.com`) at [telium.chat/list](https://telium.chat/list). The directory discovers the real API URL from your file.
 
-:::tip[Keep the names straight]
-If you [list your server publicly](https://telium.chat/list), submit `example.com`, because that is your account domain. Telium's directory will read the `.well-known` file to discover `chat.example.com` automatically.
-:::
+## For public servers: keep discovery current
 
-### Avoid these common mistakes
+The tiny file above is enough to explain the basic mapping but is only a subset of the full Telium document. If your server changes signing keys, capabilities, compatibility versions, referral policy, failover or relocation state, a hand-maintained copy can get stale.
 
-| Symptom | Likely cause |
-| --- | --- |
-| `/.well-known/telium/server` returns your homepage | Your SPA fallback caught the request; the extensionless asset wasn't included in the deployed output |
-| It downloads as a file or isn't valid JSON | Missing or incorrect `_headers` `Content-Type` rule, or invalid JSON |
-| You get 301 or 302 | A redirect rule, canonical-URL rule or `_redirects` file is intercepting this path |
-| Discovery returns `@alex:chat.example.com` instead | `server_name` is still set to the API hostname |
-| It finds the server but cannot sign in | Check HTTPS and WebSocket access to the `api`/`gateway` URLs, plus registration state |
-| API works but federation is missing features | The static minimal document doesn't publish all current protocol/capability fields; use the live option below |
+For a public service, choose one of these:
 
-**Don't use a normal redirect rule to point the discovery URL at the backend.** You want to return a JSON document that **names** the backend. A `301` or `302` is a different protocol behavior, and federation code may not follow that redirect. Cloudflare Pages' `_redirects` `200` proxying also does not support proxying external domains: this isn't a way to turn the JSON document into a cross-domain reverse proxy.
+- **A live reverse proxy at the website host.** Serve only `/.well-known/telium/server` from the Telium backend, leaving every other website path alone. This works with a proxy you control, such as Caddy or nginx.
+- **An edge/serverless function** supported by your website host, which fetches and returns the backend's complete JSON. This incurs whatever request limits the provider imposes.
+- **A static file you update** whenever relevant discovery fields change. The basic static example is the simplest, but you are responsible for maintaining compatibility and notices. To mirror all fields, copy the **full** JSON from the backend's discovery endpoint rather than assuming the minimal example includes everything.
 
-## Optional: keep the discovery file up to date automatically
+### Live reverse proxy example (Caddy)
 
-For a **public home server**, serving the **complete live JSON** is better than the minimal static file: the server can publish new signing keys, protocol capabilities, referral settings, failover and relocation information without you editing Pages each time.
-
-Cloudflare Pages can do that using a single **Pages Function**. It leaves the rest of your website static.
-
-### Step 1. Remove the static `server` file
-
-Remove `public/.well-known/telium/server` if you created it above. The Pages Function will now serve that URL.
-
-### Step 2. Create a tiny Pages Function
-
-At the **root of your website repository** (beside `public/`, **not inside it**), create:
-
-```text
-functions/
-  .well-known/
-    telium/
-      server.js
-```
-
-Put the following code in `server.js`:
-
-```js
-export async function onRequestGet() {
-  const upstream = await fetch(
-    "https://chat.example.com/.well-known/telium/server",
-    { headers: { Accept: "application/json" } },
-  );
-
-  if (!upstream.ok) {
-    return new Response("Telium discovery is temporarily unavailable", {
-      status: 502,
-      headers: { "Cache-Control": "no-store" },
-    });
-  }
-
-  return new Response(upstream.body, {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "public, max-age=60",
-    },
-  });
-}
-```
-
-Replace `chat.example.com` with your Telium API address. Pages reads the file's path as the URL route, so this handler responds only at `/.well-known/telium/server`. It **fetches the full live discovery response** from your server without giving the browser a redirect or proxying the rest of the API through your website.
-
-**For the Pages site's other URLs, keep using static files.** Do not add a catch-all Function. If you are using a framework that generates a `_routes.json`, ensure this discovery path actually invokes the Function. The [Pages Functions routing guide](https://developers.cloudflare.com/pages/functions/routing/) describes the matching rules.
-
-### Step 3. Deploy and verify
-
-Commit and push your change, then run the same `curl` tests from [Step 5](#step-5-test-the-real-signup-path). To confirm the response is live, compare the `.well-known` JSON on both domains after a server change.
-
-**Tradeoff:** A Pages Function uses the Cloudflare Workers request quota, unlike a static Pages file. The current Free allowance is shared with Workers (100,000 requests/day), so this is not an unlimited-function option. Only discovery requests need invoke this Function, not every website visit. See [Cloudflare's Functions pricing](https://developers.cloudflare.com/pages/functions/pricing/). If you specifically want **zero function invocations**, keep the static method and maintain it when server metadata or protocol capabilities change.
-
-## Alternative: serve the live document through a traditional proxy
-
-If your website already uses a path-aware proxy such as Caddy, you can serve the live discovery JSON without Cloudflare Pages Functions:
+If the website and API are served through a Caddy proxy you control, a path-specific route can provide up-to-date discovery without touching the rest of the website:
 
 ```caddyfile
 example.com {
@@ -218,18 +191,75 @@ chat.example.com {
 }
 ```
 
-The website backend `127.0.0.1:3000` is only an example; replace it with your existing site upstream. This requires the website domain to route through that proxy, so it is **not** the usual choice when `example.com` stays on Cloudflare Pages.
+Replace `127.0.0.1:3000` with the address of **your existing website**, and use the actual Telium upstream. This example assumes both services are on the same host. A site hosted elsewhere needs a different reverse-proxy topology.
+
+### Optional Cloudflare Pages Function (advanced)
+
+If you specifically use Cloudflare Pages and can deploy Functions through **Git or Wrangler** (not dashboard drag-and-drop), create `functions/.well-known/telium/server.js` in the **website project root**, outside the static output folder:
+
+```js
+export async function onRequestGet() {
+  const upstream = await fetch(
+    "https://chat.example.com/.well-known/telium/server",
+    { headers: { Accept: "application/json" } },
+  );
+
+  if (!upstream.ok) {
+    return new Response("Discovery unavailable", {
+      status: 502,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
+  return new Response(upstream.body, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Access-Control-Allow-Origin": "*",
+      "Cache-Control": "public, max-age=60",
+    },
+  });
+}
+```
+
+Remove the static `.well-known/telium/server` file if using this Function, so there is just one source for that route. Replace the backend hostname in the code.
+
+**Restrict Function invocations to that path**, so ordinary static website visits don't consume Functions requests. Put a `_routes.json` file in the website **build output** (or use your framework's equivalent), and ensure it contains these effective rules:
+
+```json
+{
+  "version": 1,
+  "include": ["/.well-known/telium/server"],
+  "exclude": []
+}
+```
+
+If your framework already generates `_routes.json`, **merge** rather than overwrite its routing rules. Pages Functions request quotas apply to the routed calls; check [Cloudflare's deployment requirements](https://developers.cloudflare.com/pages/functions/get-started/) and [routing rules](https://developers.cloudflare.com/pages/functions/routing/). This is optional: there is no need to add Functions merely to use a website domain for Telium.
+
+## Troubleshooting
+
+| What happens | What to check |
+| --- | --- |
+| `/.well-known` shows your homepage | The file wasn't deployed, or a site-wide rewrite caught it |
+| 404 or 403 | Wrong document root, hidden dot-directory restriction, incorrect permissions or host configuration |
+| The file downloads | Configure `Content-Type: application/json` for this path |
+| HTTP 301 or 302 | Redirect/canonical-host rules are intercepting the discovery path; test the final HTTPS account domain directly |
+| The client connects to the wrong server | `server_name` / `api` differs between the file and `telium.toml` |
+| Basic sign-in works but a federation feature fails | Static discovery may lack keys, capabilities or other fields; use a full current response |
+| You can't create `.well-known` files | Your website provider may not support arbitrary assets; use its custom endpoint feature or a different website setup |
 
 ## Frequently asked questions
 
-**Do I need to move my website away from Cloudflare Pages?** No. Your website stays where it is. Only one special path must respond with discovery JSON.
+**Is this a redirect?** In everyday terms, it *points* Telium at another hostname. Technically, it's a JSON document, **not an HTTP redirect**.
 
-**Is the file a redirect?** Conceptually it directs Telium to the right backend, but technically **no**: it is a JSON document with an `api` URL, not an HTTP redirect response.
+**Does the website need to run Telium?** No. Your website serves one file. The backend handles account logins, messages and uploads.
 
-**Can `chat.example.com` use Cloudflare Tunnel?** Yes. Tunnel supports homeserver HTTP and WebSocket traffic, including login, guild messages and media uploads within the provider's limits. It does **not** carry SFU or TURN UDP media; see [SFU](/self-hosting/sfu/).
+**Do I need Cloudflare or Git?** No. A file manager, FTP/SFTP, manual upload, normal website build or capable web server works.
 
-**Can the API use a totally different domain I own?** Standard Telium federation and clients discover the advertised HTTPS API address, but some clients and integrations (including the current JavaScript bot SDK) restrict delegation to the same domain or one of its subdomains to protect credentials. **The safest documented setup is `example.com` → `chat.example.com`.**
+**Can the backend use Cloudflare Tunnel?** Yes for Telium's HTTP and WebSocket endpoints. A tunnel does not carry SFU/TURN UDP media; see [SFU](/self-hosting/sfu/).
 
-**Can I do this after people already registered as `@alex:chat.example.com`?** Do not change `server_name` in place. Their account addresses already have an identity. Use [Relocation](/self-hosting/relocation/) and [Migration](/federation/migration/) instead.
+**What if the API is on a completely unrelated domain?** Telium can discover an HTTPS API URL, but some integrations (including the bot SDK) restrict requests to the same hostname or a subdomain for security. `example.com` with `chat.example.com` is the most compatible setup.
 
-**Next:** If you want to accept strangers' registrations, read [Run a public homeserver](/self-hosting/public-server/) for upload limits, retention, abuse reporting and the listing wizard.
+**What if I already have accounts at `@alice:chat.example.com`?** Don't edit `server_name` in place. See [Relocation](/self-hosting/relocation/) and [Migration](/federation/migration/).
+
+**Next:** If you are opening signups to strangers, read [Run a public homeserver](/self-hosting/public-server/) for upload limits, retention, moderation and listing.
