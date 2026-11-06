@@ -5,7 +5,20 @@ sidebar:
   order: 3
 ---
 
+**Operating a public server?** Start with [Run a public homeserver](/self-hosting/public-server/) for upload quotas, retention, moderation and readiness, then use the [listing wizard](https://telium.chat/list) to submit your entry. The following sections explain advanced recommendation eligibility and the signed catalogue.
+
 This page covers where a new account gets created: the default on your own server, the opt-in recommendation flow that spreads new accounts across community homeservers, and what an operator must do to receive referrals.
+
+## Which option do you want?
+
+| Goal | Action |
+| --- | --- |
+| **Just run my own server** | Do nothing here. Keep or close registration to suit your community. |
+| **Let people find my server** | Use the [listing wizard](https://telium.chat/list) for the [public homeserver directory](#directory-and-recommended-pool). Listing makes you discoverable but does not put you in automated recommendations. |
+| **Volunteer to receive new account signups** | Join the directory, then [opt in](#opting-in) both in the registry and your live config. Additional age, uptime and availability checks apply. |
+| **Suggest another home to people using my signup page** | Configure `registration.recommendations.suggest_alternatives` and use a client build that verifies the signed catalogue. |
+
+**You control your own signups.** Being listed never overrides `registration.open`, and `recommendations.accepting = false` pauses automatic recommendations without deleting your directory entry. For what to do right after installing, see [After setting up your server](/self-hosting/after-setup/).
 
 ## Defaults
 
@@ -33,7 +46,7 @@ Ordinary web builds pin no key, so they always offer the serving homeserver and 
 
 ## Directory and recommended pool
 
-The public homeserver directory is built from [`site/registry/servers.json`](https://github.com/telium-chat/telium/blob/main/site/registry/servers.json). You join it by opening a pull request. The site probes each listed server's `/.well-known/telium/server` and `/_telium/v1/capabilities` every hour and records reachability, API origin, protocol version, roles, registration state, moves, sunsets and live referral settings.
+The public homeserver directory is built from [`site/registry/servers.json`](https://github.com/telium-chat/telium/blob/main/site/registry/servers.json). You join through [telium.chat/list](https://telium.chat/list), which files an issue and prepares a pull request, or by opening a pull request manually. A maintainer still reviews the listing. The site probes each listed server's `/.well-known/telium/server` and `/_telium/v1/capabilities` every hour and records reachability, API origin, protocol version, roles, registration state, moves, sunsets and live referral settings.
 
 Being listed does not put you in the recommended pool. The pool is a stricter subset.
 

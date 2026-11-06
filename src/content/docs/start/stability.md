@@ -7,6 +7,14 @@ sidebar:
 
 Telium is at release stage **alpha**, protocol version **1 (provisional)**. The protocol is not frozen.
 
+## What this means for you
+
+**Just using Telium?** Expect the client to change, and understand that an operator may need to update the server before older clients can connect. Keep your account recovery material safe. Don't treat an experimental service as your only copy of important files.
+
+**Running a private home?** Preserve the database, server keys, media and a working backup-decryption key. A server update can include a one-way database migration.
+
+**Hosting strangers?** Do not promise uninterrupted service or permanent attachment storage while the software is still alpha. Publish your [media retention policy](/self-hosting/public-server/#2-set-file-sizes-quotas-and-retention), verify offsite restores and give users a way to reach you about outages.
+
 :::caution
 Expect breaking changes. Keep backups, and test that you can restore them. See [Backups](/self-hosting/backups/).
 :::

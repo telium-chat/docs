@@ -5,7 +5,18 @@ sidebar:
   order: 1
 ---
 
-A guild is a community with channels, roles and members. This page covers how permissions resolve, how invites and addresses work, and the moderation tools a guild has.
+A guild is a community with channels, roles and members — similar to a Discord server, but it can live on a different Telium server than your account. This page covers how permissions resolve, how invites and addresses work, and the moderation tools a guild has.
+
+## Start with a guild
+
+1. In the Telium client, create a guild or join one through an invite.
+2. Create text and voice channels for the people who will use them.
+3. Invite a second account and check what a regular member can see and do.
+4. Add roles and moderation rules only when you need them.
+
+**Two different kinds of authority:** A guild owner manages that community's channels, permissions and members. A [homeserver administrator](/self-hosting/server-ownership/) manages the machine's accounts and server-wide policy. Owning a guild does not grant administrator access to the home server.
+
+For more detail, jump to [permissions](#permissions), [invites](#invites) or [moderation](#automod).
 
 ## Where a guild lives
 

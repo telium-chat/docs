@@ -7,6 +7,15 @@ sidebar:
 
 The Telium desktop app (Electron) can show what you are playing, listening to or watching as part of your presence. This page covers the controls, the sources it reads, and what reaches other people.
 
+## Turn it on (or off)
+
+1. Open the **desktop app** and sign in. Detection is a desktop feature, not something a browser tab can do by itself.
+2. Go to **Settings → Activity sharing** and choose whether to share games, music or video. Game presence starts enabled; the other two categories are optional.
+3. Launch a game or play supported media, then inspect the status shown on your profile. If nothing appears, check the settings pane's detected sources and whether your system exposes them.
+4. Turn a switch off whenever you do not want to broadcast that kind of activity. These controls apply **to this device only**.
+
+Your detected activity is not a public log of everything you've run, but it can be visible while you're online. An invisible or offline status hides it.
+
 ## Settings
 
 Open **Settings -> Activity sharing**. Three switches work independently:

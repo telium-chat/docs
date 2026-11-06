@@ -16,7 +16,7 @@ A production homeserver is one `telium-server` process behind TLS on a public do
 - A domain name
 - Its DNS record pointed at the machine
 
-No client to host: [telium.chat](https://telium.chat) and the packaged desktop and Android clients work with every server. And if you would rather not run a server at all, there is [managed hosting](/self-hosting/managed-hosting/).
+No client to host: [telium.chat](https://telium.chat) and the packaged desktop and Android clients work with every server. If you do not want to run a server, you can use an account home that accepts registrations instead. [How account homes and signups work](/federation/onboarding/).
 
 ## Pick an install
 
@@ -35,6 +35,12 @@ Both install guides are one command with your domain as the argument; everything
 - **The startup audit.** `telium-server check` runs before every start and refuses configs that would expose a production server. See [Checking a config](/self-hosting/configuration/#checking-a-config).
 - **Updates, on by default.** Both installs ship an updater and timer; see [Updates](/self-hosting/updates/).
 
+## Want your website and Telium on different domains?
+
+You can keep your existing website at `example.com` (on shared hosting, a site builder, static hosting, or elsewhere), host Telium on `chat.example.com`, and still issue account addresses like `@you:example.com`. The [website-domain guide](/self-hosting/domain-delegation/) shows how to publish a one-line `telium.txt` pointer with manual uploads, hosting panels or Git; each install method shows the extra config edit needed. Set the account domain **before the first signup**.
+
 ## Finish
 
 Once your server answers on its domain, register your account — the first one on a fresh server becomes its administrator — then set `[registration] open = false` and restart. Voice and video mesh up to four participants with no extra setup; a bigger server wants an [SFU](/self-hosting/sfu/).
+
+**Next:** Work through [After setting up your server](/self-hosting/after-setup/) to verify sign-in, backups, updates, storage limits and whether your server should accept public signups.

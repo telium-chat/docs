@@ -7,6 +7,15 @@ sidebar:
 
 This page covers calls in direct messages and group chats: the three call privacy settings, how a call picks mesh or SFU, where the SFU comes from, and what each server can see. Guild voice channels are covered in [Voice and video](/features/voice-and-video/).
 
+## Start a private call
+
+1. Open a direct message or group conversation.
+2. Start a call from that conversation and give the app microphone permission if asked.
+3. Choose how to handle your network address in **Settings → Calls & audio → Call privacy** before calling. You can override the default for a specific conversation.
+4. If you cannot connect under a strict privacy setting, the needed relay may be unavailable. You can check with your homeserver operator rather than silently relaxing your privacy preference.
+
+**Your conversation's messages and call media are end-to-end encrypted.** However, direct peer-to-peer calls reveal participants' network addresses to each other. The three options below explain how to avoid that tradeoff, and which relays must exist.
+
 ## Call privacy
 
 Set your default in **Settings -> Calls & audio -> Call privacy**, with per-conversation overrides below it. The setting lives in your client sync store; servers never learn it.

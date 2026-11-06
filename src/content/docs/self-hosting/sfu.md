@@ -7,6 +7,25 @@ sidebar:
 
 This page sets up `telium-sfu` and connects it to your homeserver. Without an SFU, guild calls fall back to peer-to-peer mesh, capped at `voice.mesh_max_participants` (4).
 
+## Do you need an SFU?
+
+- **Just testing or running a small guild?** You can skip this page. Calls with up to four people use mesh by default.
+- **Hosting larger voice channels?** An SFU relays each person's audio and video, so clients do not need to send a separate stream to everyone else.
+- **Running a homeserver behind Cloudflare Tunnel?** The homeserver can use a tunnel, but an SFU needs separately reachable media ports. You can host the SFU elsewhere.
+
+### Private does not mean public
+
+**Running an SFU for your own community does not commit you to carrying calls for the whole Telium network.** There are two trust modes:
+
+| Mode | Who can use it? | What to configure |
+| --- | --- | --- |
+| **Private (recommended to start)** | Only the homeservers you add to **Trusted servers** | Keep `trust.public = false`; add your homeserver in the SFU admin dashboard or `[[trust.origins]]`. |
+| **Public (optional)** | Any homeserver that publishes keys and can reach the SFU | Set `trust.public = true` **only** when you want to share your relay capacity. |
+
+An SFU can also serve several specific trusted homeservers without being public. If you are inviting other operators to use it, consider bandwidth and participant limits before making it available. [Post-installation checklist](/self-hosting/after-setup/#want-to-help-grow-the-network).
+
+## What runs where
+
 | Piece | Role |
 |---|---|
 | `telium-server` | Authorises calls and signs short-lived join tokens. |

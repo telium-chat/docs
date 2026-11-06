@@ -5,7 +5,9 @@ sidebar:
   order: 3
 ---
 
-Telium has one React client that runs in three shells. The protocol, state and UI code under `web/src/` is shared, so permissions and features come from the server, not the platform. Clients built outside this project exist too — see [Custom clients](#custom-clients).
+**Want to start chatting?** Open [telium.chat](https://telium.chat) in a browser; no download or server installation is required. Prefer an app? Choose the appropriate package below. If you're new to Telium, follow [Your first steps](/start/first-steps/) to create an account and join a guild.
+
+Telium's shared React client runs in a browser, on desktop and on Android. The protocol, state and UI code under `web/src/` is shared across those shells. Clients built outside this project exist too — see [Custom clients](#custom-clients).
 
 | Runtime | Shell | Package |
 | --- | --- | --- |

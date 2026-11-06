@@ -74,12 +74,11 @@ Details: [Federation overview](/federation/overview/) and [Signing](/reference/p
 
 ## Who can read what
 
-<img class="diagram diagram-light" src="/diagrams/who_reads-light.svg" alt="Your devices read everything. The guild server reads guild messages and guild calls. The SFU reads guild-call media and sees only metadata for DM calls. The home server stores DM ciphertext and sealed settings but cannot read them. No server receives your password." />
-<img class="diagram diagram-dark" src="/diagrams/who_reads-dark.svg" alt="Your devices read everything. The guild server reads guild messages and guild calls. The SFU reads guild-call media and sees only metadata for DM calls. The home server stores DM ciphertext and sealed settings but cannot read them. No server receives your password." />
-
 | Data | Readable by |
 | --- | --- |
-| Guild messages | The guild server |
+| Guild text messages | The guild server (not end-to-end encrypted). |
+| Guild calls through an SFU | Participants' devices encrypt media under a per-call MLS group. The SFU sees transport metadata but cannot decrypt the media. |
+| Guild mesh calls | Media uses peer-to-peer transport encryption; a malicious guild server could interfere with signalling. |
 | DM and group-conversation content | Only participants' devices (MLS). Home servers route ciphertext and keep delivery metadata. See [DM encryption](/security/dm-encryption/). |
 | Passwords | Not sent to the server as a reusable secret (OPAQUE). See [Account security](/security/account-security/). |
 | Media | Anyone holding its capability reference |
