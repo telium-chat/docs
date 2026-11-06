@@ -20,7 +20,7 @@ This is a working checklist for future docs passes. It is **not** a replacement 
 - [x] Added [after setting up your server](src/content/docs/self-hosting/after-setup.md), covering administrators, registration, backups, updates, testing, storage and directory/SFU decisions.
 - [x] Added skim-friendly introductions to guilds, media, public-home onboarding and SFU hosting.
 - [x] Added a [public homeserver walkthrough](src/content/docs/self-hosting/public-server.md): first-user experience, operator checks, 50 MiB upload example, quota, 30-day retention, listing wizard and referral opt-in.
-- [x] Added [domain delegation](src/content/docs/self-hosting/domain-delegation.md): permanent account identity versus API URL, `.well-known` route, live proxy and verification.
+- [x] Added [website-domain setup](src/content/docs/self-hosting/domain-delegation.md): Cloudflare Pages static `.well-known` file, JSON headers, optional live Function, immutable account domain versus API URL and verification. All three installers now describe the necessary pre-signup edit.
 - [x] Moved step-by-step user guidance to the top of voice, DM calls, friends, notifications, watch-together, rich presence and help pages.
 - [x] Made the privacy matrix and alpha-stability caveats understandable without reading protocol details.
 - [x] Verified in the implementation that SFU guild calls use MLS-based E2EE and corrected contradictory security prose.
