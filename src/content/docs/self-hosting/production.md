@@ -35,6 +35,10 @@ Both install guides are one command with your domain as the argument; everything
 - **The startup audit.** `telium-server check` runs before every start and refuses configs that would expose a production server. See [Checking a config](/self-hosting/configuration/#checking-a-config).
 - **Updates, on by default.** Both installs ship an updater and timer; see [Updates](/self-hosting/updates/).
 
+## Want your website and Telium on different domains?
+
+You can keep a website at `example.com` (including Cloudflare Pages), host Telium on `chat.example.com`, and still issue account addresses like `@you:example.com`. The [Cloudflare Pages `.well-known` walkthrough](/self-hosting/domain-delegation/) has copy-paste instructions, and each install method shows the extra config edit needed. Set the account domain **before the first signup**.
+
 ## Finish
 
 Once your server answers on its domain, register your account — the first one on a fresh server becomes its administrator — then set `[registration] open = false` and restart. Voice and video mesh up to four participants with no extra setup; a bigger server wants an [SFU](/self-hosting/sfu/).
