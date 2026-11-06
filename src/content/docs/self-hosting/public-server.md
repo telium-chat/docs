@@ -162,4 +162,4 @@ The directory can keep showing you; the referral signal updates on its next prob
 
 There is no responsible universal "one VPS supports X users" number: file behavior, online concurrency, media origin and federation traffic vary. Measure your own workload before promising an account capacity. Use [Observability](/self-hosting/observability/), [Scaling](/self-hosting/scaling/), [Disaster recovery](/self-hosting/disaster-recovery/) and [Sunset](/self-hosting/sunset/) as you grow.
 
-**Next:** If your account domain is a website but the API runs elsewhere, follow the [Cloudflare Pages `.well-known` setup](/self-hosting/domain-delegation/). Then [submit your public listing](https://telium.chat/list).
+**Next:** If your account domain is a website but the API runs elsewhere, follow the [one-line `telium.txt` setup](/self-hosting/domain-delegation/). Then [submit your public listing](https://telium.chat/list).
