@@ -79,7 +79,7 @@ The standalone installer currently uses **one domain** for both the server's ide
    ```
 
 4. Test `https://chat.example.com/.well-known/telium/server`: it should announce `server_name` of `example.com`.
-5. Leave `example.com` pointed at your website host. Add the [`.well-known` file using your website provider's normal publishing method](/self-hosting/domain-delegation/) there, then register through the account domain `example.com`.
+5. Leave `example.com` pointed at your website host. Add a [one-line `telium.txt` file using your website provider's normal publishing method](/self-hosting/domain-delegation/) there, then register through the account domain `example.com`.
 
 **Replace `example.com` and `chat.example.com` with your own domains.** Do this before any accounts exist. The domain in an account ID is not something you can change by editing a config file later.
 
