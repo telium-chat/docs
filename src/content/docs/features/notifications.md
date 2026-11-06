@@ -9,6 +9,15 @@ sidebar:
 
 This page covers push transports, what triggers a notification, the per-device encrypted inbox, and what each party learns.
 
+## Get notifications working
+
+1. Sign in on the device where you want alerts.
+2. **Web browser:** Allow notifications for the Telium client site when your browser asks. Browser support and site permissions must be enabled for Web Push to work.
+3. **Android:** The app can receive notifications through UnifiedPush. On Play Services devices, the bundled distributor normally needs no server-side Firebase setup; Google-free devices can choose a compatible external distributor.
+4. If you're missing a particular guild's alerts, check whether its channel is muted, whether the event is one that generates an alert, and your device's notification permissions. Being online can also change whether a push is sent.
+
+Your homeserver sends a minimal wake-up event; the device then retrieves notification details. You do **not** need to configure FCM or APNs on a typical community homeserver just to support browser and Android notifications.
+
 ## Push support today
 
 | Transport | Status |
