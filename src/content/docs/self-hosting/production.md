@@ -37,7 +37,7 @@ Both install guides are one command with your domain as the argument; everything
 
 ## Want your website and Telium on different domains?
 
-You can keep a website at `example.com` (including Cloudflare Pages), host Telium on `chat.example.com`, and still issue account addresses like `@you:example.com`. The [Cloudflare Pages `.well-known` walkthrough](/self-hosting/domain-delegation/) has copy-paste instructions, and each install method shows the extra config edit needed. Set the account domain **before the first signup**.
+You can keep your existing website at `example.com` (on shared hosting, a site builder, static hosting, or elsewhere), host Telium on `chat.example.com`, and still issue account addresses like `@you:example.com`. The [website-domain guide](/self-hosting/domain-delegation/) has instructions for manual uploads, hosting panels, Git and live proxies; each install method shows the extra config edit needed. Set the account domain **before the first signup**.
 
 ## Finish
 
