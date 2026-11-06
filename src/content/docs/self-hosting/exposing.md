@@ -5,6 +5,8 @@ sidebar:
   order: 5
 ---
 
+**Want usernames like `@alice:example.com` while the server runs at `chat.example.com`?** See [Domain delegation with `.well-known`](/self-hosting/domain-delegation/) for the extra discovery route you must serve on the account domain.
+
 The server binds loopback; whatever sits in front of it is the public side. Pick one front and follow its section — Caddy if the box has open ports and you want the least moving parts, a Cloudflare Tunnel if you want none at all, nginx if you already run it. The tunnel kit includes the tunnel, and the standalone kit can run this page's Caddy as a container (its `proxy` profile), so this page is mostly for the native install and for fronts the box already runs.
 
 Whatever you use, the front must:
