@@ -73,7 +73,7 @@ A small voice call works in peer-to-peer **mesh** mode without a media server. F
 
 ## Before you welcome strangers
 
-**Planning a public service?** The [public homeserver walkthrough](/self-hosting/public-server/) has copyable size limits, per-user quotas, 30-day retention, a registration and moderation checklist, and the steps for [telium.chat/list](https://telium.chat/list). If you keep your normal website at `example.com` while Telium runs at `chat.example.com`, use the [Cloudflare Pages `.well-known` instructions](/self-hosting/domain-delegation/) **before creating your first account**.
+**Planning a public service?** The [public homeserver walkthrough](/self-hosting/public-server/) has copyable size limits, per-user quotas, 30-day retention, a registration and moderation checklist, and the steps for [telium.chat/list](https://telium.chat/list). If you keep your normal website at `example.com` while Telium runs at `chat.example.com`, follow the [website-domain `.well-known` instructions](/self-hosting/domain-delegation/) **before creating your first account**.
 
 
 ### Choose your registration policy
