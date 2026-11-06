@@ -9,6 +9,20 @@ This page lists what each component can observe from the data it handles, whethe
 
 Message content in DMs and group DMs is end-to-end encrypted. Who is in a conversation, who sent each frame from which device, when, how large, and who is typing is visible to at least one server.
 
+## Privacy at a glance
+
+| What you're doing | What is protected | Who may still see something |
+| --- | --- | --- |
+| **Guild text chat** | Encrypted in transit, **not end-to-end** | The guild server can read message content; members with access can too. |
+| **DMs and group DMs** | End-to-end encrypted message content | Homeservers still handle participants, delivery times and sizes. |
+| **Small guild voice call (mesh)** | Peer-to-peer DTLS-SRTP transport encryption | Other participants receive the media and may learn your IP. A malicious signalling server is a trust risk. |
+| **Guild call through an SFU** | Per-call MLS-based end-to-end media encryption | The SFU forwards ciphertext but learns call metadata, participant IPs and traffic patterns. |
+| **DM/group call** | End-to-end encrypted call media | The chosen SFU or TURN relay, if any, observes connection metadata and IPs. |
+| **An uploaded file** | Transport is protected; **don't assume a file is end-to-end encrypted** | The media origin stores or handles its bytes. Check where your uploads go and their expiry. |
+| **Friends, presence and profiles** | User settings limit some sharing | Your home and relevant guild servers still process relationship and presence metadata. |
+
+If you are choosing a homeserver, the practical rule is to **trust its operator with your account and metadata**. If you are joining a guild, assume its operator can read guild text. If you are sending a file, choose an upload origin and expiry policy you trust. [Your first steps](/start/first-steps/) and [Media](/features/media/) explain how to find those controls.
+
 :::caution
 Guild text channels are not end-to-end encrypted: the guild server can read their messages. **Guild calls through an SFU are end-to-end encrypted**, so the SFU cannot read their media. Mesh calls use peer-to-peer transport encryption, but a malicious guild server controlling the signalling could intercept them. See [Voice and video](/features/voice-and-video/#encryption-on-the-sfu).
 :::
