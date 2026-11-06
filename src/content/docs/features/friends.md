@@ -9,6 +9,15 @@ sidebar:
 
 The sections below explain relationship states, presence and the cross-server behavior. Each account home stores its own user's side of every relationship; there is no shared friendship database.
 
+## Add someone as a friend
+
+1. Get their **full Telium address**, such as `@alex:home.example`. A username without the account domain may refer to someone else.
+2. Send them a friend request through the client's friends interface.
+3. They can accept or decline. You can cancel a pending outgoing request or remove a friendship later.
+4. If a request fails across servers, check that their address is correct. Federation may also be temporarily unavailable — unlike a local friend request, the two home servers need to communicate.
+
+**Who sees your activity?** Accepted friends can receive your presence. A request alone does not grant presence access. You can block an account without notifying them that you chose the block action.
+
 ## Relationship states
 
 Your home keeps one row per peer, in one of four states:
