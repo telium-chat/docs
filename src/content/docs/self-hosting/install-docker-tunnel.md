@@ -40,6 +40,35 @@ curl -fsS https://chat.example.com/.well-known/telium/server
 
 Register your account — the first one becomes the administrator — then set `[registration] open = false` in `/opt/telium/telium.toml` and `docker compose up -d`. One line worth checking first: `[voice]` names the SFU this deployment was staged against; remove it unless it is yours, and calls mesh up to four people without it. Data is a named volume (`telium-data`) plus `/srv/telium-backups` for archives — see [Backups](/self-hosting/backups/).
 
+## Using your website domain for accounts
+
+For a website on `example.com` (such as Cloudflare Pages) and a Telium API through a tunnel on `chat.example.com`, you can keep usernames like `@you:example.com`.
+
+1. **Install using the tunnel hostname**, not your website's root domain:
+
+   ```sh
+   sudo ./deploy/install.sh chat.example.com
+   ```
+
+2. In Cloudflare, route the tunnel's public hostname **`chat.example.com`** to this kit's Telium container (`http://172.31.240.3:8448`), as described above. Leave **`example.com`** assigned to the Cloudflare Pages website.
+3. **Before creating your first Telium account**, edit `/opt/telium/telium.toml`:
+
+   ```toml
+   server_name = "example.com"
+   public_base_url = "https://chat.example.com"
+   ```
+
+4. Apply the edit:
+
+   ```sh
+   cd /opt/telium
+   sudo docker compose up -d --force-recreate server
+   ```
+
+5. Confirm `https://chat.example.com/.well-known/telium/server` announces `server_name` as `example.com`. Then add the [`.well-known` discovery file to Cloudflare Pages](/self-hosting/domain-delegation/#cloudflare-pages-the-easy-way), and choose `example.com` when registering an account.
+
+Only the Telium subdomain needs a tunnel route; **your Pages website stays on the original domain**. A tunnel can carry the homeserver HTTP/WebSocket requests, but not an SFU's UDP media.
+
 ## Troubleshooting
 
 | Symptom | Check |
