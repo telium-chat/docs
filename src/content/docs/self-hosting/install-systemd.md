@@ -86,6 +86,32 @@ curl -fsS https://chat.example.com/.well-known/telium/server
 curl -fsS https://chat.example.com/_telium/v1/capabilities
 ```
 
+## Using your website domain for accounts
+
+Want your website at `example.com` (for example, on Cloudflare Pages), but your Telium server at `chat.example.com`? Your account addresses can still be `@you:example.com`.
+
+1. **Run the installer with the account domain** so it creates the right long-term identity:
+
+   ```sh
+   sudo ./deploy/install-native.sh example.com
+   ```
+
+2. **Before registering any accounts**, edit `/etc/telium/telium.toml`:
+
+   ```toml
+   server_name = "example.com"
+   public_base_url = "https://chat.example.com"
+   ```
+
+   Keep the database, `bind`, backups and other installed values as they were.
+
+3. Set up DNS and HTTPS for **`chat.example.com`** to reach your Telium server. Keep **`example.com`** pointed at your website host, not at your Telium VPS. Apply the edit with `sudo systemctl restart telium-server`.
+4. Put a small `.well-known` file **on your website domain** so clients entering `example.com` discover the server on `chat.example.com`. Follow the [Cloudflare Pages step-by-step guide](/self-hosting/domain-delegation/#cloudflare-pages-the-easy-way).
+
+If you use this split setup, the installer's generic instruction to point the supplied domain at this box **does not apply to the website domain**. Your website keeps `example.com`; only the API hostname points to the Telium ingress. Both names must answer over HTTPS.
+
+**Do not change `server_name` on an established server.** [Why the domain matters](/self-hosting/domain-delegation/#what-this-looks-like).
+
 ## Storage
 
 | Path | Holds | Notes |
