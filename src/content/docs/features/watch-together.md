@@ -7,6 +7,16 @@ sidebar:
 
 Watch together puts one video on everyone's screen in a call and keeps every copy on the same second. It lives on the call stage, rides the call's signalling, and ends when the call ends.
 
+## Start a watch session
+
+1. Join a voice call with the people you want to watch with.
+2. Open **Watch together** on the call stage, then choose a supported video source or paste its link.
+3. In a guild, you need the `STREAM` permission. In a DM/group call, anyone in the call can start.
+4. Each participant is told which video service their device will contact and must agree before its player loads.
+5. Use play, pause or seek normally — Telium keeps the players near the same point. If the site is not supported, **share your screen** instead.
+
+**Privacy heads-up:** The video provider learns your network address when you accept and load its player. Other people in a guild call can also be on a server whose operator can read the watch-session signalling. Use [Voice and video](/features/voice-and-video/) for screen-sharing controls and [Privacy](/security/privacy/) for server trust.
+
 ## What can be synced
 
 | Source | Sync | Notes |
