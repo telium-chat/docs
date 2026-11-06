@@ -128,6 +128,9 @@ Ignored unless `roles.relay = true`. A relay carries guild traffic for this serv
 
 ## Media policy
 
+**For public operators:** Start with the practical [50 MiB / 1 GiB quota / 30-day expiry recipe](/self-hosting/public-server/#2-set-file-sizes-quotas-and-retention) before using this reference table. The reference default allows unlimited total upload storage per user.
+
+
 | Key | Default | Does |
 |---|---|---|
 | `default` | `"enabled"` | `enabled` (uploads free), `quota` (a per-user allowance) or `disabled`. |
