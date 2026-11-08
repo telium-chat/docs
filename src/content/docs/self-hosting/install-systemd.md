@@ -13,21 +13,36 @@ You can keep your existing website at `example.com` (on any hosting provider), r
 
 ## What you need
 
-- A Linux box with systemd, `curl`, `tar` and `sha256sum` (a small VPS is plenty)
+- A Linux box running systemd (a small VPS is plenty)
 - A public hostname for the Telium HTTPS endpoint (for example, `chat.example.com`). Your account domain may stay on a separate website host.
-- sudo
+- Root access, either through a root login or `sudo`. The installer works on root-only VPS images with no `sudo`.
+- `curl` or `wget` to download the bootstrap; Git is **not** needed. On Debian/Ubuntu, the bootstrap installs missing server-side packages.
 
-## One command
+## Quick install (no Git needed)
+
+From **any directory**, download the small bootstrap script and launch it with the domain:
 
 ```sh
-git clone https://github.com/telium-chat/telium.git
-cd telium
-sudo ./deploy/install-native.sh chat.example.com
+curl -fsSLo /tmp/telium-native-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-native.sh
+bash /tmp/telium-native-setup.sh chat.example.com
 ```
+
+If you don't have `curl`, use `wget` for the download instead:
+
+```sh
+wget -qO /tmp/telium-native-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-native.sh
+bash /tmp/telium-native-setup.sh chat.example.com
+```
+
+The bootstrap automatically uses `sudo` for ordinary users when available; if you're already root, no `sudo` command is needed. When neither `sudo` nor root privileges are available, ask the machine's administrator for access. If both `curl` and `wget` are missing on Debian/Ubuntu, run `apt-get update && apt-get install -y curl ca-certificates` **as root**, then use the first command above. Missing packages like `tar` and `sha256sum` are installed by the bootstrap on Debian/Ubuntu.
+
+:::note[Checking the script before running it]
+The bootstrap is [open-source shell code](https://github.com/telium-chat/telium/blob/main/deploy/bootstrap-native.sh). You can read the saved `/tmp/telium-native-setup.sh` file before executing it.
+:::
 
 The script downloads the current release from the rolling `server-latest` tag, checks it against the sha256 the release publishes, creates the `telium` user and its directories, writes `/etc/telium/telium.toml` from your domain, installs the unit and the update timer, and starts the server. It prints the three things only a human can do: DNS, TLS, and registering your account.
 
-It is safe to run again. What is ours — the binary, the units, the updater — is replaced each run, which is how it upgrades; what is yours — `telium.toml`, `update.conf`, the data — is created once and never touched.
+It is safe to run again. The installer preserves your server identity, configuration, data, and backup settings. It installs the updater and lets that updater manage binary upgrades and safe restarts.
 
 ## By hand
 
@@ -97,7 +112,7 @@ Want your website at `example.com` (on any hosting provider), but your Telium se
 1. **Run the installer with the account domain** so it creates the right long-term identity. Replace `example.com` with the real domain you own — the installer deliberately refuses example domains:
 
    ```sh
-   sudo ./deploy/install-native.sh example.com
+   bash /tmp/telium-native-setup.sh example.com
    ```
 
 2. **Before registering any accounts**, edit `/etc/telium/telium.toml`:
