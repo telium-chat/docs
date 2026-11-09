@@ -56,6 +56,7 @@ export default defineConfig({
             { slug: 'self-hosting/updates' },
             { slug: 'self-hosting/server-ownership' },
             { slug: 'self-hosting/sfu', label: 'Voice relay (SFU)' },
+            { slug: 'self-hosting/sfu-docker', label: 'Standalone SFU with Docker' },
             {
               label: 'Advanced operations',
               collapsed: true,
