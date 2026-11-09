@@ -13,7 +13,7 @@ An SFU is **not** a Telium homeserver. A homeserver handles accounts, communitie
 
 | What you want to do | Where to start |
 | --- | --- |
-| **Run a Telium homeserver** so people can create accounts and join communities | [Install with Compose](/self-hosting/install-docker/) or [install natively](/self-hosting/install-native/). Running your own SFU is optional. |
+| **Run a Telium homeserver** so people can create accounts and join communities | [Install with Compose](/self-hosting/install-docker/) or [install natively](/self-hosting/install-systemd/). Running your own SFU is optional. |
 | **Run a separate SFU with Docker**, whether for your own communities or as a public relay | [Standalone SFU with Docker](/self-hosting/sfu-docker/). It installs only the relay, not a homeserver. |
 | **Run an SFU directly on Linux** without Docker | Use [the native SFU installer](#install-with-the-script) below. |
 | **Connect an existing homeserver to your own SFU** | Install the SFU using either method, then [configure your homeserver to use it](#point-the-homeserver-at-it). |
