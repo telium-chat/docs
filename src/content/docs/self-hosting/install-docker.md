@@ -11,6 +11,8 @@ cd telium
 sudo bash deploy/standalone/install.sh
 ```
 
+**This installer creates a Telium homeserver.** If you only want to run public voice relays in Docker, use the [standalone SFU Docker installer](/self-hosting/sfu-docker/) instead. You do **not** need a homeserver for that.
+
 Answer three questions — your domain, who fronts it (the kit's Caddy with automatic certificates, or whatever already runs on the box), and whether it carries voice calls — and the installer writes the config, starts the stack, and turns on a timer that keeps every container current. Updates are on by default; `TELIUM_UPDATES=manual` in `/opt/telium/update.conf` is how you decline. Re-run the installer any time to upgrade the machinery; it never overwrites a file you could have edited.
 
 :::tip[Want accounts on your website domain?]
