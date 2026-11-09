@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-This page sets up `telium-sfu` and connects it to your homeserver. Without an SFU, guild calls fall back to peer-to-peer mesh, capped at `voice.mesh_max_participants` (4).
+This page explains Telium's voice relays and how to connect one to a homeserver. **Want to contribute public SFU capacity without hosting accounts?** Follow the [standalone SFU Docker guide](/self-hosting/sfu-docker/) instead. Small guild calls can fall back to peer-to-peer mesh, capped at `voice.mesh_max_participants` (4).
 
 ## Do you need an SFU?
 
@@ -59,11 +59,13 @@ It installs nginx, Certbot, Rust if needed, `livekit-server` and `telium-sfu`, c
 
 The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted servers** (`/admin/trust`) you add a homeserver by its `server_name`. The SFU discovers it, verifies its key and starts accepting its tokens without a restart. Removing one stops new sessions from it; calls already connected are left alone.
 
-## Install with Compose
+## Install with Docker Compose
 
-The standalone Compose kit can run the SFU beside the homeserver on one host. Its installer asks *"carry voice calls from this box?"* and does everything the answer implies: adds the SFU container — which launches and supervises LiveKit itself — writes the two extra domain names into the kit's config, routes both through the same front, and points the homeserver's `[voice]` region at the result. The answer lives as `COMPOSE_PROFILES` in the kit's `.env`, so adding or removing the SFU later is an edit and a `docker compose up -d`. See [Install with Compose](/self-hosting/install-docker/).
+**SFU only (public or private, no homeserver):** Use the [standalone SFU Docker guide](/self-hosting/sfu-docker/). It runs `telium-sfu` and LiveKit in one container with its own config, dashboard and updates. It also covers **multiple independent SFU containers** on one host, which require separate projects, state and media ports.
 
-Container or not, two things do not change: the SFU sits behind Docker's NAT, so `livekit.rtc.use_external_ip` stays `true`, and the media ports in the table above must be open on the host firewall. Trust is wired as always — the SFU fetches the homeserver's key from `/_telium/v1/keys` and follows rotation on its own.
+**Homeserver with an optional SFU on the same box:** Use [Install with Compose](/self-hosting/install-docker/). That installer asks whether to carry calls and adds a bundled SFU next to the homeserver. **Do not use this installer to deploy standalone public relays.**
+
+For either Docker deployment, `livekit.rtc.use_external_ip` must be `true` behind Docker NAT, and the corresponding media ports must be open on the host. In public mode the SFU discovers guild-server keys as needed; private relays use configured trust origins.
 
 ## Install by hand
 
