@@ -51,7 +51,7 @@ public = true
 allow_insecure_discovery = false
 ```
 
-**Edit the existing sections; do not append duplicate TOML tables.** Keep the generated `bind = "0.0.0.0:7890"` and `[admin] bind = "0.0.0.0:7891"` *inside the container*; the Compose port mappings expose them to the host only on loopback. Keep `livekit.rtc.use_external_ip = true` behind Docker NAT. Leave generated LiveKit credentials in the instance's persistent data volume.
+**Edit the existing sections; do not append duplicate TOML tables.** Keep the generated `bind = "0.0.0.0:7890"` and `[admin] bind = "0.0.0.0:7891"` *inside the container*; the Compose port mappings expose them to the host only on loopback. Keep `livekit.rtc.use_external_ip = true` behind Docker NAT. Keep the generated LiveKit configuration and admin state isolated in each instance's data volume; the SFU writes LiveKit credentials at startup. Do not copy its generated `livekit.yaml` between instances.
 
 Public trust means any real Telium guild server with valid published keys may request sessions. Do not set `allow_insecure_discovery` to `true` on a public relay.
 
@@ -177,7 +177,7 @@ sudo docker compose logs --tail=100 sfu
 curl -fsS https://sfu-b.example.com/health
 ```
 
-Each project owns its own `sfu-data` named volume, so the generated keys and usage records remain independent. Never share those volumes, copy `livekit.yaml` or expose their admin ports publicly. Give each public relay its own directory listing.
+Each project owns its own `sfu-data` named volume, so runtime configuration, admin state and usage records remain independent. Never share those volumes, copy `livekit.yaml` or expose their admin ports publicly. Give each public relay its own directory listing.
 
 ### Updates for a multi-instance host
 
