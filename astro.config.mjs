@@ -41,9 +41,10 @@ export default defineConfig({
           ],
         },
         {
-          label: 'Run a server',
+          label: 'Self-host Telium',
           items: [
-            { slug: 'self-hosting/production', label: 'Start here: production' },
+            { slug: 'self-hosting', label: 'Start here: self-hosting' },
+            { slug: 'self-hosting/production', label: 'Set up a homeserver' },
             { slug: 'self-hosting/install-systemd' },
             { slug: 'self-hosting/install-docker' },
             { slug: 'self-hosting/install-docker-tunnel' },
