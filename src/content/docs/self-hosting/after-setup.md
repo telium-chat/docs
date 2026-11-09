@@ -105,7 +105,7 @@ There are **two separate ways** to contribute. Neither happens automatically whe
 
 The easiest way to list your server is the [public listing wizard](https://telium.chat/list). For an account-home listing, the directory is backed by [`site/registry/servers.json`](https://github.com/telium-chat/telium/blob/main/site/registry/servers.json). Follow the [onboarding checklist and eligibility rules](/federation/onboarding/#opting-in) before opting into recommendations. You can be listed without accepting automatic beginner referrals.
 
-If you want to offer shared SFU capacity, plan limits and monitoring before you enable public trust. Publishing a public URL is not the same as committing to serve everyone.
+If you want to offer shared SFU capacity **without running a homeserver**, follow [Standalone SFU with Docker](/self-hosting/sfu-docker/). Plan limits and monitoring before you enable public trust. Publishing a public URL is not the same as committing to serve everyone.
 
 ## A simple ongoing routine
 
