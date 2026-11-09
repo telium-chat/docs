@@ -7,7 +7,7 @@ You can host a **Telium homeserver** for accounts and communities, a **voice rel
 
 ## Host a homeserver
 
-A homeserver manages accounts, communities, messages and uploaded files. Start here if you want to create a place where people can sign up or host communities.
+A homeserver manages accounts, communities, messages and uploaded files. **Keep registration private** for yourself or invited people, or **open it to the public** so others can create accounts. Private registration doesn't stop your members from participating in other Telium communities.
 
 - **[Set up a homeserver](/self-hosting/production/)** — choose a native Linux or Docker installation and get your server online.
 - **[After-setup checklist](/self-hosting/after-setup/)** — check registration, backups, updates and other essentials once it's running.
@@ -16,7 +16,7 @@ A homeserver manages accounts, communities, messages and uploaded files. Start h
 
 ## Host a voice relay (SFU)
 
-An **SFU** forwards voice, video and screen sharing between people in calls. It doesn't host accounts or communities. You can operate a private relay for specific homeservers or contribute public calling capacity to the network.
+An **SFU** forwards voice, video and screen sharing between people in calls. It doesn't host accounts or communities. **Private relays** accept calls only from homeservers you trust; **public relays** can serve other Telium homeservers across the network. Listing a public relay in the directory is a separate, optional step.
 
 - **[Understand SFUs and choose a setup](/self-hosting/sfu/)** — learn how relays work, when you might want one and how to install one directly on Linux.
 - **[Run a standalone SFU with Docker](/self-hosting/sfu-docker/)** — deploy a voice relay without installing a homeserver, including guidance for running multiple containers.
