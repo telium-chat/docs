@@ -1,17 +1,17 @@
 ---
 title: Standalone SFU with Docker
-description: Run a public Telium voice relay without a homeserver, and learn how to isolate multiple relay containers.
+description: Install a dedicated Telium voice and video relay with Docker, for private communities or the public network.
 sidebar:
   order: 8
 ---
 
-**You do not need a Telium homeserver to run an SFU.** A standalone SFU is one container that runs `telium-sfu` **and** its own LiveKit process. It can carry calls for many different Telium homeservers.
+This guide installs a **Telium voice and video relay** in Docker. An SFU carries the media for calls; it does not host accounts, messages or communities. You can run it on its own, even if you do not operate a Telium homeserver.
 
-This guide is for people donating public voice capacity. To run a homeserver *with* an optional SFU, use [Install with Compose](/self-hosting/install-docker/) instead. To understand private versus public relays, see [SFU](/self-hosting/sfu/).
+You decide who can use it: keep it **private** for homeservers you trust, or make it **public** so other Telium communities can use it. The steps below show how to make it public, but that is optional. For a plain-language explanation of how relays work, see [Voice relays (SFU)](/self-hosting/sfu/).
 
-## Run one standalone public SFU
+## Run one SFU with Docker
 
-The supported installer sets up **one Docker SFU per machine**, including its own update timer. Start here even if you plan to run more instances later.
+The installer puts the SFU and its LiveKit media engine in **one container**. It supports one SFU per machine and includes an update timer. You can [add more isolated containers manually](#run-multiple-sfu-containers-on-one-host) later.
 
 ### 1. Prepare the host
 
@@ -32,13 +32,13 @@ cd telium
 sudo bash deploy/install-sfu.sh
 ```
 
-This is **not** `deploy/standalone/install.sh` (the homeserver kit). The SFU installer creates `/opt/telium-sfu/compose.yml`, `/opt/telium-sfu/sfu.toml`, and the `telium-sfu-update.timer` update service. It **does not start an unconfigured container** and it does not install/configure the host's TLS proxy.
+This installs **only the relay**, not a homeserver. The SFU installer creates `/opt/telium-sfu/compose.yml`, `/opt/telium-sfu/sfu.toml`, and the `telium-sfu-update.timer` update service. It **does not start an unconfigured container** and it does not install/configure the host's TLS proxy.
 
 Run it with `sudo` from an ordinary login account. It needs Docker, the Compose plugin, and systemd already installed. For a root-only environment, create an ordinary operator account and pass it as `TELIUM_RUN_AS`.
 
-### 3. Configure the public relay
+### 3. Configure the relay
 
-Edit `/opt/telium-sfu/sfu.toml`:
+Edit `/opt/telium-sfu/sfu.toml`. This example allows **public use** of your SFU. If you want to serve only chosen homeservers, keep `public = false` instead and [configure trusted servers](/self-hosting/sfu/#private-and-public-relays).
 
 ```toml
 [livekit]
@@ -53,7 +53,7 @@ allow_insecure_discovery = false
 
 **Edit the existing sections; do not append duplicate TOML tables.** Keep the generated `bind = "0.0.0.0:7890"` and `[admin] bind = "0.0.0.0:7891"` *inside the container*; the Compose port mappings expose them to the host only on loopback. Keep `livekit.rtc.use_external_ip = true` behind Docker NAT. Keep the generated LiveKit configuration and admin state isolated in each instance's data volume; the SFU writes LiveKit credentials at startup. Do not copy its generated `livekit.yaml` between instances.
 
-Public trust means any real Telium guild server with valid published keys may request sessions. Do not set `allow_insecure_discovery` to `true` on a public relay.
+In public mode, any Telium homeserver with valid published signing keys can request sessions. In private mode, only homeservers you explicitly trust can do so. Never set `allow_insecure_discovery` to `true` on a public relay.
 
 Before listing it, set suitable `[limits]` values in that same file. In particular, review `max_rooms`, `max_participants`, `transfer_budget_bytes` and `transfer_period_days`. A value of `0` means no ceiling/budget; it is **not** a safe bandwidth budget for a metered host. See [SFU configuration](/self-hosting/sfu/#configuration) and the [full reference](https://github.com/telium-chat/telium/blob/main/sfu/sfu.example.toml).
 
@@ -109,9 +109,9 @@ Expect a healthy `/health` response with `"ok":true`. Check that the LiveKit hos
 
 The SFU's admin first-run link appears in the container logs. Access the host-loopback dashboard over an SSH tunnel, for example `ssh -L 7891:127.0.0.1:7891 operator@your-host`, then open the local URL shown by the logs. Unlike the **native** SFU, the Compose dashboard cannot rewrite host nginx or request certificates for you.
 
-### 6. List it for other communities
+### 6. List it for other communities (public relays only)
 
-Open [telium.chat/list](https://telium.chat/list), choose **A relay (SFU)**, and submit the public HTTPS URL `https://sfu.example.com`. The directory probes `/health` and asks for contact/region/capacity details.
+Skip this step if you are running a private relay. For a public relay, open [telium.chat/list](https://telium.chat/list), choose **A relay (SFU)**, and submit the public HTTPS URL `https://sfu.example.com`. The directory probes `/health` and asks for contact/region/capacity details.
 
 Being in the public directory and **opting into automatic selection** are separate choices. If you want it considered for the automatic SFU feed, opt in there as well; eligibility still depends on observed health and age. See the [directory rules](https://github.com/telium-chat/telium/blob/main/site/registry/README.md#relays-sfus-are-a-separate-directory-with-the-same-rules).
 

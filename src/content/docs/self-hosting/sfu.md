@@ -1,21 +1,34 @@
 ---
-title: SFU
-description: Run telium-sfu, the LiveKit-backed media relay for guild voice, video and screen sharing, and point your homeserver at it.
+title: Voice relays (SFU)
+description: Understand Telium voice relays, decide whether to run one, and choose a native or Docker installation.
 sidebar:
   order: 7
 ---
 
-This page explains Telium's voice relays and how to connect one to a homeserver. **Want to contribute public SFU capacity without hosting accounts?** Follow the [standalone SFU Docker guide](/self-hosting/sfu-docker/) instead. Small guild calls can fall back to peer-to-peer mesh, capped at `voice.mesh_max_participants` (4).
+An **SFU** (Selective Forwarding Unit) is a voice and video relay. Instead of everyone in a call sending a separate stream to everyone else, participants send their media to an SFU, which forwards it to the other people in the call.
 
-## Do you need an SFU?
+An SFU is **not** a Telium homeserver. A homeserver handles accounts, communities and call permissions; an SFU handles the audio, video and screen-share traffic. You can run either one without running the other.
 
-- **Just testing or running a small guild?** You can skip this page. Calls with up to four people use mesh by default.
-- **Hosting larger voice channels?** An SFU relays each person's audio and video, so clients do not need to send a separate stream to everyone else.
-- **Running a homeserver behind Cloudflare Tunnel?** The homeserver can use a tunnel, but an SFU needs separately reachable media ports. You can host the SFU elsewhere.
+## Which guide should I use?
 
-### Private does not mean public
+| What you want to do | Where to start |
+| --- | --- |
+| **Run a Telium homeserver** so people can create accounts and join communities | [Install with Compose](/self-hosting/install-docker/) or [install natively](/self-hosting/install-systemd/). Running your own SFU is optional. |
+| **Run a separate SFU with Docker**, whether for your own communities or as a public relay | [Standalone SFU with Docker](/self-hosting/sfu-docker/). It installs only the relay, not a homeserver. |
+| **Run an SFU directly on Linux** without Docker | Use [the native SFU installer](#install-with-the-script) below. |
+| **Connect an existing homeserver to your own SFU** | Install the SFU using either method, then [configure your homeserver to use it](#point-the-homeserver-at-it). |
 
-**Running an SFU for your own community does not commit you to carrying calls for the whole Telium network.** There are two trust modes:
+## Do you need to run your own SFU?
+
+**Not necessarily.** Telium homeservers can use available SFUs from the public relay directory. Hosting your own makes sense if you want to control relay capacity, serve specific communities or contribute more relay capacity to the network.
+
+If no usable SFU is available, smaller calls can fall back to direct peer-to-peer connections (mesh), subject to the homeserver's `voice.mesh_max_participants` limit (4 by default). Mesh is a fallback, not a reason to assume every small call avoids SFUs.
+
+A homeserver can operate behind Cloudflare Tunnel, but an SFU needs publicly reachable media ports. You can run the SFU on a different machine or VPS.
+
+### Private and public relays
+
+You choose who may use your SFU. Hosting one for your community does **not** automatically make it available to everyone:
 
 | Mode | Who can use it? | What to configure |
 | --- | --- | --- |
@@ -37,7 +50,7 @@ The homeserver stays the authority. The SFU verifies the homeserver's signature 
 ## Requirements
 
 - A host with its own public address, separate from any HTTP-only ingress. Media is UDP and cannot pass through a Cloudflare Tunnel or an HTTP proxy.
-- A hostname such as `sfu.example.com`. If it is on Cloudflare, make the record DNS-only.
+- Two DNS names such as `sfu.example.com` (the relay API) and `livekit.example.com` (LiveKit signalling). If you use Cloudflare, set both records to DNS-only.
 - These ports open on the SFU host:
 
 | Port | Protocol | Purpose |
@@ -49,9 +62,11 @@ The homeserver stays the authority. The SFU verifies the homeserver's signature 
 
 ## Install with the script
 
-From a Telium checkout on a Debian or Ubuntu host:
+On a Debian or Ubuntu host, clone Telium and run the SFU-specific installer (not the homeserver installer):
 
 ```sh
+git clone https://github.com/telium-chat/telium.git
+cd telium
 sudo bash sfu/install.sh
 ```
 
@@ -61,9 +76,9 @@ The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted ser
 
 ## Install with Docker Compose
 
-**SFU only (public or private, no homeserver):** Use the [standalone SFU Docker guide](/self-hosting/sfu-docker/). It runs `telium-sfu` and LiveKit in one container with its own config, dashboard and updates. It also covers **multiple independent SFU containers** on one host, which require separate projects, state and media ports.
+To run a relay **without installing a Telium homeserver**, follow [Standalone SFU with Docker](/self-hosting/sfu-docker/). It runs `telium-sfu` and LiveKit in one container and explains how to operate multiple independent relays on the same host.
 
-**Homeserver with an optional SFU on the same box:** Use [Install with Compose](/self-hosting/install-docker/). That installer asks whether to carry calls and adds a bundled SFU next to the homeserver. **Do not use this installer to deploy standalone public relays.**
+If you are **also setting up a Telium homeserver**, the [homeserver Compose installer](/self-hosting/install-docker/) offers an option to run an SFU alongside it. This is a different installer, because a homeserver and an SFU do different jobs.
 
 For either Docker deployment, `livekit.rtc.use_external_ip` must be `true` behind Docker NAT, and the corresponding media ports must be open on the host. In public mode the SFU discovers guild-server keys as needed; private relays use configured trust origins.
 
@@ -85,7 +100,7 @@ Install `livekit-server` from the [LiveKit releases](https://github.com/livekit/
 bind = "127.0.0.1:7890"
 
 [livekit]
-public_url = "https://sfu.example.com"
+public_url = "https://livekit.example.com"
 
 [trust]
 discovery = true
@@ -98,7 +113,7 @@ discovery_url = "https://chat.example.com"
 
 `server_name` must equal the homeserver's `server_name`. The SFU fetches `{discovery_url}/_telium/v1/keys` and follows key rotation on its own. Add one `[[trust.origins]]` block per homeserver. To pin a key instead of discovering it, drop `discovery_url` and set `key_id` and `public_key_b64` from `telium-server keys`.
 
-Put the control API behind TLS (for example nginx and Certbot proxying `https://sfu.example.com` to `http://127.0.0.1:7890`), then run it:
+Provide HTTPS for both public names: proxy `https://sfu.example.com` to the SFU control API at `http://127.0.0.1:7890`, and proxy `https://livekit.example.com` to LiveKit signalling at `http://127.0.0.1:7880` with WebSocket upgrade support. For an nginx example, see [the Docker guide's HTTPS section](/self-hosting/sfu-docker/#4-provide-https-for-both-names). Then run the SFU:
 
 ```sh
 ./target/release/telium-sfu serve --config sfu.toml
@@ -115,6 +130,8 @@ curl -fsS https://sfu.example.com/health
 | `POST /control` | homeserver-signed command | `mute`, `deafen`, `disconnect`, `subscribe` and `unsubscribe`, translated to LiveKit. |
 
 ## Point the homeserver at it
+
+**Only if you operate a homeserver that should use this SFU:** add the relay as a voice region in that homeserver's configuration. Running a public SFU for other operators does not require you to install or configure a homeserver of your own.
 
 ```toml
 [voice]
