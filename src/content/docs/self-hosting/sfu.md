@@ -76,7 +76,7 @@ The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted ser
 
 ## Install with Docker Compose
 
-To run a relay **without installing a Telium homeserver**, follow [Standalone SFU with Docker](/self-hosting/sfu-docker/). It runs `telium-sfu` and LiveKit in one container and explains how to operate multiple independent relays on the same host.
+To run a relay **without installing a Telium homeserver**, follow [Standalone SFU with Docker](/self-hosting/sfu-docker/). It runs `telium-sfu` and LiveKit in one container.
 
 If you are **also setting up a Telium homeserver**, the [homeserver Compose installer](/self-hosting/install-docker/) offers an option to run an SFU alongside it. This is a different installer, because a homeserver and an SFU do different jobs.
 
