@@ -1,11 +1,11 @@
 ---
 title: Sync encryption
-description: How the client seals synced preferences, drafts, stickers and identity pins so your homeserver stores them without reading them.
+description: How Telium protects synced drafts and preferences.
 sidebar:
   order: 4
 ---
 
-The sync store (`/_telium/v1/sync`) carries preferences, recent emoji, GIF favourites, saved stickers, message drafts and identity pins between your devices. Your client seals every value before upload. The homeserver stores, quotas, returns and migrates the values but cannot read them. This page covers the key, the envelope, what stops the server from tampering, and what it still learns.
+The client encrypts synced settings, drafts and favorites before storing them on the homeserver. The server can still observe request timing, size and keys used for storage. This page explains recovery, rollback protection and what happens when keys are unavailable.
 
 ## Key
 

@@ -1,13 +1,13 @@
 ---
 title: Account-home onboarding
-description: How new users get an account home, how operators opt in to referrals, and the eligibility rules for the recommended signup pool.
+description: Public homeserver listing and signup recommendations.
 sidebar:
   order: 3
 ---
 
-**Operating a public server?** Start with [Run a public homeserver](/self-hosting/public-server/) for upload quotas, retention, moderation and readiness, then use the [listing wizard](https://telium.chat/list) to submit your entry. The following sections explain advanced recommendation eligibility and the signed catalogue.
+**Three different things:** A server can appear in the **public homeserver directory**, separately opt into **automatic account-home recommendations**, or run a **voice relay (SFU)**. Listing a homeserver does not enroll it in recommendations and does not list an SFU.
 
-This page covers where a new account gets created: the default on your own server, the opt-in recommendation flow that spreads new accounts across community homeservers, and what an operator must do to receive referrals.
+If you're planning to accept strangers, complete [Run a public homeserver](/self-hosting/public-server/) before listing. Submit a listing at [telium.chat/list](https://telium.chat/list). The rules below are for operators who also want to be recommended.
 
 ## Which option do you want?
 

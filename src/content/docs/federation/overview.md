@@ -1,11 +1,13 @@
 ---
 title: Federation
-description: How Telium servers discover each other, sign requests, hand out guild sessions, resolve guild addresses and block peers.
+description: How Telium servers talk to each other.
 sidebar:
   order: 1
 ---
 
-Telium federation connects independent account homes, guild servers and media origins. Each server stays the authority for what it owns and uses signed messages to tell the others. This page covers discovery, keys, cross-server sessions, guild vanity addresses, revocation notices and defederation.
+Alice's account lives at `home.example`. She can join a guild hosted at `guilds.example` without opening another account. Her home signs her identity; the guild server enforces its channels and permissions. Neither server automatically controls the other.
+
+This is the **operator/developer explanation** of discovery, signing and delivery. New users can start at [First steps](/start/first-steps/).
 
 ## Names and discovery
 

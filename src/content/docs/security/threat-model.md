@@ -1,15 +1,13 @@
 ---
 title: Threat model
-description: What each Telium component is trusted with, what it can do if hostile, and the known gaps.
+description: Telium's security boundaries and non-goals.
 sidebar:
   order: 1
 ---
 
-This page lists each principal in a Telium deployment, what it is trusted with, and what it can do if it turns hostile. Gaps where the code does not yet enforce a claim are listed at the end.
+Start with these limits: **guild text is readable by the guild server; metadata is not hidden; no relay makes Telium anonymous; and Telium has not had an independent security audit.** SFU guild calls use encrypted media, but servers and relays can still observe connection metadata.
 
-:::caution[Limits]
-Guild text channels are not end-to-end encrypted; the guild server reads their messages. Guild SFU calls use end-to-end encrypted media under a per-call MLS group. Mesh calls have peer-to-peer transport encryption, but malicious signalling can compromise that path. Telium has not had an independent security audit.
-:::
+The tables below describe what each party is trusted with and what happens if it acts maliciously. Read [Privacy](/security/privacy/) for the user-facing summary.
 
 ## Assumptions and non-goals
 

@@ -1,11 +1,13 @@
 ---
 title: Account security
-description: OPAQUE login, MFA, devices and revocation, the recovery key, password reset, recovery email and account lifecycle.
+description: Keep access to your Telium account.
 sidebar:
   order: 2
 ---
 
-This page covers how your account home authenticates you and protects your account: password login, MFA, devices, the recovery key, password reset and account deletion. Identity roots and guardians are on [Identity continuity](/security/identity-continuity/). DM key custody is on [DM encryption](/security/dm-encryption/).
+Use a strong password, enable available multi-factor authentication, review signed-in devices and **save your recovery key off the device**. If you lose both recovery material and trusted devices, some encrypted data may not be recoverable.
+
+This is the technical reference for login, account recovery and sessions. For a first account, see [First steps](/start/first-steps/).
 
 ## Account ids
 

@@ -1,15 +1,13 @@
 ---
 title: Network privacy
-description: Who learns your IP address for each kind of Telium connection, and how the Protect my IP relay works.
+description: Understand who sees your IP address.
 sidebar:
   order: 7
 ---
 
-This page covers who learns your IP address for each connection Telium makes, and how the **Protect my IP** relay works. For what each component can read once a request arrives, see [Privacy](/security/privacy/).
+**Protect my IP is not anonymity.** It changes which server receives your network address for some traffic. Your homeserver, the relay you use, call participants or media providers may still learn it depending on the connection.
 
-:::note
-None of these options provide anonymity. Each one decides which party holds your address.
-:::
+Use the table below to choose the appropriate setting; see [Privacy](/security/privacy/) for access to message contents and metadata.
 
 ## Connections
 

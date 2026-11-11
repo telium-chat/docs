@@ -1,15 +1,13 @@
 ---
 title: DM encryption
-description: How Telium encrypts direct and group messages with MLS, how keys are recovered on a new device, and what servers still see.
+description: Direct-message encryption and recovery.
 sidebar:
   order: 3
 ---
 
-Direct messages and group DMs use MLS (RFC 9420). Your client encrypts message bodies, attachment keys, reactions, edits, pins and other conversation signals before your homeserver receives them. This page covers key custody and recovery, device trust, the conversation sequencer, and what the infrastructure can still see.
+**DMs and group DMs are end-to-end encrypted; guild text channels are not.** Messages are encrypted before the homeserver receives them, but the server still sees routing information, timing and some other metadata. Encryption does not protect you from a compromised device or a malicious web client served by an untrusted origin.
 
-:::caution
-Only DMs and group DMs are end-to-end encrypted. Guild channels are not; see [Privacy](/security/privacy/). Typing indicators in DMs are also sent in plaintext.
-:::
+For practical recovery steps, start with [Account security](/security/account-security/). The rest of this page describes the key and protocol behavior.
 
 ## Key custody
 

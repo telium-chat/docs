@@ -1,17 +1,11 @@
 ---
 title: Identity continuity
-description: The immutable tid identity, signed root rotation, guardian recovery, and the first-contact limit.
+description: Verify an account's cryptographic identity.
 sidebar:
   order: 5
 ---
 
-An account address such as `@alice:home.example` is a routing address. The cryptographic identity is a self-certifying `tid:` that clients verify themselves. This page covers how that identity is created, rotated and recovered, and where its protection ends.
-
-```text
-tid:<hex>  =  SHA-256("telium-identity-id:v1\0" || genesis cross-signing public key)
-```
-
-The homeserver stores and publishes the identity state. Clients verify it locally.
+A username such as `@alice:home.example` is an address. A `tid:` identifier anchors a cryptographic identity that can survive authorized key rotation. This page explains those proofs and their limits. The client cannot prove that the first identity it sees was the one you intended without an independent verification channel.
 
 ## Genesis
 

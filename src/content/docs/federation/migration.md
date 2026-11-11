@@ -1,17 +1,18 @@
 ---
 title: Account and guild migration
-description: Move an account or a guild to another Telium server, what travels in the bundle, and how to recover a stuck move.
+description: Move an account or guild between homeservers.
 sidebar:
   order: 2
 ---
 
-You can move an account or a guild from one Telium server to another. This page covers the steps, the authorizations a move needs, the cooling-off window, what the bundle carries, how the transfer handles failure, and the tombstone that keeps old ids resolving.
+| Goal | Use |
+| --- | --- |
+| Move your own account to a different homeserver | **Account migration** |
+| Move a guild to a different hosting server | **Guild migration** |
+| Rename the *same* homeserver with its existing database and users | [Domain relocation](/self-hosting/relocation/) |
+| Close a homeserver and let users leave over time | [Planned shutdown](/self-hosting/sunset/) |
 
-A move runs in a fixed order: grant, transfer, acknowledge, tombstone, stand down. The source destroys nothing until the destination has acknowledged a complete import.
-
-:::caution[Account moves start a new cryptographic identity]
-An account move does not yet carry the source account's `tid:` [identity continuity](/security/identity-continuity/) chain. The destination account keeps its own immutable identity. Contacts' clients treat the moved account as a new identity and must verify it again. The identities you have pinned for your contacts (`identity.pins.v1`) do travel, sealed, in the sync store.
-:::
+Migration is initiated by the account or guild owner; the operator does not silently move everyone. The process verifies permission, transfers data and leaves forwarding records. Follow the guided client flow when available; the details below explain recovery and edge cases.
 
 ## Authorization
 

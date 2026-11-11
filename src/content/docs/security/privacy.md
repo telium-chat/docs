@@ -1,13 +1,13 @@
 ---
 title: Privacy
-description: What your homeserver, guild servers, peers, call infrastructure, push providers and third parties can see.
+description: What Telium's operators can read.
 sidebar:
   order: 6
 ---
 
-This page lists what each component can observe from the data it handles, whether or not it chooses to look. For who learns your IP address, see [Network privacy](/security/network-privacy/).
+**Guild text is not end-to-end encrypted.** Guild operators can read messages stored on their server. DMs and group DMs encrypt message content on your devices, but homeservers still handle delivery metadata. Voice encryption and IP exposure depend on the call path; see the table below.
 
-Message content in DMs and group DMs is end-to-end encrypted. Who is in a conversation, who sent each frame from which device, when, how large, and who is typing is visible to at least one server.
+There is no anonymity promise here. Choose homeserver and guild operators with that in mind.
 
 ## Privacy at a glance
 
