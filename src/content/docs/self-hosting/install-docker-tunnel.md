@@ -29,9 +29,9 @@ In Cloudflare's tunnel dashboard, route `chat.example.com` to **`http://172.31.2
 
 ```sh
 read -rsp 'Cloudflare Tunnel token: ' TOKEN; printf '\n'
+sudo install -m 600 /dev/null /opt/telium/tunnel.env
 printf 'TUNNEL_TOKEN=%s\n' "$TOKEN" | sudo tee /opt/telium/tunnel.env >/dev/null
 unset TOKEN
-sudo chmod 600 /opt/telium/tunnel.env
 ```
 
 The prompt hides the token and keeps it out of shell history. Restrict access to `tunnel.env` and never commit it to Git.
