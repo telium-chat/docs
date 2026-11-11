@@ -28,7 +28,9 @@ The kit is installed in `/opt/telium`, with an automatic updater and preserved c
 In Cloudflare's tunnel dashboard, route `chat.example.com` to **`http://172.31.240.3:8448`** (the server container's address on the kit network). Then create the local token file:
 
 ```sh
-sudo sh -c 'printf "TUNNEL_TOKEN=%s\n" "$1" > /opt/telium/tunnel.env' sh YOUR_TUNNEL_TOKEN
+read -rsp 'Cloudflare Tunnel token: ' TOKEN; printf '\n'
+printf 'TUNNEL_TOKEN=%s\n' "$TOKEN" | sudo tee /opt/telium/tunnel.env >/dev/null
+unset TOKEN
 sudo chmod 600 /opt/telium/tunnel.env
 ```
 
