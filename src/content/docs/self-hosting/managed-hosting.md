@@ -5,14 +5,9 @@ sidebar:
   order: 20
 ---
 
-**This is an operator integration guide, not a list of places where you can buy hosting.** Your server can show a list of hosting providers in the create-a-guild flow, with each provider's prices, limits and terms. You can curate providers yourself, subscribe to signed catalogues other operators publish, or both. Your own curated list is also published as a signed catalogue others can subscribe to.
+**This page is for operators who publish hosting-provider catalogues**, not people looking for a hosting company.
 
-The list is a directory and nothing more:
-
-- No money moves through Telium, and no server or client collects a payment credential.
-- No account is created at a provider. The client opens the provider's own signup page in a new tab (`noopener`) and stops there.
-- The server never fetches a URL found inside a catalogue, and never executes anything in one.
-- Nothing verifies that a provider runs a Telium server or that its prices are real. Listing a provider means you are willing to name it.
+A homeserver can show third-party guild hosting offers in the create-a-guild flow. It can curate its own list, subscribe to signed lists, or publish a signed list for others. Telium does not process payments or provision a hosted guild on the user's behalf.
 
 ## What users see
 

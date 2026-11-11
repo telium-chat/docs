@@ -5,11 +5,13 @@ sidebar:
   order: 9
 ---
 
-The server takes encrypted backups on a schedule, can copy them to an S3-compatible bucket, rehearses a restore daily, and restores with one command. This page covers configuration, checking, restoring and the restore drill.
+**Do this first:** copy your backup encryption key off the server, then copy at least one backup off the server and test a restore. An archive without its key cannot be recovered.
 
-:::danger
-Copy the backup key somewhere other than the server today: a password manager, another machine, or paper. Every archive is unreadable without it. The server logs an `ERROR` once, the first time it generates a key, and does not remind you again.
-:::
+1. Check the configured backup directory and key location.
+2. Confirm scheduled backups are succeeding.
+3. Run a verification and a restore drill before trusting the archive.
+
+This page is the detailed backup and restore reference. If you just installed Telium, start with [After setup](/self-hosting/after-setup/).
 
 ## What an archive holds
 

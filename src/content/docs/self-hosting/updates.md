@@ -5,7 +5,15 @@ sidebar:
   order: 11
 ---
 
-This page covers the server's version check, the two box-side updaters in `deploy/`, how releases are numbered, and how clients find their own updates. The server never installs anything itself. An updater script, your config manager or a person does the installing.
+**Check whether your server is actually updating**, not just whether the application runs.
+
+| Installation | Status |
+| --- | --- |
+| Native | `sudo /usr/local/sbin/telium-update-native --status` |
+| Standalone Compose | `sudo /opt/telium/update.sh --status` |
+| Tunnel Compose | `sudo /opt/telium/update.sh --status` |
+
+The **server** checks and reports versions; a separate installer-provided **updater** applies them. Policy, pins and maintenance windows are configured on the host. Before a major upgrade or rollback, see [Upgrades](/self-hosting/upgrades/).
 
 ## Server version check
 

@@ -5,9 +5,21 @@ sidebar:
   order: 6
 ---
 
-This page lists every `telium.toml` key, one at a time. A key you leave out takes its compiled-in default, shown in each table below. The same list in annotated-file form is [`server/telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml), and `telium-server init` writes it for you.
+Edit your installation's `telium.toml` and restart the server for changes to take effect. On native installs it is usually `/etc/telium/telium.toml`; on the Compose kits it is `/opt/telium/telium.toml`.
 
-The server reads `telium.toml` once at startup. Nothing writes it at runtime, including the admin console, so a change means editing the file and restarting.
+**Most operators need only a few settings:**
+
+| Task | Section |
+| --- | --- |
+| Public address and database | [The server itself](#the-server-itself) |
+| Open or invitation-only registration | [Registration](#registration) |
+| File-size limits and per-user quota | [Media policy](#media-policy) |
+| Local or S3 attachment storage | [Media store](#media-store) |
+| Backups | [Backup](#backup) |
+| SFUs for calls | [Voice](#voice) |
+| Monitoring and security | [Metrics](#metrics), [Moderation](#moderation) |
+
+For full defaults, compare the version actually installed with [the annotated config](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml). **Don't paste an entire example over your existing config.** This page is a reference, not an installation checklist.
 
 ## Writing sizes, durations and rates
 

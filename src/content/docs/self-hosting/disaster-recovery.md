@@ -5,7 +5,9 @@ sidebar:
   order: 16
 ---
 
-This page is a set of runbooks, one per incident. Commands assume `-c /etc/telium/telium.toml` and data in `/var/lib/telium`. `$TOKEN` is your own admin session token, and `a.example` is your server.
+**If the server is down:** establish whether the database and signing keys are safe before starting another instance or restoring an archive. Do not start two servers against the same database.
+
+Use the incident heading below that matches the failure. Commands assume a native installation; adapt config and paths for Docker. Keep [a verified backup and its key](/self-hosting/backups/) off the host before you need this page.
 
 ## First five minutes
 

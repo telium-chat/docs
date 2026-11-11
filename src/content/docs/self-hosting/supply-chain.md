@@ -5,7 +5,9 @@ sidebar:
   order: 21
 ---
 
-This page lists every release artifact, what protects its integrity, and how to verify a download or pin the release-manifest key on your server.
+This is the reference for checking Telium releases and updater trust.
+
+**For routine operation:** use your installer-provided updater and check its status in [Updates](/self-hosting/updates/). **For manual downloads:** compare the artifact hash with the published checksum and verify the signed release manifest against a pinned trusted key; a checksum downloaded from the same compromised source alone does not authenticate the publisher.
 
 ## Release artifacts
 

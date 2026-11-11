@@ -5,9 +5,9 @@ sidebar:
   order: 19
 ---
 
-A planned shutdown gives your users notice, lets them move or download their accounts, and ends with signed tombstones so peers and clients stop retrying. The server never moves anyone: each user decides where to go and starts their own [migration](/federation/migration/).
+Use this procedure when you are **closing** a homeserver and want users to have time to export or move accounts.
 
-If your server is changing its name rather than closing, see [Relocation](/self-hosting/relocation/).
+Announce the date, allow users to move, and publish the final signed shutdown state. A shutdown does not transfer anyone automatically. If you're keeping the same accounts and changing the server's name, use [Relocation](/self-hosting/relocation/) instead.
 
 ## 1. Announce
 

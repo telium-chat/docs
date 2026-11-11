@@ -5,7 +5,9 @@ sidebar:
   order: 13
 ---
 
-A Telium server is one process and one SQLite database in WAL mode. The rate limiter, presence, gateway subscriber maps and background loops all live in that process's memory. This page gives the capacity you can expect and what the server does when you exceed it.
+Telium's reference homeserver uses **one server process and one SQLite database**. Don't start multiple writers against the same database.
+
+Before changing hardware, measure real CPU, memory, disk, database and upload traffic. The targets below are engineering estimates, not a promise of users per VPS. For monitoring, see [Observability](/self-hosting/observability/).
 
 ## Capacity targets
 

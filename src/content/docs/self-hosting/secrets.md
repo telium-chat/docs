@@ -5,11 +5,9 @@ sidebar:
   order: 8
 ---
 
-This page lists the secrets a Telium deployment holds, where each one lives, and the rotation steps. It ends with what to do after a compromise.
+**Back up the backup encryption key and OPAQUE server setup off the machine.** Losing either can make recovery impossible even if database or archive files survive.
 
-:::danger
-Two secrets cannot be recovered if lost. The **OPAQUE server setup** (in the database) protects every password, and the **backup encryption key** opens every archive. Keep a copy of both off the box, and keep the backup key apart from the archives.
-:::
+Keep secrets out of Git and logs; prefer file references with restrictive permissions. This page is the rotation and incident-response reference—not a list of secrets you need to create by hand during normal installation.
 
 ## Handling secrets
 

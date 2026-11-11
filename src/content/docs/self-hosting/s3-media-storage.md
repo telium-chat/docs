@@ -5,13 +5,9 @@ sidebar:
   order: 8
 ---
 
-**Want to run Telium on a small VPS without using its disk for every attachment?** You can put uploaded files in an S3-compatible object-storage bucket. Your homeserver still handles accounts, messages and the upload/download API; the bucket holds the actual stored media.
+**Use this if local attachment storage is filling your VPS.** Telium keeps the account database and API on the homeserver while new file bytes are written to a private S3-compatible bucket.
 
-This is **optional**. A small private server can keep the default local storage. If you expect many users or attachments, remote media storage may make capacity easier to manage.
-
-:::caution[Already have uploads on this server?]
-**Do not simply change `media_store.store` from `local` to `s3` on a server containing important uploads.** Changing the backend does not itself migrate existing files; old attachments may become unavailable. This guide describes setting up the storage backend for a **new server or a server with no important uploads**. For an existing server, arrange and test a migration of both object bytes and their expected keys before switching. Keep a full backup and the original local media until every old attachment has been verified.
-:::
+You don't need S3 for a small private server. **If you already have uploads, don't switch `media_store.store` without migrating those objects**; existing links may break. S3 uploads and encrypted [server backups](/self-hosting/backups/) are different systems.
 
 ## 1. Pick a provider and create a bucket
 

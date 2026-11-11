@@ -5,7 +5,9 @@ sidebar:
   order: 10
 ---
 
-This page covers moving a homeserver to a new release and back. A newer binary migrates an older database forward at startup. An older binary refuses to open a newer database, names the release that wrote it, and exits.
+**Before upgrading:** check the release notes, take a fresh backup, verify that you can restore it, and confirm the updater has not held a release for manual review.
+
+A newer server may migrate the SQLite database. A previous binary can refuse to open that newer database. **Rolling back the binary is not the same as restoring an older database.** See [Backups](/self-hosting/backups/) and [Updates](/self-hosting/updates/) for the practical commands.
 
 ## Versions
 

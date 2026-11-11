@@ -5,7 +5,9 @@ sidebar:
   order: 17
 ---
 
-This page lists what the server deletes when an account or guild goes away, what it keeps, and the settings that control retention and integrity checks.
+Deletion does not always remove data everywhere instantly. This reference explains what Telium deletes, what may remain in archives or other servers, and how media expiry works.
+
+**For operators:** set retention policies before accepting uploads, explain expiry to users, and remember that older backups may contain data no longer visible on the live server. See [public-server settings](/self-hosting/public-server/#set-media-limits).
 
 ## Account deletion
 

@@ -5,9 +5,9 @@ sidebar:
   order: 18
 ---
 
-A relocation renames your server from `old.example` to `new.example`. The operator, database, accounts, passwords, devices, guilds and history stay the same. The server and its peers rewrite every reference to the old name.
+Use relocation when you are **renaming the same homeserver**, keeping its database and accounts. Do **not** use it just to move the API behind a different hostname; that is [account-domain delegation](/self-hosting/domain-delegation/).
 
-A relocation moves no data and asks users for nothing. To move a single account or guild between two servers, use [migration](/federation/migration/) instead. To close a server for good, see [Sunset](/self-hosting/sunset/).
+A relocation affects identifiers and peer discovery. Follow the sequence below and keep the old domain reachable during the transition. For moving one account to another operator, use [account migration](/federation/migration/).
 
 ## Steps
 

@@ -5,12 +5,9 @@ sidebar:
   order: 12
 ---
 
-A warm standby is a second Telium server that holds a live, read-only copy of your primary. If the primary dies, an operator promotes the standby and it takes over the domain's authority. There is no quorum or automatic election: a human decides.
+A warm standby keeps a read-only replica of a homeserver ready for **manual** promotion after a failure. It is not load balancing and it is not a backup replacement.
 
-Your data-loss window is the replication lag at the moment of failure. With the default poll that is about 5 seconds.
-
-<img class="diagram diagram-light" src="/diagrams/warm_standby-light.svg" alt="On the primary, write triggers fill repl_log. The standby pulls it with signed requests every 5 seconds into a read-only copy, served at /_telium/standby/a.example." />
-<img class="diagram diagram-dark" src="/diagrams/warm_standby-dark.svg" alt="On the primary, write triggers fill repl_log. The standby pulls it with signed requests every 5 seconds into a read-only copy, served at /_telium/standby/a.example." />
+Use it only after your primary has off-host backups and a restore drill. **Never promote a replica while the old primary may still be accepting writes.** The operator must decide when to fail over; there is no automatic leader election.
 
 ## Consent on both sides
 

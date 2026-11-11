@@ -5,7 +5,11 @@ sidebar:
   order: 15
 ---
 
-This page covers who counts as a server administrator, the routes and commands that manage them, and how to regain admin access from the host's shell.
+This page is about **server-wide administrators**, not guild moderators.
+
+**Native installs:** the first signup is deliberately *not* promoted automatically. Run the installer's local `admin recover` command for the operator account, then verify the control plane is available. Other deployment profiles may bootstrap the first user differently; don't assume every kit shares that behavior.
+
+Keep at least one usable administrator account. Unregistered names in `registration.admins` are dangerous: whoever registers one first receives admin status.
 
 ## Who is an administrator
 

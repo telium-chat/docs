@@ -5,9 +5,9 @@ sidebar:
   order: 14
 ---
 
-Telium exposes a Prometheus scrape endpoint at `/metrics` and writes logs under a fixed set of categories. Metrics are aggregates only, with no per-user, per-guild or per-peer labels.
+For a new server, start with three checks: public discovery works, backups are current, and the updater is healthy. This page covers the next level: **Prometheus metrics, alerts and structured logs**.
 
-An unsampled gauge is omitted from the output rather than reported as `0`, so pair threshold alerts with `absent()`.
+The `/metrics` endpoint is disabled by default. Keep it private or require a scrape token before enabling it. Telium exposes aggregate metrics rather than labels containing user IDs.
 
 ## Enabling `/metrics`
 
