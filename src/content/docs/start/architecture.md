@@ -5,7 +5,9 @@ sidebar:
   order: 2
 ---
 
-Telium splits authority by what owns the data. An account has one authoritative home server, and a guild has one authoritative guild server. They can be the same machine, but nothing in the protocol requires it. You can sign in as `@alice:home.example` and join guilds hosted on `guilds.example` and anywhere else.
+**One account, many communities.** Alice can sign in at `@alice:home.example` and join a guild on `guilds.example`. Alice's homeserver owns her account; the guild server owns its channels and permissions. Files may come from a media origin, and voice traffic may use an SFU.
+
+Read the role descriptions below only if you're planning a deployment or building a client. To get started without operating anything, see [First steps](/start/first-steps/).
 
 ## Roles
 

@@ -5,16 +5,9 @@ sidebar:
   order: 3
 ---
 
-**Want to start chatting?** Open [telium.chat](https://telium.chat) in a browser; no download or server installation is required. Prefer an app? Choose the appropriate package below. If you're new to Telium, follow [Your first steps](/start/first-steps/) to create an account and join a guild.
+**Just want to chat?** Use [telium.chat](https://telium.chat). You do not need to install or host a server. For packaged apps, use the downloads below.
 
-Telium's shared React client runs in a browser, on desktop and on Android. The protocol, state and UI code under `web/src/` is shared across those shells. Clients built outside this project exist too — see [Custom clients](#custom-clients).
-
-| Runtime | Shell | Package |
-| --- | --- | --- |
-| Web | Any modern browser | Hosted at [telium.chat](https://telium.chat), or a build served by your homeserver from `web/dist` |
-| Linux desktop | Electron | AppImage, x86_64 |
-| Windows desktop | Electron | NSIS installer, x64 |
-| Android | Tauri 2 | APK, ARM64 |
+The browser and desktop clients use the same account. The rest of this page covers builds and third-party clients; skip those sections unless you're developing or troubleshooting.
 
 ## Downloads
 

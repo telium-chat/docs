@@ -1,56 +1,32 @@
 ---
-title: Getting help
-description: Where to report bugs, request features and disclose security issues, and what to include.
+title: Troubleshooting and support
+description: Fix common problems and file useful bug reports.
 sidebar:
   order: 5
 ---
 
-The GitHub issue tracker is the support channel. This page says where each kind of problem goes and what to attach.
+## Start here
 
-| Problem | Where it goes |
+| Problem | Try this |
 | --- | --- |
-| The client misbehaved or a screen broke | A [bug report](https://github.com/telium-chat/telium/issues/new?template=bug_report.yml) |
-| A homeserver misbehaved (federation, media, calls, delivery) | A bug report naming the server and the component |
-| A feature you want | A [feature idea](https://github.com/telium-chat/telium/issues/new?template=feature_request.yml) |
-| Anything that could expose an account, a server or a message | Not a public issue. Report it privately as described in [SECURITY.md](https://github.com/telium-chat/telium/blob/main/SECURITY.md). |
-| A user or message breaks a server's rules | That server's operators, through the report action in the client |
+| Can't sign in or register | Check the homeserver domain after `:` in your username. Some servers require invitation codes. |
+| Telium can't find a server | Check its `/.well-known/telium/server` URL or [website-domain delegation](/self-hosting/domain-delegation/). |
+| File upload fails or returns HTTP 413 | Check both the [server upload policy](/self-hosting/public-server/#set-media-limits) and proxy/tunnel limits. |
+| Call connects with no audio | Check microphone access and the [SFU troubleshooting steps](/self-hosting/sfu/#troubleshooting). |
+| A cross-server friend or guild action fails | Try a local action, then report both homeserver domains for [federation debugging](/federation/overview/). |
 
-You can also file from the client under **Settings → Help & feedback**. It attaches diagnostics and shows you their contents first.
+## Report a bug
 
-## A quick problem checklist
+Use the [Telium issue tracker](https://github.com/telium-chat/telium/issues). For a new feature, use the feature request form; for a software failure, use the bug report form. Report abuse to the relevant **server operator**, not the software issue tracker.
 
-| What is wrong? | First things to try |
-| --- | --- |
-| Can't sign in or register | Double-check the **account home domain** (after the `:` in your username); a server can temporarily close registration. |
-| The app can't find a server | Test `https://your-account-domain/.well-known/telium/server`. If its API is hosted on a different domain, check [delegation](/self-hosting/domain-delegation/). |
-| Upload says too large or HTTP 413 | Compare the server's file-size policy with any reverse-proxy/tunnel limit. Public operators have a [media checklist](/self-hosting/public-server/#2-set-file-sizes-quotas-and-retention). |
-| Voice has no audio | Check device and browser permissions; if mesh works but larger calls fail, ask the operator to inspect their [SFU](/self-hosting/sfu/). |
-| Friends or guilds fail across servers | Try a local guild first. If that works, include both homeserver domains in a [federation bug report](/federation/overview/). |
+**Security vulnerabilities must be reported privately** through [SECURITY.md](https://github.com/telium-chat/telium/blob/main/SECURITY.md), not a public issue.
 
-Before you post logs or screenshots, remove passwords, access tokens, recovery keys, private message contents and other people's sensitive information.
-
-## What to include
-
-### Client
-
-- The build line from the footer of the settings screen: version, build ID, runtime and build time. You can select it to copy.
-- Diagnostics from **Settings → Connected servers → Copy diagnostics**. They contain versions, connection close codes, storage health and recent failures, and no messages, drafts, names or credentials, so they are safe to post publicly.
-
-### Homeserver
-
-Run these and paste the output:
+Include the client version, platform, what you tried, what happened and reproduction steps. Operators can also attach a short relevant log excerpt. On native installs:
 
 ```sh
-telium-server version
-telium-server updates check
-uname -m                # x86_64 or aarch64
-telium-server check     # config audit
+journalctl -u telium-server -n 100
 ```
 
-Add the log excerpt around the failure (`journalctl -u telium-server` on a native install, `docker logs` under Compose). Logs can name guilds and accounts, so trim them to the relevant window.
+On Compose, run `docker compose logs --tail=100 server` from the install directory.
 
-For federation problems, include logs from both servers if you can.
-
-## Contributing a fix
-
-Start at [CONTRIBUTING.md](https://github.com/telium-chat/telium/blob/main/CONTRIBUTING.md) and [Development](/reference/development/).
+**Remove secrets before sharing:** passwords, bearer tokens, recovery keys, private messages and personal data. Check logs and screenshots yourself before uploading them. Developers can start with [Contributing](/reference/development/).

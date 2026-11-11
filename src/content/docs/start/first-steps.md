@@ -1,62 +1,38 @@
 ---
-title: Your first steps in Telium
-description: Create an account, find a community, send messages and try calls without running a server.
+title: Get started with Telium
+description: Create an account, join a community and try a call.
 sidebar:
   order: 1
 ---
 
-You do **not** need to host anything to use Telium. Pick an account home, sign in and join communities hosted across the network.
+You do **not** need to host a server to use Telium.
 
-## 1. Open a client
+## 1. Open Telium
 
-Use [telium.chat](https://telium.chat) in your browser, or choose a [desktop or Android client](/start/clients/). The same account works across clients.
+Use [telium.chat](https://telium.chat) in your browser or [download an app](/start/clients/).
 
-## 2. Choose where your account lives
+## 2. Choose a homeserver
 
-A Telium address looks like `@alex:chat.example.com`. The part after the colon names your **home server**: the server that stores your account and handles sign-in.
+Your address looks like `@alex:example.com`. The domain is your **homeserver**: it keeps your account and signs you in. You can use an invitation from someone you trust, browse the available server choices, or enter a server domain yourself.
 
-- If someone invited you to their server, ask whether they accept new accounts and use their domain.
-- If your client offers a server directory or recommendation, you can browse it. You can also enter a server name manually.
-- A home server must allow registration before you can create an account there. Its operator sets the rules and manages that server.
+A homeserver may accept everyone or require a registration code. Ask its operator if signups are closed.
 
-**Your home server is not the same thing as a guild.** Once you have an account, you can join guilds (communities) hosted on *other* Telium servers without creating a new account on each one. [How federation works](/start/architecture/).
+**Choose a server whose operator you trust.** It handles your login and metadata. See [Privacy](/security/privacy/) for what server operators can see.
 
-:::caution[Choose an operator you trust]
-Your home server handles your login and account metadata. A guild server can read messages in its guild text channels. DMs and group DMs are end-to-end encrypted, but guild text messages are not. See [Privacy](/security/privacy/).
-:::
+## 3. Register and save your recovery key
 
-## 3. Create your account and protect it
+Choose a strong password. If Telium shows a recovery key, save it outside the device. Review the devices signed in to your account under Settings. [More about account recovery](/security/account-security/).
 
-Register with a unique localpart and a strong password. If the client gives you an account recovery key, **save it somewhere safe and outside the device** before dismissing it. Review your sign-in devices and available recovery settings under your account's security settings.
+## 4. Join a community
 
-[Account security](/security/account-security/) explains what your home server can and cannot recover if you lose access.
+A **guild** is a community with channels and roles. You can join guilds on other servers without creating a second account. Use an invite, or [create a guild](/features/guilds/) and invite your friends. Add friends by their full `@name:server` address.
 
-## 4. Find people and communities
+## 5. Send a message and try a call
 
-There are two easy starting points:
+Send a message, upload a file and join a voice channel. Upload size and expiry depend on the server. Small calls can run directly between people; larger ones use a voice relay. [Uploads](/features/media/) · [Calls](/features/voice-and-video/).
 
-- **Join a guild through an invite.** A guild has channels, members, roles and moderators. It can live on a different server from your account.
-- **Create your own guild.** Add text or voice channels, then invite friends.
+## Need help?
 
-You can also [add friends](/features/friends/) using their full Telium address, even when their accounts live on different home servers.
+Check [Troubleshooting](/start/getting-help/). Telium is [alpha software](/start/stability/), so don't rely on it as your only copy of important data.
 
-Read [Guilds](/features/guilds/) when you want to manage roles, invitations and moderation.
-
-## 5. Try a message, a file and a call
-
-Send a message to a friend or a guild channel. Try attaching a small file and check where it will be uploaded and when it expires — the destination and limits can vary. [How file uploads work](/features/media/).
-
-For voice, join a channel with another person. Small calls work directly between participants; larger calls can use an [SFU relay](/features/voice-and-video/). You don't have to run an SFU yourself.
-
-## If something doesn't work
-
-| Problem | Where to go |
-| --- | --- |
-| The client can't reach your server | [Client connection problems](/start/clients/#connection-problems) |
-| You can't register | Check that your chosen home server allows new accounts; another server may accept them |
-| A guild invite or friend request fails | [Federation](/federation/overview/) and [Getting help](/start/getting-help/) |
-| Calls have no audio or fail to connect | [Voice and video](/features/voice-and-video/) |
-
-Telium is still [alpha](/start/stability/). Expect changes, report bugs when you find them, and do not rely on guild text channels for secrets.
-
-**Want to operate your own home server instead?** Start with [Running in production](/self-hosting/production/), then follow [After setting up your server](/self-hosting/after-setup/).
+**Want your own server?** Start with [Self-hosting](/self-hosting/).
