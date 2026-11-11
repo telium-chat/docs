@@ -1,73 +1,106 @@
 ---
-title: Exposing your server
-description: DNS, TLS and the reverse proxy or tunnel that put a homeserver on a public domain.
+title: Make your homeserver reachable
+description: Set up HTTPS with Caddy, nginx or Cloudflare Tunnel.
 sidebar:
   order: 5
 ---
 
-**Want usernames like `@alice:example.com` while keeping your website on `example.com` and running Telium at `chat.example.com`?** Follow [Use your website domain for Telium accounts](/self-hosting/domain-delegation/). It explains the one-line `telium.txt` pointer, how to upload it to an existing website, and how to check browser compatibility.
+A Telium homeserver needs a public **HTTPS address**. The native installer listens on \`127.0.0.1:8448\`; your reverse proxy or tunnel makes it reachable to other people.
 
-The server binds loopback; whatever sits in front of it is the public side. Pick one front and follow its section — Caddy if the box has open ports and you want the least moving parts, a Cloudflare Tunnel if you want none at all, nginx if you already run it. The tunnel kit includes the tunnel, and the standalone kit can run this page's Caddy as a container (its `proxy` profile), so this page is mostly for the native install and for fronts the box already runs.
+**Choose one front end:**
 
-Whatever you use, the front must:
+| You have | Use |
+| --- | --- |
+| A public Linux server with ports 80/443 available | [Caddy](#caddy) |
+| Cloudflare Tunnel already configured | [Cloudflare Tunnel](#cloudflare-tunnel) |
+| nginx already serving other sites | [nginx and Certbot](#nginx-and-certbot) |
+| The standalone Compose kit with bundled Caddy | Follow [its installer](/self-hosting/install-docker/), not this manual setup |
 
-- pass WebSocket upgrades on all paths;
-- allow a read timeout above 90 seconds (the gateway heartbeat is 45 s; the shipped examples use 600 s);
-- send `X-Forwarded-For`, with its own address listed in `rate_limit.trusted_proxies`;
-- accept request bodies of at least 128 MB;
-- leave out its own Content-Security-Policy, since the server sends one.
+If your website stays at \`example.com\` while the API runs at \`chat.example.com\`, finish [account-domain setup](/self-hosting/domain-delegation/) **before creating accounts**.
 
-The shipped configs in [`deploy/reverse-proxy/`](https://github.com/telium-chat/telium/blob/main/deploy/reverse-proxy/) — a Caddyfile and an nginx.conf — already do all of this. Replace `telium.example.org` with your hostname and keep the upstream at `http://127.0.0.1:8448`.
+## Before you start
+
+Point your API hostname's DNS to the server or configure its tunnel. Do not put the homeserver's raw HTTP port 8448 on the public internet.
+
+Your front must forward all routes, including \`/.well-known/telium/server\` and \`/_telium/v1/\`, and support WebSockets. Set request-body limits high enough for your chosen upload policy, and allow long-lived gateway connections. Configure \`rate_limit.trusted_proxies\` for the actual proxy address; incorrect trust settings make different users share one rate limit.
 
 ## Caddy
 
-The least config for a plain VPS. Caddy fetches and renews certificates by itself, forwards WebSocket upgrades without being told, streams rather than buffers, and has no read timeout to trip over.
+Caddy obtains and renews HTTPS certificates for your hostname. On Debian/Ubuntu, install Caddy and add this **site block** to its Caddyfile:
 
-```sh
-sudo apt install caddy                     # or your distro's package
-sudo cp deploy/reverse-proxy/Caddyfile /etc/caddy/Caddyfile
-sudo $EDITOR /etc/caddy/Caddyfile          # set your hostname
+\`\`\`text
+chat.example.com {
+    reverse_proxy 127.0.0.1:8448
+}
+\`\`\`
+
+For example:
+
+\`\`\`sh
+sudo apt install caddy
+sudoedit /etc/caddy/Caddyfile
 sudo systemctl reload caddy
-```
+\`\`\`
 
-`rate_limit.trusted_proxies` stays `["127.0.0.1"]` — Caddy is on the same box.
+If that file already serves other sites, **add the block rather than replacing the file**. Caddy forwards WebSockets automatically. Open inbound **TCP 80 and 443** at the VPS provider and on the host firewall.
+
+The [shipped Caddyfile](https://github.com/telium-chat/telium/tree/main/deploy/reverse-proxy) has a more complete production example. For a proxy on the same host, \`rate_limit.trusted_proxies = ["127.0.0.1"]\` is appropriate.
 
 ## Cloudflare Tunnel
 
-No open ports: `cloudflared` makes outbound connections only, and Cloudflare terminates TLS. The tunnel carries HTTP and WebSockets, which is all the homeserver needs. In the dashboard, map your hostname to `http://127.0.0.1:8448`, and list the tunnel's local address — `127.0.0.1` when `cloudflared` runs on the box — in `rate_limit.trusted_proxies`.
+A tunnel lets the homeserver receive HTTPS and WebSocket requests without opening inbound HTTP ports.
 
-The Compose kit runs `cloudflared` as a container on a fixed address instead; its page has the details.
+1. Create a tunnel in the Cloudflare dashboard.
+2. Map the public hostname \`chat.example.com\` to \`http://127.0.0.1:8448\` **if cloudflared runs on the same host as the native server**.
+3. Make sure cloudflared is running and the tunnel hostname has a valid public HTTPS certificate.
+4. Test the HTTPS discovery URL below.
 
-:::caution
-A tunnel cannot carry SFU or TURN media, which is UDP. An SFU needs its own public address with its DNS record unproxied. See [SFU](/self-hosting/sfu/).
-:::
+**For the dedicated Docker tunnel kit**, the upstream is instead its fixed container address, \`http://172.31.240.3:8448\`. Follow [the Docker tunnel guide](/self-hosting/install-docker-tunnel/) for that setup.
 
-Cloudflare's proxy caps upload sizes below what the server allows, so very large media uploads fail with 413 behind a tunnel — another reason big-media servers pick a plain proxy.
+Cloudflare Tunnel carries homeserver HTTP and WebSockets. It **cannot forward an SFU's UDP media**, and its upload-size limits may be lower than those configured in Telium.
 
 ## nginx and Certbot
 
-If nginx is already what the box runs:
+If nginx is already installed, add a virtual host for the API name and issue an HTTPS certificate. This is an HTTP-only starting point for **Certbot's nginx integration**:
 
-```sh
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d chat.example.com
-```
+\`\`\`nginx
+server {
+    listen 80;
+    server_name chat.example.com;
 
-Copy `deploy/reverse-proxy/nginx.conf` into a site, set your hostname, keep the upstream at `http://127.0.0.1:8448`, then:
+    client_max_body_size 128m;
+    location / {
+        proxy_pass http://127.0.0.1:8448;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 600s;
+    }
+}
+\`\`\`
 
-```sh
-sudo nginx -t && sudo systemctl reload nginx
-```
+Enable the site, run \`sudo nginx -t\`, reload nginx and obtain a certificate with Certbot (or your existing ACME solution). **Do not leave the API HTTP-only**; client discovery and sign-in require a working public HTTPS endpoint. See the [shipped nginx config](https://github.com/telium-chat/telium/tree/main/deploy/reverse-proxy) for a more complete example.
 
-The example redirects HTTP to HTTPS, disables response buffering for the gateway, allows 128 MB bodies and adds per-IP request limits with a tighter zone for `/_telium/v1/auth/`. Keep `rate_limit.trusted_proxies` at `["127.0.0.1"]`.
+If nginx is on the same host, add \`127.0.0.1\` to \`rate_limit.trusted_proxies\`.
 
 ## Verify
 
-From another machine — not the server itself, so you are testing DNS and TLS too:
+From another machine, run:
 
-```sh
+\`\`\`sh
 curl -fsS https://chat.example.com/.well-known/telium/server
 curl -fsS https://chat.example.com/_telium/v1/capabilities
-```
+\`\`\`
 
-Then open [telium.chat](https://telium.chat) (or any other Telium client), register on your server, and create a guild. Caddy and Cloudflare renew certificates on their own; behind any other front, expiry is yours to watch.
+The first response should advertise your intended \`server_name\` and HTTPS API URL. If localhost health succeeds but these commands fail, debug **DNS, certificate issuance and reverse-proxy routing** first:
+
+\`\`\`sh
+curl -fsS http://127.0.0.1:8448/_telium/v1/health
+\`\`\`
+
+If uploads fail with HTTP 413, compare proxy and tunnel body limits with [your media policy](/self-hosting/common-settings/#file-limits-and-expiry). If connections drop, verify WebSocket forwarding and read timeouts.
+
+**Next:** [After installation](/self-hosting/after-setup/).
