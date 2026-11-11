@@ -1,26 +1,27 @@
 ---
 title: Self-host Telium
-description: Find the right guide to run a homeserver, a voice relay (SFU), or both.
+description: Choose between a homeserver and a voice relay, then follow one installation guide.
 ---
 
-You can host a **Telium homeserver** for accounts and communities, a **voice relay (SFU)** to carry audio and video calls, or both. They're separate services, so you don't have to run one to run the other.
+There are two services you can host. **You can run either without running the other.**
 
-## Host a homeserver
+| Service | What it does | Install |
+| --- | --- | --- |
+| **Homeserver** | Hosts accounts, messages, communities and files. Can be private or accept public signups. | [Homeserver setup](/self-hosting/production/) |
+| **Voice relay (SFU)** | Carries audio, video and screen sharing. Can serve only trusted servers or anyone on the network. | [SFU setup](/self-hosting/sfu/) |
 
-A homeserver manages accounts, communities, messages and uploaded files. **Keep registration private** for yourself or invited people, or **open it to the public** so others can create accounts. Private registration doesn't stop your members from participating in other Telium communities.
+## Homeserver
 
-- **[Set up a homeserver](/self-hosting/production/)** — choose a native Linux or Docker installation and get your server online.
-- **[After-setup checklist](/self-hosting/after-setup/)** — check registration, backups, updates and other essentials once it's running.
-- **[Run a public homeserver](/self-hosting/public-server/)** — prepare for people you don't know to sign up, including upload limits, file retention and joining the public directory.
-- **[Use your website domain for Telium accounts](/self-hosting/domain-delegation/)** — keep your existing website and Telium server on separate hosts while using your website domain for account addresses.
+1. [Choose native or Docker installation](/self-hosting/production/).
+2. [Finish setup](/self-hosting/after-setup/): register, set administrator access, verify backups and updates.
+3. If you want strangers to create accounts, follow the [public homeserver checklist](/self-hosting/public-server/) **before opening registration**.
 
-## Host a voice relay (SFU)
+For an existing website such as `example.com`, you can run the server at `chat.example.com` while keeping usernames at `@name:example.com`. Set this up [before the first account is created](/self-hosting/domain-delegation/).
 
-An **SFU** forwards voice, video and screen sharing between people in calls. It doesn't host accounts or communities. **Private relays** accept calls only from homeservers you trust; **public relays** can serve other Telium homeservers across the network. Listing a public relay in the directory is a separate, optional step.
+## Voice relay (SFU)
 
-- **[Understand SFUs and choose a setup](/self-hosting/sfu/)** — learn how relays work, when you might want one and how to install one directly on Linux.
-- **[Run a standalone SFU with Docker](/self-hosting/sfu-docker/)** — deploy a voice relay without installing a homeserver, including guidance for running multiple containers.
+Use the [native SFU installer](/self-hosting/sfu/#install-with-the-script) or the [standalone Docker SFU guide](/self-hosting/sfu-docker/). Neither requires a homeserver.
 
-:::tip[Do I need to host both?]
-No. A homeserver can use available relays from the public SFU directory, and an SFU can serve other homeservers without hosting any accounts of its own.
-:::
+**Private** means only the homeservers you trust can use the relay. **Public** means other Telium servers can use its capacity. You choose during setup or in the SFU configuration.
+
+For configuration, storage, recovery and other operations, use the **Advanced operations** section in the sidebar.

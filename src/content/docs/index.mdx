@@ -1,9 +1,9 @@
 ---
-title: Telium docs
-description: Start chatting, set up a homeserver, or learn how Telium works.
+title: Telium documentation
+description: Help for using Telium, running a server, and building clients.
 template: splash
 hero:
-  tagline: Chat in communities across independent servers. Your account stays on the server you choose.
+  tagline: Use Telium, host your own server, or connect a community.
   image:
     dark: ../../assets/telium-lockup-light.svg
     light: ../../assets/telium-lockup-dark.svg
@@ -11,38 +11,25 @@ hero:
     - text: Open Telium
       link: https://telium.chat
       icon: external
-    - text: Run a server
+    - text: Self-hosting
       link: /self-hosting/
       icon: right-arrow
-    - text: Get the app
+    - text: Download an app
       link: /start/clients/
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+## Find what you need
 
-## What brings you here?
+| I want to… | Start here |
+| --- | --- |
+| Create an account and start chatting | [First steps](/start/first-steps/) |
+| Install a homeserver | [Homeserver setup](/self-hosting/production/) |
+| Run a voice relay for my community or the public network | [Host an SFU](/self-hosting/sfu/) |
+| Use my website domain for Telium usernames | [Account domains](/self-hosting/domain-delegation/) |
+| Develop a client, bot or integration | [Development](/reference/development/), [bots](/features/bots/) and [API reference](/reference/api/) |
+| Understand privacy or federation | [Privacy](/security/privacy/) and [federation](/federation/overview/) |
 
-<CardGrid>
-  <Card title="I want to use Telium" icon="download">
-    Follow the [first-time walkthrough](/start/first-steps/), open [the web client](https://telium.chat), or [get an app](/start/clients/). Learn about [guilds and channels](/features/guilds/), [friends](/features/friends/) and [calls](/features/voice-and-video/).
-  </Card>
-  <Card title="I want to self-host Telium" icon="laptop">
-    Host a homeserver or a voice/video relay (SFU). Keep it private or make it public. [Explore self-hosting guides](/self-hosting/).
-  </Card>
-  <Card title="I want to build or integrate" icon="puzzle">
-    Read [how the network works](/start/architecture/), [create a bot](/features/bots/), or explore the [API](/reference/api/) and [protocol](/reference/protocol/).
-  </Card>
-</CardGrid>
+You don't need to run a server to use Telium. Your account lives on one homeserver, but you can join communities hosted on other servers.
 
-## The two things to know
-
-**Your home server** keeps your account and signs you into other Telium servers. **A guild** is a community with its own channels, roles and messages. You can join guilds hosted elsewhere without moving your account.
-
-You do **not** need to run your own server to use Telium. If you do host one, a small server can handle accounts, guilds and file storage in one process. Voice calls of more than a few people may need a separate [SFU media relay](/self-hosting/sfu/).
-
-:::caution[Telium is in alpha]
-Expect changes and rough edges. Direct messages are end-to-end encrypted, but **guild text channels are not**. Before relying on Telium for anything sensitive, read [Stability](/start/stability/) and [Privacy](/security/privacy/).
-:::
-
-Need a hand? [Getting help](/start/getting-help/) explains where to report a problem and what information to include.
+**Telium is in alpha.** Back up anything important and expect changes to the protocol and client. [Read the stability notes](/start/stability/).

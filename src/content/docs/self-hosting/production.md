@@ -1,50 +1,36 @@
 ---
-title: Running in production
-description: Pick how to install a Telium homeserver, then take it from nothing to a public HTTPS domain.
+title: Set up a homeserver
+description: Choose an installer and bring a Telium homeserver online.
 sidebar:
   order: 1
 ---
 
-A production homeserver is one `telium-server` process behind TLS on a public domain. Everything below is in service of that sentence: install the binary, tell it its own name, put something public in front of it, and keep it updated.
+A homeserver holds accounts, communities, messages and attachments. You need a Linux host and an HTTPS domain. You do **not** need to host the Telium web client: use [telium.chat](https://telium.chat).
 
-<img class="diagram diagram-light" src="/diagrams/production-light.svg" alt="Clients reach a reverse proxy over HTTPS on port 443. The proxy forwards HTTP to telium-server on 127.0.0.1:8448, which keeps its data in a SQLite data dir and signs join tokens for telium-sfu. Call media flows over UDP between clients and the SFU." />
-<img class="diagram diagram-dark" src="/diagrams/production-dark.svg" alt="Clients reach a reverse proxy over HTTPS on port 443. The proxy forwards HTTP to telium-server on 127.0.0.1:8448, which keeps its data in a SQLite data dir and signs join tokens for telium-sfu. Call media flows over UDP between clients and the SFU." />
+## Choose an installation method
 
-## What you need
+| Method | Use it when | Guide |
+| --- | --- | --- |
+| **Native Linux (systemd)** | You want a single server binary and no Docker runtime. | [Native install](/self-hosting/install-systemd/) |
+| **Docker Compose** | You already use Docker or want an optional bundled HTTPS proxy and SFU. | [Compose install](/self-hosting/install-docker/) |
+| **Docker with Cloudflare Tunnel** | You cannot expose inbound HTTP ports and already use Cloudflare. | [Tunnel install](/self-hosting/install-docker-tunnel/) |
 
-- A Linux machine with systemd — a small VPS is plenty — with Docker installed only if you pick the container path
-- A domain name
-- Its DNS record pointed at the machine
+For an **SFU without accounts**, stop here and follow [SFU setup](/self-hosting/sfu/) instead.
 
-No client to host: [telium.chat](https://telium.chat) and the packaged desktop and Android clients work with every server. If you do not want to run a server, you can use an account home that accepts registrations instead. [How account homes and signups work](/federation/onboarding/).
+## Before you install
 
-## Pick an install
-
-| Install | Recommended when | Guide |
-|---|---|---|
-| **Native (systemd)** | Default. Telium is one static binary with a SQLite database; there is nothing else to install. | [Install natively](/self-hosting/install-systemd/) |
-| **Docker Compose** | The box already runs Docker. One installer, three questions; the kit's Caddy or your own front, voice calls optional, updates on by default. A tunnel-only variant needs no open ports. | [Install with Compose](/self-hosting/install-docker/) · [(tunnel)](/self-hosting/install-docker-tunnel/) |
-| **From source** | You are developing the server, not hosting it. | [Development](/reference/development/#homeserver) |
-
-Both install guides are one command with your domain as the argument; everything the config needs is derived from it.
-
-## What every install shares
-
-- **Two settings that matter.** `server_name` and `public_base_url` are both your domain; everything else keeps its default. See [Configuration](/self-hosting/configuration/).
-- **Something public in front.** Caddy on the box, or a Cloudflare Tunnel with no open ports. See [Exposing your server](/self-hosting/exposing/).
-- **The startup audit.** `telium-server check` runs before every start and refuses configs that would expose a production server. See [Checking a config](/self-hosting/configuration/#checking-a-config).
-- **Updates, on by default.** Both installs ship an updater and timer; see [Updates](/self-hosting/updates/).
-
-## Want your website and Telium on different domains?
-
-You can keep your existing website at `example.com` (on shared hosting, a site builder, static hosting, or elsewhere), host Telium on `chat.example.com`, and still issue account addresses like `@you:example.com`. The [website-domain guide](/self-hosting/domain-delegation/) shows how to publish a one-line `telium.txt` pointer with manual uploads, hosting panels or Git; each install method shows the extra config edit needed. Set the account domain **before the first signup**.
-
-## Optional: keep uploads off your VPS disk
-
-Telium can store attachments in a private [S3-compatible bucket](/self-hosting/s3-media-storage/). The guide covers provider setup, configuration and verification. This is separate from configuring remote [backups](/self-hosting/backups/), and is easiest to enable before hosting real uploads.
+1. **Choose your account name.** The `server_name` is the domain in `@name:example.com`. Don't casually change it after accounts exist.
+2. **Choose your public API address.** Most installations use the same hostname for identity and the API. If your website stays at `example.com` but the API runs at `chat.example.com`, follow [Account domains](/self-hosting/domain-delegation/) **before registration**.
+3. **Prepare DNS and HTTPS.** Your public API must be available over HTTPS. The native install needs a separate [reverse proxy or tunnel](/self-hosting/exposing/); the standalone Compose kit can supply Caddy.
+4. **Decide who can sign up.** A private server is enough for you and invited friends. Public signup is optional; [read the public checklist](/self-hosting/public-server/) before enabling it.
 
 ## Finish
 
-Once your server answers on its domain, register your account — the first one on a fresh server becomes its administrator — then set `[registration] open = false` and restart. Voice and video mesh up to four participants with no extra setup; a bigger server wants an [SFU](/self-hosting/sfu/).
+After your chosen installer reports a healthy local server:
 
-**Next:** Work through [After setting up your server](/self-hosting/after-setup/) to verify sign-in, backups, updates, storage limits and whether your server should accept public signups.
+1. Check `https://YOUR-API-HOST/.well-known/telium/server` from outside the host.
+2. Register through [telium.chat](https://telium.chat). Native private installs issue a one-time registration code; keep it until you've used it.
+3. **Grant administrator access.** Native installs require the local `admin recover` command; other installers may use first-account bootstrap. Follow your install guide rather than assuming the first user is an admin.
+4. Go through [After setup](/self-hosting/after-setup/) for backups, updates, uploads and federation.
+
+Calls can use public SFUs; operating a homeserver does **not** require operating an SFU.
