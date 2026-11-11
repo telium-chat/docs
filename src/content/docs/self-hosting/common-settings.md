@@ -56,7 +56,7 @@ attachment_max_age_days = "30d"
 
 This is **an example**, not Telium's default. It allows a stored-file quota of 1 GiB per account, single files up to 50 MiB, and 30-day attachment expiry. Users must know that old attachments may disappear even while their messages remain.
 
-Your proxy or tunnel may impose a **smaller** upload limit. See [Store files in S3](/self-hosting/s3-media-storage/) if VPS disk space is the issue, or [Media policy reference](/self-hosting/configuration/#media-policy/) for all options.
+Your proxy or tunnel may impose a **smaller** upload limit. See [Store files in S3](/self-hosting/s3-media-storage/) if VPS disk space is the issue, or [Media policy reference](/self-hosting/configuration/#media-policy) for all options.
 
 ## Backups
 
