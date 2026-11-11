@@ -1,9 +1,21 @@
 ---
-title: Install with Compose
-description: The standalone container kit — one interactive installer, three questions, a homeserver that updates itself.
+title: Install with Docker Compose
+description: Install a homeserver with the standalone Compose kit.
 sidebar:
   order: 3
 ---
+
+Use this installer if you already run Docker. It can add Caddy for HTTPS and an optional SFU for voice. For an **SFU without a homeserver**, use [standalone SFU with Docker](/self-hosting/sfu-docker/).
+
+## Requirements
+
+- Linux with systemd, Docker and Compose v2
+- A domain pointed at the host
+- An ordinary account with `sudo`
+- If using the bundled Caddy, free inbound TCP ports 80 and 443
+- If adding a local SFU, public media ports as shown in [SFU setup](/self-hosting/sfu/#requirements)
+
+## 1. Install
 
 ```sh
 git clone https://github.com/telium-chat/telium.git
@@ -11,93 +23,60 @@ cd telium
 sudo bash deploy/standalone/install.sh
 ```
 
-**This installer creates a Telium homeserver.** If you only want to run public voice relays in Docker, use the [standalone SFU Docker installer](/self-hosting/sfu-docker/) instead. You do **not** need a homeserver for that.
+Or download the [standalone installer](https://github.com/telium-chat/telium/blob/main/deploy/standalone/install.sh) without cloning. It asks for your domain, whether to use the bundled Caddy or your existing proxy, and whether to add voice.
 
-Answer three questions — your domain, who fronts it (the kit's Caddy with automatic certificates, or whatever already runs on the box), and whether it carries voice calls — and the installer writes the config, starts the stack, and turns on a timer that keeps every container current. Updates are on by default; `TELIUM_UPDATES=manual` in `/opt/telium/update.conf` is how you decline. Re-run the installer any time to upgrade the machinery; it never overwrites a file you could have edited.
+The Compose project lives in `/opt/telium`. It keeps editable configuration in `.env` and `telium.toml`. Automatic updates are enabled by default; [update policy](/self-hosting/updates/) is in `/opt/telium/update.conf`. Re-running the installer preserves your edited config.
 
-:::tip[Want accounts on your website domain?]
-You can keep your website on `example.com` with its existing provider and put Telium on `chat.example.com`, while still using addresses such as `@you:example.com`. See [Using your website domain for accounts](#using-your-website-domain-for-accounts) **before the first signup**.
-:::
+## 2. Bring it online
 
-No clone wanted? Fetch the installer on its own:
+Point DNS to your host. If you chose your **own** proxy, send HTTPS traffic to the local server at `127.0.0.1:8448`; see [Expose a homeserver](/self-hosting/exposing/). The web client stays at [telium.chat](https://telium.chat).
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/telium-chat/telium/main/deploy/standalone/install.sh -o install.sh
-sudo bash install.sh
-```
-
-## What you need
-
-- A Linux box with Docker and the compose plugin
-- A hostname for the Telium HTTPS endpoint (for example, `chat.example.com`). Your website and account identity domain can be different.
-- Ports 80 and 443 free (or an existing front). Voice adds TCP 7881, UDP 3478 and UDP 50000–60000.
-
-## What it asks
-
-| Question | Answers |
-|---|---|
-| Your domain | `chat.example.com` — normally both the API hostname and account identity; to use `@you:example.com` instead, [follow this extra setup](#using-your-website-domain-for-accounts) before registration |
-| Who fronts it | **1** the kit's Caddy (default) · **2** your own proxy or tunnel, pointed at `127.0.0.1:8448` |
-| Voice calls? | Adds the [SFU](/self-hosting/sfu/) container and asks for two more domain names, suggested for you |
-
-The whole stack is one Compose project in `/opt/telium`. The server publishes nothing but `127.0.0.1:8448`; what is public is the front's decision. Your answers live in one file, `/opt/telium/.env` — switch the front or add voice later by editing `COMPOSE_PROFILES` there and running `docker compose up -d` again.
-
-## After it finishes
-
-```sh
-# 1. DNS: your domain (and the SFU names, if you took voice) -> the box.
-#    On Cloudflare, DNS-only for the SFU names -- media cannot ride the proxy.
+cd /opt/telium
+sudo docker compose ps
 curl -fsS https://chat.example.com/.well-known/telium/server
-
-# 2. Register your account. The first one becomes the administrator.
-
-# 3. Close the door: set [registration] open = false in /opt/telium/telium.toml, then
-cd /opt/telium && docker compose up -d
 ```
 
-With voice, calls bigger than four people now run through your SFU; its dashboard is at `https://sfu.example.com/admin`. Everything about regions, public mode and TURN works exactly as on a native install — see [SFU](/self-hosting/sfu/).
+Sign up on your server. The standalone kit currently starts with open registration, and its default config allows the first account to become admin. **Register your operator account first**, then edit `/opt/telium/telium.toml`:
 
-**Optional: want to keep user uploads off your VPS disk?** See [Store uploads in S3-compatible storage](/self-hosting/s3-media-storage/) for a copyable `telium.toml` example and a test checklist. This is separate from backing up your server.
+```toml
+[registration]
+open = false
+```
+
+Apply with `sudo docker compose up -d --force-recreate server`. Verify admin access in the client control plane.
 
 ## Using your website domain for accounts
 
-If your normal website is at `example.com` (wherever it is hosted) and you want the actual Telium server at `chat.example.com`, users can still register as `@you:example.com`.
+For usernames like `@you:example.com` while the API lives at `chat.example.com`:
 
-The standalone installer currently uses **one domain** for both the server's identity and its built-in HTTPS proxy. For this setup:
+1. Answer **`chat.example.com`** in the installer, so the bundled proxy is configured for the correct hostname.
+2. **Before creating accounts**, edit `/opt/telium/telium.toml`:
 
-1. **Answer `chat.example.com`** when the installer asks for a domain. That keeps the kit's Caddy and DNS instructions pointed at the actual Telium backend.
-2. **Before creating the first account**, open `/opt/telium/telium.toml`. Change its `server_name` to your website domain, but leave `public_base_url` pointing to the chat subdomain using the existing environment variable:
+```toml
+server_name = "example.com"
+public_base_url = "https://${env:TELIUM_CHAT_DOMAIN}"
+```
 
-   ```toml
-   server_name = "example.com"
-   public_base_url = "https://${env:TELIUM_CHAT_DOMAIN}"
-   ```
+3. Keep `TELIUM_CHAT_DOMAIN=chat.example.com` in `/opt/telium/.env` and recreate the server container.
+4. Publish `https://example.com/telium.txt` containing `chat.example.com` on your **existing website**. See [Account-domain setup](/self-hosting/domain-delegation/).
 
-   In `/opt/telium/.env`, keep `TELIUM_CHAT_DOMAIN=chat.example.com`. The kit uses this for its Caddy hostname, so changing it to `example.com` would incorrectly send its proxy to your website's domain.
+Don't send `example.com` to the VPS if it hosts your website elsewhere.
 
-3. Apply the configuration change:
+## Voice and files
 
-   ```sh
-   cd /opt/telium
-   sudo docker compose up -d --force-recreate server
-   ```
+If you chose the voice profile, point the two SFU DNS names at the host and open TCP 7881, UDP 3478 and UDP 50000–60000. Keep SFU hostnames DNS-only if using Cloudflare. See [SFU setup](/self-hosting/sfu/) for private/public relay options.
 
-4. Test `https://chat.example.com/.well-known/telium/server`: it should announce `server_name` of `example.com`.
-5. Leave `example.com` pointed at your website host. Add a [one-line `telium.txt` file using your website provider's normal publishing method](/self-hosting/domain-delegation/) there, then register through the account domain `example.com`.
-
-**Replace `example.com` and `chat.example.com` with your own domains.** Do this before any accounts exist. The domain in an account ID is not something you can change by editing a config file later.
-
-## The manual route
-
-The installer only does what you can: put [these five files](https://github.com/telium-chat/telium/tree/main/deploy/standalone) in a directory, write your domains into `.env`, and `docker compose up -d`. `telium.toml` reads its identity from `.env`, so there is one place to edit; `sfu.toml` has three marked lines for the voice profile. The kit's README explains what each file is for.
+Uploads use local storage by default. [S3-compatible storage](/self-hosting/s3-media-storage/) is optional, but it does not replace backups.
 
 ## Troubleshooting
 
-| Symptom | Check |
-|---|---|
-| Nothing answers on your domain | DNS first, then `docker compose ps` in `/opt/telium`; Caddy's certificate needs DNS to resolve before it can be issued |
-| Port 80 or 443 already in use | You picked the kit's Caddy while the box already runs a front — re-run the installer and answer 2, or retire the old one |
-| Every user shares one rate limit | `trusted_proxies` in `telium.toml` must name your front: `172.31.241.2` for the kit's Caddy, `172.31.241.1` for a front on the host — the installer sets the right one |
-| Calls mesh instead of using the SFU | `COMPOSE_PROFILES` lacks `voice`, or the `[voice]` block in `telium.toml` is still commented |
-| Calls connect but carry no audio | The SFU's media ports — TCP 7881, UDP 3478, UDP 50000–60000 — are firewalled, or the SFU names are Cloudflare-proxied instead of DNS-only |
-| The server refuses to start, logs an unresolvable `${env:…}` | `.env` is missing a variable |
+```sh
+cd /opt/telium
+sudo docker compose ps
+sudo docker compose logs --tail=100 server
+```
+
+If the domain doesn't answer, check DNS and TLS. If 80/443 are already used, choose your **existing proxy** rather than the kit's Caddy. If calls have no media, check the SFU's publicly reachable UDP ports.
+
+**Next:** [After setup](/self-hosting/after-setup/).

@@ -1,9 +1,19 @@
 ---
-title: Install with Compose (tunnel)
-description: The no-open-ports container kit — one installer command, one tunnel token, a homeserver that updates itself.
+title: Install with Cloudflare Tunnel
+description: Run a Compose homeserver without opening inbound HTTP ports.
 sidebar:
   order: 4
 ---
+
+Use this only if you already use Cloudflare Tunnel and want Docker Compose. The tunnel carries homeserver HTTP and WebSockets. **It does not carry SFU UDP media.**
+
+## Requirements
+
+- Linux with Docker, Compose v2 and systemd
+- A Cloudflare-managed hostname
+- An ordinary operator account with `sudo`
+
+## 1. Install the tunnel kit
 
 ```sh
 git clone https://github.com/telium-chat/telium.git
@@ -11,73 +21,53 @@ cd telium
 sudo ./deploy/install.sh chat.example.com
 ```
 
-The argument is the public tunnel hostname. Normally it is also your account domain, but **if you keep a website on the root domain**, use the Telium subdomain (such as `chat.example.com`) and then follow [Using your website domain for accounts](#using-your-website-domain-for-accounts) before the first signup. The installer puts the kit in `/opt/telium` — `compose.yml`, a `telium.toml` with your identity set, the update timer — and leaves exactly one thing only you can do: create the tunnel. Run it again any time; it upgrades the machinery and never overwrites `compose.yml`, `telium.toml`, `update.conf` or `tunnel.env`.
+The kit is installed in `/opt/telium`, with an automatic updater and preserved configuration files. It requires a Cloudflare Tunnel token before the tunnel service can start.
 
-## What you need
+## 2. Connect Cloudflare Tunnel
 
-- A Linux box with systemd, Docker and the compose plugin
-- A domain on Cloudflare — the front is a Cloudflare Tunnel, so **no ports are open at all**; the tunnel is the only way in
-- sudo, from an ordinary account: that account owns the deploy, and the updater runs as it
-
-## The tunnel token
-
-1. In the Cloudflare dashboard, create a tunnel and map `chat.example.com` to `http://172.31.240.3:8448` — the server container's fixed address on the kit's private network.
-2. Give the token to the box:
+In Cloudflare's tunnel dashboard, route `chat.example.com` to **`http://172.31.240.3:8448`** (the server container's address on the kit network). Then create the local token file:
 
 ```sh
-printf 'TUNNEL_TOKEN=%s\n' "$TOKEN" > /opt/telium/tunnel.env
-chmod 600 /opt/telium/tunnel.env
+sudo sh -c 'printf "TUNNEL_TOKEN=%s\n" "$1" > /opt/telium/tunnel.env' sh YOUR_TUNNEL_TOKEN
+sudo chmod 600 /opt/telium/tunnel.env
 ```
 
-Compose refuses to start while `tunnel.env` is missing, and the token must never be committed. That is the whole install. Updates need nothing from you: the timer checks the registry every minute and moves the image inside whatever window `update.conf` names — the same fields as every other kit, documented in [Updates](/self-hosting/updates/).
-
-## After it finishes
+Replace the placeholder with your token, or enter it securely without putting it in shell history. Don't commit `tunnel.env`.
 
 ```sh
-cd /opt/telium && docker compose ps        # server and tunnel up
+cd /opt/telium
+sudo docker compose up -d
+sudo docker compose ps
 curl -fsS https://chat.example.com/.well-known/telium/server
 ```
 
-Register your account — the first one becomes the administrator — then set `[registration] open = false` in `/opt/telium/telium.toml` and `docker compose up -d`. One line worth checking first: `[voice]` names the SFU this deployment was staged against; remove it unless it is yours, and calls mesh up to four people without it. Data is a named volume (`telium-data`) plus `/srv/telium-backups` for archives — see [Backups](/self-hosting/backups/).
+## 3. Register and secure it
 
-**Optional: low-disk VPS?** Use [S3-compatible storage for user uploads](/self-hosting/s3-media-storage/) instead of filling the server volume. This does not bypass Cloudflare Tunnel's HTTP upload-size limit or replace backups.
+The tunnel kit's config starts with open registration. Register your operator account through [telium.chat](https://telium.chat), verify your admin access, then set `[registration] open = false` in `/opt/telium/telium.toml` and recreate the server container.
+
+Check [backups and updates](/self-hosting/after-setup/) before inviting users. The tunnel provider may have a lower HTTP upload limit than Telium.
 
 ## Using your website domain for accounts
 
-For an existing website on `example.com` (hosted anywhere) and a Telium API through a tunnel on `chat.example.com`, you can keep usernames like `@you:example.com`.
+If your website stays at `example.com` but you want accounts like `@you:example.com`:
 
-1. **Install using the tunnel hostname**, not your website's root domain. Replace `chat.example.com` with the real subdomain you control:
+1. Install the kit with **`chat.example.com`**, the tunnel hostname.
+2. Before registering, edit `/opt/telium/telium.toml`:
 
-   ```sh
-   sudo ./deploy/install.sh chat.example.com
-   ```
+```toml
+server_name = "example.com"
+public_base_url = "https://chat.example.com"
+```
 
-2. In Cloudflare, route the tunnel's public hostname **`chat.example.com`** to this kit's Telium container (`http://172.31.240.3:8448`), as described above. Leave **`example.com`** with your existing website host.
-3. **Before creating your first Telium account**, edit `/opt/telium/telium.toml`:
-
-   ```toml
-   server_name = "example.com"
-   public_base_url = "https://chat.example.com"
-   ```
-
-4. Apply the edit:
-
-   ```sh
-   cd /opt/telium
-   sudo docker compose up -d --force-recreate server
-   ```
-
-5. Confirm `https://chat.example.com/.well-known/telium/server` announces `server_name` as `example.com`. Then [publish a one-line `telium.txt` file on your website host](/self-hosting/domain-delegation/), and choose `example.com` when registering an account.
-
-Only the Telium subdomain needs a tunnel route; **your existing website stays on the original domain**. A tunnel can carry the homeserver HTTP/WebSocket requests, but not an SFU's UDP media.
+3. Recreate the server and [publish `/telium.txt` on your website](/self-hosting/domain-delegation/). Keep the website's DNS pointing at its original host.
 
 ## Troubleshooting
 
-| Symptom | Check |
-|---|---|
-| Compose refuses to start | `tunnel.env` is missing or empty |
-| Clients cannot connect | the dashboard maps your hostname to `http://172.31.240.3:8448`, and the tunnel container is up |
-| Every user shares one rate limit | `trusted_proxies` in `telium.toml` must be exactly the tunnel's address, `172.31.240.2` |
-| Pulls fail unauthenticated | `docker login` as the owning account, not root |
-| Uploads fail with 413 | Cloudflare's upload limit — large media wants the [standalone kit](/self-hosting/install-docker/)'s plain front |
-| Calls never use an SFU | a tunnel carries HTTP only; an SFU on this box wants the standalone kit and its open ports |
+| Problem | Check |
+| --- | --- |
+| No public connection | Tunnel token and the `http://172.31.240.3:8448` route |
+| Rate limits shared by all users | `rate_limit.trusted_proxies` needs the tunnel peer `172.31.240.2` |
+| Upload returns HTTP 413 | Your tunnel provider's upload limit |
+| SFU calls fail | A tunnel cannot carry SFU media; host the relay on reachable TCP/UDP ports |
+
+**Next:** [After setup](/self-hosting/after-setup/).

@@ -1,153 +1,87 @@
 ---
-title: Install natively
-description: One static binary, one config file and a systemd unit — from nothing to a running homeserver.
+title: Install on Linux (systemd)
+description: Install a Telium homeserver without Docker, then publish it over HTTPS.
 sidebar:
   order: 2
 ---
 
-The recommended install. Telium is a single static binary with a SQLite database, so there is nothing else to install and no container runtime to maintain. This page takes a fresh box to a server running on `127.0.0.1:8448` with automatic updates enabled; the public side is [Exposing your server](/self-hosting/exposing/).
+**Use this for a Linux server with systemd.** The installer downloads a release, configures the service and its automatic updater, and starts the server on `127.0.0.1:8448`. You provide DNS and HTTPS afterward.
 
-:::tip[Already have a website on your domain?]
-You can keep your existing website at `example.com` (on any hosting provider), run Telium at `chat.example.com`, and have user IDs like `@you:example.com`. Before anyone registers, follow [Using your website domain for accounts](#using-your-website-domain-for-accounts).
-:::
+## Requirements
 
-## What you need
+- Linux with systemd and root or sudo access
+- A domain you control
+- `curl` or `wget` to download the bootstrap
 
-- A Linux box running systemd (a small VPS is plenty)
-- A public hostname for the Telium HTTPS endpoint (for example, `chat.example.com`). Your account domain may stay on a separate website host.
-- Root access, either through a root login or `sudo`. The installer works on root-only VPS images with no `sudo`.
-- `curl` or `wget` to download the bootstrap; Git is **not** needed. On Debian/Ubuntu, the bootstrap installs missing server-side packages.
+You do **not** need Git or a locally hosted web client.
 
-## Quick install (no Git needed)
+## 1. Install
 
-From **any directory**, download the small bootstrap script and launch it with the domain:
+Run from any directory, replacing the domain:
 
 ```sh
 curl -fsSLo /tmp/telium-native-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-native.sh
 bash /tmp/telium-native-setup.sh chat.example.com
 ```
 
-If you don't have `curl`, use `wget` for the download instead:
+If you lack `curl`, use `wget -qO /tmp/telium-native-setup.sh URL` with the same URL, then run the script. You can review the saved script before executing it. The bootstrap installs missing packages on supported Debian/Ubuntu hosts.
 
-```sh
-wget -qO /tmp/telium-native-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-native.sh
-bash /tmp/telium-native-setup.sh chat.example.com
-```
+**When prompted about registration**, choose **No** to require one-time codes, or **Yes** to allow anyone to register. A private install prints an initial registration code **once**. Save it.
 
-The bootstrap automatically uses `sudo` for ordinary users when available; if you're already root, no `sudo` command is needed. When neither `sudo` nor root privileges are available, ask the machine's administrator for access. If both `curl` and `wget` are missing on Debian/Ubuntu, run `apt-get update && apt-get install -y curl ca-certificates` **as root**, then use the first command above. Missing packages like `tar` and `sha256sum` are installed by the bootstrap on Debian/Ubuntu.
+The installer runs the server as the `telium` system user, installs the update timer, and leaves your config and data intact if rerun. It does not set up a public HTTPS proxy.
 
-:::note[Checking the script before running it]
-The bootstrap is [open-source shell code](https://github.com/telium-chat/telium/blob/main/deploy/bootstrap-native.sh). You can read the saved `/tmp/telium-native-setup.sh` file before executing it.
-:::
+## 2. Set up DNS and HTTPS
 
-The script downloads the current release from the rolling `server-latest` tag, checks it against the sha256 the release publishes, creates the `telium` user and its directories, writes `/etc/telium/telium.toml` from your domain, installs the unit and the update timer, and starts the server. It prints the three things only a human can do: DNS, TLS, and registering your account.
-
-It is safe to run again. The installer preserves your server identity, configuration, data, and backup settings. It installs the updater and lets that updater manage binary upgrades and safe restarts.
-
-## By hand
-
-The script is the commands below, in order. Reading them is a fair way to check what it does.
-
-```sh
-# The release. Also published as server-v<version>; verify against the
-# SHA256SUMS-server published beside it.
-curl -fsSLO https://github.com/telium-chat/telium/releases/download/server-latest/telium-server-linux-x86_64.tar.gz
-tar -xzf telium-server-linux-x86_64.tar.gz            # telium-server, telium.example.toml
-install -Dm755 telium-server /usr/local/bin/telium-server
-
-# User, paths, config
-useradd --system --home-dir /var/lib/telium --shell /usr/sbin/nologin telium
-install -d -o telium -g telium -m 750 /var/lib/telium
-install -d -o telium -g telium -m 700 /var/backups/telium
-install -d -m 755 /etc/telium
-```
-
-Write `/etc/telium/telium.toml` (mode 600, owned by `telium`) — every value is derived from your domain:
-
-```toml
-server_name = "chat.example.com"
-public_base_url = "https://chat.example.com"
-bind = "127.0.0.1:8448"
-database_url = "sqlite:///var/lib/telium/telium.db?mode=rwc"
-media_dir = "/var/lib/telium/media"
-
-[rate_limit]
-trusted_proxies = ["127.0.0.1"]
-
-[backup]
-dir = "/var/backups/telium/archives"
-key_file = "/var/backups/telium/backup.key"
-```
-
-Everything not listed keeps its compiled-in default; `telium.example.toml` in the release annotates all of it.
-
-```sh
-# Units and the updater
-install -Dm644 deploy/telium-server.service /etc/systemd/system/
-install -Dm755 deploy/update-native.sh /usr/local/sbin/telium-update-native
-install -Dm644 deploy/telium-update-native.service deploy/telium-update-native.timer /etc/systemd/system/
-systemctl daemon-reload
-systemctl enable --now telium-server.service telium-update-native.timer
-```
-
-The unit drops all capabilities, keeps the filesystem read-only apart from the data and backup directories, runs `telium-server check` as `ExecStartPre` and restarts on failure. The updater replaces the binary when the release channel moves; pins and maintenance windows are in [Updates](/self-hosting/updates/).
-
-## Verify
+Point the API hostname at the host. Follow [Expose a homeserver](/self-hosting/exposing/) to use Caddy, nginx or a tunnel. Then check:
 
 ```sh
 curl -fsS http://127.0.0.1:8448/_telium/v1/health
+curl -fsS https://chat.example.com/.well-known/telium/server
 ```
 
-Then put TLS in front ([Exposing your server](/self-hosting/exposing/)), and from another machine:
+The second command must work **from another machine** before you try to sign in.
+
+## 3. Register and become administrator
+
+1. Open [telium.chat](https://telium.chat), select your server and register.
+2. On a private install, enter the one-time code from the terminal.
+3. **The native installer does not automatically make the first signup an administrator.** Run the recovery command printed by the installer, substituting your username:
 
 ```sh
-curl -fsS https://chat.example.com/.well-known/telium/server
-curl -fsS https://chat.example.com/_telium/v1/capabilities
+cd /var/lib/telium
+sudo -u telium /usr/local/bin/telium-server --config /etc/telium/telium.toml admin recover USERNAME --reason "Initial server owner"
 ```
+
+If private registration's bootstrap code was lost or already used, generate a new code as the `telium` user:
+
+```sh
+cd /var/lib/telium
+sudo -u telium /usr/local/bin/telium-server --config /etc/telium/telium.toml registration-code create
+```
+
+On a root-only machine without `sudo`, use `runuser -u telium --` instead. Don't enable public signups just to create an administrator.
 
 ## Using your website domain for accounts
 
-Want your website at `example.com` (on any hosting provider), but your Telium server at `chat.example.com`? Your account addresses can still be `@you:example.com`.
+To keep `example.com` as your website and use `@you:example.com` while serving the API from `chat.example.com`, **install with `example.com` as the identity**. Before creating accounts, edit:
 
-1. **Run the installer with the account domain** so it creates the right long-term identity. Replace `example.com` with the real domain you own — the installer deliberately refuses example domains:
+```toml
+server_name = "example.com"
+public_base_url = "https://chat.example.com"
+```
 
-   ```sh
-   bash /tmp/telium-native-setup.sh example.com
-   ```
+The file is `/etc/telium/telium.toml`. Restart with `sudo systemctl restart telium-server`, publish a [`telium.txt` pointer](/self-hosting/domain-delegation/) at your website, and point only `chat.example.com` at the Telium host. Don't change `server_name` after users register.
 
-2. **Before registering any accounts**, edit `/etc/telium/telium.toml`:
+## Paths and troubleshooting
 
-   ```toml
-   server_name = "example.com"
-   public_base_url = "https://chat.example.com"
-   ```
+| Item | Location |
+| --- | --- |
+| Config | `/etc/telium/telium.toml` |
+| Database and media | `/var/lib/telium` |
+| Backup archives and key | `/var/backups/telium` |
+| Server logs | `journalctl -u telium-server -n 100` |
+| Update timer | `systemctl status telium-update-native.timer` |
 
-   Keep the database, `bind`, backups and other installed values as they were.
+If the service won't start, inspect its journal and run `telium-server check` with your config. If local health works but the public URL fails, start with [DNS, TLS and proxy forwarding](/self-hosting/exposing/). For manual installation, service templates and release verification, see [the deploy source](https://github.com/telium-chat/telium/tree/main/deploy).
 
-3. Set up DNS and HTTPS for **`chat.example.com`** to reach your Telium server. Keep **`example.com`** pointed at your website host, not at your Telium VPS. Apply the edit with `sudo systemctl restart telium-server`.
-4. Put a one-line **`telium.txt`** file on your website with `chat.example.com` inside it, so clients entering `example.com` can find the server. Follow the [website-domain setup guide](/self-hosting/domain-delegation/) for file managers, manual uploads, Git and browser compatibility.
-
-If you use this split setup, the installer's generic instruction to point the supplied domain at this box **does not apply to the website domain**. Your website keeps `example.com`; only the API hostname points to the Telium ingress. Both names must answer over HTTPS.
-
-**Do not change `server_name` on an established server.** [Why the account domain matters](/self-hosting/domain-delegation/#how-it-works).
-
-## Storage
-
-| Path | Holds | Notes |
-|---|---|---|
-| `/var/lib/telium` | database, media, cold archive | The data. |
-| `/var/backups/telium` | archives, backup key | On a different mount from the data if you can. |
-| `/etc/telium/telium.toml` | config | Mode 600. |
-
-**Optional: want attachments on remote storage instead of the VPS disk?** Follow [Store uploads in S3-compatible storage](/self-hosting/s3-media-storage/) after installing; this is separate from storing encrypted [backups](/self-hosting/backups/) off-box.
-
-See [Backups](/self-hosting/backups/) for what the archives protect against, and [Secrets](/self-hosting/secrets/) for `"${env:NAME}"` / `"${file:…}"` in the config.
-
-## Troubleshooting
-
-| Symptom | Check |
-|---|---|
-| The unit will not start | `journalctl -u telium-server -n 50`; `ExecStartPre` runs `check`, and a danger finding stops it |
-| Clients cannot connect | `public_base_url`, HTTPS, and WebSocket forwarding — see [Exposing your server](/self-hosting/exposing/) |
-| Every user shares one rate limit | the proxy is missing from `rate_limit.trusted_proxies` |
-| The updater says "not in the release manifest" | the binary was not installed from a release build |
+**Next:** [After setup](/self-hosting/after-setup/).
