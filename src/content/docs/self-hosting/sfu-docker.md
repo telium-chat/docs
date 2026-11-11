@@ -1,28 +1,24 @@
 ---
 title: Standalone SFU with Docker
-description: Install a dedicated Telium voice and video relay with Docker, for private communities or the public network.
+description: Run a Telium voice relay without installing a homeserver.
 sidebar:
   order: 8
 ---
 
-This guide installs a **Telium voice and video relay** in Docker. An SFU carries the media for calls; it does not host accounts, messages or communities. You can run it on its own, even if you do not operate a Telium homeserver.
+This guide installs **only** `telium-sfu` and its LiveKit media engine. No homeserver, account service or web client is installed. The relay can be **private** (trusted homeservers only) or **public** (other Telium servers can use it).
 
-You decide who can use it: keep it **private** for homeservers you trust, or make it **public** so other Telium communities can use it. The steps below show how to make it public, but that is optional. For a plain-language explanation of how relays work, see [Voice relays (SFU)](/self-hosting/sfu/).
+For concepts and the native installer, see [SFU setup](/self-hosting/sfu/).
 
 ## Run one SFU with Docker
 
-The installer puts the SFU and its LiveKit media engine in **one container**. The installer manages one SFU on the host and includes an update timer.
-
 ### 1. Prepare the host
 
-You need a Linux host with Docker, Docker Compose v2, systemd, a public IP address and two DNS names, for example:
+You need Linux, Docker, Compose v2, systemd, an ordinary sudo-capable account and two DNS names pointed at the host:
 
-- `sfu.example.com` — Telium's HTTPS API (`/health` and `/session`).
-- `livekit.example.com` — LiveKit signalling over HTTPS/WebSocket.
+- `sfu.example.com`: HTTPS API and health checks
+- `livekit.example.com`: HTTPS/WebSocket signalling
 
-Point both DNS names at the host. If using Cloudflare, set **DNS only** (not proxied). Standard HTTP tunnels and reverse proxies cannot carry the UDP media.
-
-Allow inbound TCP **80/443**, TCP **7881**, UDP **3478**, and UDP **50000–60000** in both the host firewall and cloud firewall. Keep the internal API (7890), LiveKit signalling (7880) and administration (7891) off the public internet; the supplied Compose file binds them to host loopback.
+Allow **TCP 80/443 and 7881**, plus **UDP 3478 and 50000–60000**. If using Cloudflare, set the SFU DNS records to **DNS only**. HTTP tunnels do not forward media.
 
 ### 2. Install the dedicated SFU stack
 
@@ -32,41 +28,36 @@ cd telium
 sudo bash deploy/install-sfu.sh
 ```
 
-This installs **only the relay**, not a homeserver. The SFU installer creates `/opt/telium-sfu/compose.yml`, `/opt/telium-sfu/sfu.toml`, and the `telium-sfu-update.timer` update service. It **does not start an unconfigured container** and it does not install/configure the host's TLS proxy.
-
-Run it with `sudo` from an ordinary login account. It needs Docker, the Compose plugin, and systemd already installed. For a root-only environment, create an ordinary operator account and pass it as `TELIUM_RUN_AS`.
+This creates `/opt/telium-sfu/` with `compose.yml`, `sfu.toml` and an update timer. It does **not** configure nginx, obtain certificates or start an unconfigured service. It installs some host-level systemd/update files; Docker is not a fully portable single-directory installation.
 
 ### 3. Configure the relay
 
-Edit `/opt/telium-sfu/sfu.toml`. This example allows **public use** of your SFU. If you want to serve only chosen homeservers, keep `public = false` instead and [configure trusted servers](/self-hosting/sfu/#private-and-public-relays).
+Edit the existing sections in `/opt/telium-sfu/sfu.toml`, without duplicating TOML tables:
 
 ```toml
 [livekit]
-# Keep spawn mode and the internal LiveKit URL from the generated file.
 public_url = "https://livekit.example.com"
 
 [trust]
 discovery = true
-public = true
+public = false
 allow_insecure_discovery = false
 ```
 
-**Edit the existing sections; do not append duplicate TOML tables.** Keep the generated `bind = "0.0.0.0:7890"` and `[admin] bind = "0.0.0.0:7891"` *inside the container*; the Compose port mappings expose them to the host only on loopback. Keep `livekit.rtc.use_external_ip = true` behind Docker NAT. Keep the generated LiveKit configuration and admin state in the persistent data volume; the SFU writes LiveKit credentials at startup.
+Keep `public = false` for trusted homeservers only; add them as `[[trust.origins]]` entries or through the dashboard. Set `public = true` **only** if you intend to share capacity with any verified Telium homeserver. Keep the generated internal binds and LiveKit spawn configuration.
 
-In public mode, any Telium homeserver with valid published signing keys can request sessions. In private mode, only homeservers you explicitly trust can do so. Never set `allow_insecure_discovery` to `true` on a public relay.
-
-Before listing it, set suitable `[limits]` values in that same file. In particular, review `max_rooms`, `max_participants`, `transfer_budget_bytes` and `transfer_period_days`. A value of `0` means no ceiling/budget; it is **not** a safe bandwidth budget for a metered host. See [SFU configuration](/self-hosting/sfu/#configuration) and the [full reference](https://github.com/telium-chat/telium/blob/main/sfu/sfu.example.toml).
+Before going public, set appropriate `[limits]` values for `max_rooms`, `max_participants`, `max_bitrate`, `transfer_budget_bytes` and `transfer_period_days`. **Zero means unlimited**, so don't leave it at zero if your provider meters traffic. See [SFU configuration](/self-hosting/sfu/#configuration).
 
 ### 4. Provide HTTPS for both names
 
-Install and configure a **host** reverse proxy such as nginx. The two upstreams are different:
+Use your existing **host** reverse proxy. Send:
 
-| Public hostname | Host upstream | Role |
-| --- | --- | --- |
-| `sfu.example.com` | `http://127.0.0.1:7890` | SFU control API |
-| `livekit.example.com` | `http://127.0.0.1:7880` | LiveKit signalling / WebSockets |
+| Public URL | Internal upstream |
+| --- | --- |
+| `https://sfu.example.com` | `http://127.0.0.1:7890` |
+| `https://livekit.example.com` | `http://127.0.0.1:7880` (WebSocket upgrades) |
 
-For example, these nginx HTTP virtual hosts can be used before issuing certificates:
+Here's a minimal nginx starting point; enable HTTPS certificates for **both** names with your ACME client:
 
 ```nginx
 server {
@@ -75,7 +66,6 @@ server {
     location / {
         proxy_pass http://127.0.0.1:7890;
         proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 server {
@@ -87,12 +77,11 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
-Enable the host configuration, verify it with `sudo nginx -t`, and issue certificates for **both** names with your ACME client (for example Certbot's nginx plugin). HTTPS protects signalling, but clients reach LiveKit media directly through the public TCP/UDP ports—not through nginx or Cloudflare Tunnel. Do **not** publicly proxy the admin dashboard on port 7891.
+The example only shows **HTTP routing**; do not stop there. Issue certificates and redirect public traffic to HTTPS. Keep the admin dashboard on host loopback `127.0.0.1:7891`, not publicly exposed.
 
 ### 5. Start and check it
 
@@ -105,22 +94,20 @@ curl -fsS https://sfu.example.com/health
 sudo /opt/telium-sfu/update-sfu.sh --status
 ```
 
-Expect a healthy `/health` response with `"ok":true`. Check that the LiveKit hostname supports secure WebSockets and test a real call from two accounts: a working API alone does not prove the UDP media ports are reachable.
-
-The SFU's admin first-run link appears in the container logs. Access the host-loopback dashboard over an SSH tunnel, for example `ssh -L 7891:127.0.0.1:7891 operator@your-host`, then open the local URL shown by the logs. Unlike the **native** SFU, the Compose dashboard cannot rewrite host nginx or request certificates for you.
+Expect `{"ok":true}`. Then make a real call: a healthy API does not mean UDP media reaches the host. The first-run admin link appears in container logs. To reach the loopback dashboard from your machine, use `ssh -L 7891:127.0.0.1:7891 operator@host` and open the local URL shown by the setup output.
 
 ### 6. List it for other communities (public relays only)
 
-Skip this step if you are running a private relay. For a public relay, open [telium.chat/list](https://telium.chat/list), choose **A relay (SFU)**, and submit the public HTTPS URL `https://sfu.example.com`. The directory probes `/health` and asks for contact/region/capacity details.
-
-Being in the public directory and **opting into automatic selection** are separate choices. If you want it considered for the automatic SFU feed, opt in there as well; eligibility still depends on observed health and age. See the [directory rules](https://github.com/telium-chat/telium/blob/main/site/registry/README.md#relays-sfus-are-a-separate-directory-with-the-same-rules).
+Only for public relays: visit [telium.chat/list](https://telium.chat/list), choose **A relay (SFU)** and submit `https://sfu.example.com`. A directory listing and opting into automatic selection are separate decisions, subject to the [directory rules](https://github.com/telium-chat/telium/blob/main/site/registry/README.md).
 
 ## Quick troubleshooting
 
-| Symptom | Check |
+| Problem | Check |
 | --- | --- |
-| Installer wants a Telium account domain | You used the homeserver Compose installer. Use `deploy/install-sfu.sh`. |
-| `/health` works, but calls have no media | Check UDP RTC and TURN ranges in both Docker mappings **and** `sfu.toml`, plus provider firewalls; verify public DNS is not proxied. |
-| Docker reports a port already allocated | Another service is already using a required host port. |
-| Public calls get `403` | Set `[trust] public = true` (keeping secure discovery) and confirm the requesting guild server publishes valid keys. |
-| Dashboard says it cannot configure nginx | That wizard is native-only. Configure host TLS/proxy yourself. |
+| Wrong installer asks for an account domain | Use `deploy/install-sfu.sh`, not the homeserver installer |
+| Healthy API but no media | UDP mapping in Docker, port range in config and cloud firewall |
+| `/session` returns 403 | `trust.public` and `trust.origins` |
+| First-run admin setup unreachable | SSH tunnel to 7891 and setup URL in logs |
+| Public calls exceed the budget | Transfer limit, accounting window and the host's actual bandwidth allocation |
+
+For private relays, there is no need to list anything publicly.

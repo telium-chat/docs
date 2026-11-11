@@ -1,68 +1,56 @@
 ---
-title: Voice relays (SFU)
-description: Understand Telium voice relays, decide whether to run one, and choose a native or Docker installation.
+title: Host a voice relay (SFU)
+description: Run a Telium voice relay privately or for the public network.
 sidebar:
   order: 7
 ---
 
-An **SFU** (Selective Forwarding Unit) is a voice and video relay. Instead of everyone in a call sending a separate stream to everyone else, participants send their media to an SFU, which forwards it to the other people in the call.
+An **SFU** forwards voice, video and screen-share traffic during calls. It does **not** store accounts or messages. You can host an SFU without running a Telium homeserver.
 
-An SFU is **not** a Telium homeserver. A homeserver handles accounts, communities and call permissions; an SFU handles the audio, video and screen-share traffic. You can run either one without running the other.
+You don't have to host one to use Telium: a homeserver can use available public SFUs. Smaller calls may fall back to direct connections (mesh).
 
 ## Which guide should I use?
 
-| What you want to do | Where to start |
+| Your setup | Guide |
 | --- | --- |
-| **Run a Telium homeserver** so people can create accounts and join communities | [Install with Compose](/self-hosting/install-docker/) or [install natively](/self-hosting/install-systemd/). Running your own SFU is optional. |
-| **Run a separate SFU with Docker**, whether for your own communities or as a public relay | [Standalone SFU with Docker](/self-hosting/sfu-docker/). It installs only the relay, not a homeserver. |
-| **Run an SFU directly on Linux** without Docker | Use [the native SFU installer](#install-with-the-script) below. |
-| **Connect an existing homeserver to your own SFU** | Install the SFU using either method, then [configure your homeserver to use it](#point-the-homeserver-at-it). |
+| Linux, without Docker | [Native installer](#install-with-the-script) |
+| Docker, SFU only | [Standalone SFU with Docker](/self-hosting/sfu-docker/) |
+| Already installing a homeserver in Compose | [Homeserver Compose installer](/self-hosting/install-docker/) offers an optional SFU |
+| Have an existing homeserver and SFU | [Connect them](#point-the-homeserver-at-it) |
 
-## Do you need to run your own SFU?
+## Private and public relays
 
-**Not necessarily.** Telium homeservers can use available SFUs from the public relay directory. Hosting your own makes sense if you want to control relay capacity, serve specific communities or contribute more relay capacity to the network.
-
-If no usable SFU is available, smaller calls can fall back to direct peer-to-peer connections (mesh), subject to the homeserver's `voice.mesh_max_participants` limit (4 by default). Mesh is a fallback, not a reason to assume every small call avoids SFUs.
-
-A homeserver can operate behind Cloudflare Tunnel, but an SFU needs publicly reachable media ports. You can run the SFU on a different machine or VPS.
-
-### Private and public relays
-
-You choose who may use your SFU. Hosting one for your community does **not** automatically make it available to everyone:
-
-| Mode | Who can use it? | What to configure |
+| Mode | Who can use it? | Setting |
 | --- | --- | --- |
-| **Private (recommended to start)** | Only the homeservers you add to **Trusted servers** | Keep `trust.public = false`; add your homeserver in the SFU admin dashboard or `[[trust.origins]]`. |
-| **Public (optional)** | Any homeserver that publishes keys and can reach the SFU | Set `trust.public = true` **only** when you want to share your relay capacity. |
+| **Private** | Only trusted homeservers you choose | `trust.public = false` |
+| **Public** | Other Telium homeservers that pass key verification | `trust.public = true` |
 
-An SFU can also serve several specific trusted homeservers without being public. If you are inviting other operators to use it, consider bandwidth and participant limits before making it available. [Post-installation checklist](/self-hosting/after-setup/#want-to-help-grow-the-network).
+Private is a good place to start. In the native dashboard, add homeservers under **Trusted servers**. A public relay needs bandwidth, capacity limits, monitoring and a way to handle abuse. Directory listing is a **separate opt-in**, not a consequence of enabling public trust.
 
 ## What runs where
 
-| Piece | Role |
-|---|---|
-| `telium-server` | Authorises calls and signs short-lived join tokens. |
-| `telium-sfu` | Verifies those tokens and mints LiveKit access. One SFU can serve many homeservers. |
-| `livekit-server` | The WebRTC engine. `telium-sfu` launches it for you. |
+- **`telium-server`:** owns accounts and communities, and signs call permissions.
+- **`telium-sfu`:** checks join tokens and controls a LiveKit process.
+- **`livekit-server`:** handles actual WebRTC media traffic.
 
-The homeserver stays the authority. The SFU verifies the homeserver's signature on each token and never decides membership or moderation. It fetches the homeserver's signing key over HTTPS, so you copy no keys by hand.
+SFU operators do not need to copy homeserver signing keys. The SFU discovers them from the homeserver over HTTPS.
 
 ## Requirements
 
-- A host with its own public address, separate from any HTTP-only ingress. Media is UDP and cannot pass through a Cloudflare Tunnel or an HTTP proxy.
-- Two DNS names such as `sfu.example.com` (the relay API) and `livekit.example.com` (LiveKit signalling). If you use Cloudflare, set both records to DNS-only.
-- These ports open on the SFU host:
+You need a host with a public IP, two DNS names such as `sfu.example.com` (SFU API) and `livekit.example.com` (media signalling), and these reachable ports:
 
-| Port | Protocol | Purpose |
-|---|---|---|
-| 443 | TCP | SFU control API and LiveKit signalling over HTTPS |
-| 7881 | TCP | LiveKit TCP media fallback |
-| 3478 | UDP | Embedded TURN |
-| 50000-60000 | UDP | LiveKit media |
+| Port | Protocol | Use |
+| --- | --- | --- |
+| 443 | TCP | HTTPS for the SFU API and LiveKit signalling |
+| 7881 | TCP | Media fallback |
+| 3478 | UDP | TURN |
+| 50000–60000 | UDP | WebRTC media |
+
+A Cloudflare **HTTP Tunnel cannot carry the UDP media**. If you're using Cloudflare DNS, turn off the orange-cloud proxy for SFU hostnames.
 
 ## Install with the script
 
-On a Debian or Ubuntu host, clone Telium and run the SFU-specific installer (not the homeserver installer):
+On Debian/Ubuntu, the native installer installs the SFU, LiveKit, nginx, Certbot and a systemd service:
 
 ```sh
 git clone https://github.com/telium-chat/telium.git
@@ -70,21 +58,19 @@ cd telium
 sudo bash sfu/install.sh
 ```
 
-It installs nginx, Certbot, Rust if needed, `livekit-server` and `telium-sfu`, creates a `telium-sfu` system user and service, and opens the ports above when UFW is active. It then prints a one-time setup URL. In the browser you set the admin password, enter the SFU and LiveKit signalling hostnames, choose public or private mode, and the dashboard configures nginx and Let's Encrypt.
+This is a host-level installation: it installs packages, services and proxy configuration. **It is not a self-contained folder-only install.** On a shared machine where changes to the host must be minimal, consider [Docker](/self-hosting/sfu-docker/) instead.
 
-The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted servers** (`/admin/trust`) you add a homeserver by its `server_name`. The SFU discovers it, verifies its key and starts accepting its tokens without a restart. Removing one stops new sessions from it; calls already connected are left alone.
+The installer prints a **one-time setup URL**. Open it to set the admin password, SFU hostname, LiveKit hostname and private/public mode. The admin dashboard is at `https://sfu.example.com/admin`.
+
+For a private relay, add the server's `server_name` under **Trusted servers**. No restart is needed when changing the trust list; already-connected calls are not forcibly ended.
 
 ## Install with Docker Compose
 
-To run a relay **without installing a Telium homeserver**, follow [Standalone SFU with Docker](/self-hosting/sfu-docker/). It runs `telium-sfu` and LiveKit in one container.
-
-If you are **also setting up a Telium homeserver**, the [homeserver Compose installer](/self-hosting/install-docker/) offers an option to run an SFU alongside it. This is a different installer, because a homeserver and an SFU do different jobs.
-
-For either Docker deployment, `livekit.rtc.use_external_ip` must be `true` behind Docker NAT, and the corresponding media ports must be open on the host. In public mode the SFU discovers guild-server keys as needed; private relays use configured trust origins.
+[Standalone SFU with Docker](/self-hosting/sfu-docker/) installs just the relay, with an update timer. Unlike the native installer, you supply the host HTTPS proxy. Use this if you don't want the installer to configure nginx and Certbot for you.
 
 ## Install by hand
 
-Build from the repository. `telium-protocol/` must stay beside `sfu/`.
+The reference SFU binary can also be built from source:
 
 ```sh
 cd sfu
@@ -92,7 +78,7 @@ cargo build --release --bin telium-sfu
 ./target/release/telium-sfu init --config sfu.toml
 ```
 
-Install `livekit-server` from the [LiveKit releases](https://github.com/livekit/livekit/releases). The SFU finds it on `PATH`, next to the `telium-sfu` binary, or at `livekit.binary`.
+Keep `telium-protocol/` alongside `sfu/` in the checkout. Install [LiveKit](https://github.com/livekit/livekit/releases) separately and make `livekit-server` available on `PATH` or via `livekit.binary`.
 
 ### Minimum `sfu.toml`
 
@@ -100,6 +86,8 @@ Install `livekit-server` from the [LiveKit releases](https://github.com/livekit/
 bind = "127.0.0.1:7890"
 
 [livekit]
+mode = "Spawn"
+url = "http://127.0.0.1:7880"
 public_url = "https://livekit.example.com"
 
 [trust]
@@ -111,27 +99,18 @@ server_name = "chat.example.com"
 discovery_url = "https://chat.example.com"
 ```
 
-`server_name` must equal the homeserver's `server_name`. The SFU fetches `{discovery_url}/_telium/v1/keys` and follows key rotation on its own. Add one `[[trust.origins]]` block per homeserver. To pin a key instead of discovering it, drop `discovery_url` and set `key_id` and `public_key_b64` from `telium-server keys`.
-
-Provide HTTPS for both public names: proxy `https://sfu.example.com` to the SFU control API at `http://127.0.0.1:7890`, and proxy `https://livekit.example.com` to LiveKit signalling at `http://127.0.0.1:7880` with WebSocket upgrade support. For an nginx example, see [the Docker guide's HTTPS section](/self-hosting/sfu-docker/#4-provide-https-for-both-names). Then run the SFU:
+The `discovery_url` must lead to the trusted homeserver; its `server_name` must match the server's advertised name. Use HTTPS to proxy `sfu.example.com` to `127.0.0.1:7890` and `livekit.example.com` to `127.0.0.1:7880`, preserving WebSockets.
 
 ```sh
 ./target/release/telium-sfu serve --config sfu.toml
 curl -fsS https://sfu.example.com/health
-# {"ok":true}
 ```
 
-### Endpoints
-
-| Method and path | Auth | Purpose |
-|---|---|---|
-| `GET /health` | none | `{"ok": …}`, a probe of LiveKit. Homeservers and clients poll it. |
-| `POST /session` | homeserver-signed join token | Returns `{url, token, room, max_bitrate}` for LiveKit. |
-| `POST /control` | homeserver-signed command | `mute`, `deafen`, `disconnect`, `subscribe` and `unsubscribe`, translated to LiveKit. |
+Expect `{"ok":true}`. This checks LiveKit, **not** whether your clients can send UDP media. Test a real call too.
 
 ## Point the homeserver at it
 
-**Only if you operate a homeserver that should use this SFU:** add the relay as a voice region in that homeserver's configuration. Running a public SFU for other operators does not require you to install or configure a homeserver of your own.
+Skip this section if you're operating a standalone public relay. Otherwise add a voice region to the **homeserver's** `telium.toml`:
 
 ```toml
 [voice]
@@ -143,67 +122,33 @@ name = "local"
 sfu = "https://sfu.example.com"
 ```
 
-`default_region` must name a region in the list. Restart the homeserver, create a voice channel, join from two accounts, and confirm the voice join response reports `mode: "sfu"`. If every region is unreachable, small calls fall back to mesh.
-
-Guild SFU calls are end-to-end encrypted. The join answer says `e2ee: "required"`, and the web client refuses an SFU call that does not.
+Restart the homeserver. The SFU must trust that homeserver (or be public). Test a voice call and check that it selects `mode: "sfu"`. Telium encrypts guild SFU media end to end; the relay still learns IP addresses and call metadata.
 
 ## Regions
 
-A voice channel stores a region name, usually `auto`. The homeserver resolves it from two pools: `[voice].regions` and the guild's own custom regions. For `auto` it picks, in order: the guild's healthy default, the server's healthy default, the first healthy region, then the first region if none is healthy.
-
-A client on `auto` measures `GET /health` round-trip time to up to four healthy regions and asks for the nearest. It only states a preference when the winner beats the server default by more than 25 ms. The homeserver still decides.
-
-Guild owners and members with *Manage Server* can add their own SFU in **Guild Settings → Voice / SFU**, set it as the guild default, or pin a channel to a region at creation. That SFU must trust the guild's homeserver, or run in public mode.
+A server can advertise several regions, while individual guilds can select or add one. Clients can measure region latency and request a nearer relay; the homeserver makes the final selection. See [Voice and video](/features/voice-and-video/#regions).
 
 ## Configuration
 
-| Key | Default | Notes |
-|---|---|---|
-| `bind` | `127.0.0.1:7890` | Control API listener. |
-| `livekit.mode` | `spawn` | `spawn` writes `livekit.yaml` and launches LiveKit; `external` uses one you run. |
-| `livekit.url` | `http://127.0.0.1:7880` | LiveKit API. |
-| `livekit.public_url` | empty | Browser-facing signalling URL. Set it in production. |
-| `livekit.api_key`, `api_secret` | empty | Generated in spawn mode when empty. |
-| `livekit.rtc.port_range_start`, `port_range_end` | 50000, 60000 | UDP media range. |
-| `livekit.rtc.tcp_port` | 7881 | TCP fallback. |
-| `livekit.rtc.use_external_ip` | `false` | `true` on cloud hosts behind NAT. |
-| `livekit.turn.enabled`, `udp_port` | `true`, 3478 | Embedded TURN. |
-| `livekit.room.empty_timeout` | 300 | Seconds before an empty room is removed. |
-| `trust.discovery` | `true` | Fetch each origin's key from `/_telium/v1/keys`. |
-| `trust.cache_ttl_secs` | 86400 | Key cache lifetime. |
-| `trust.public` | `false` | Trust any homeserver that publishes keys. |
-| `trust.allow_insecure_discovery` | `false` | Development only. |
-| `limits.max_bitrate` | 8000000 | Per-participant ceiling; join tokens are clamped to it. |
-| `limits.enforce`, `poll_interval_secs` | `true`, 15 | Mute video tracks whose declared layers exceed the ceiling. |
-| `admin.enabled`, `admin.bind` | `false`, `127.0.0.1:7891` | Dashboard; the installer turns it on. |
+The authoritative keys, defaults and descriptions are in [`sfu/sfu.example.toml`](https://github.com/telium-chat/telium/blob/main/sfu/sfu.example.toml). The important groups are:
 
-The full annotated file is [`sfu/sfu.example.toml`](https://github.com/telium-chat/telium/blob/main/sfu/sfu.example.toml).
+| Group | What to set |
+| --- | --- |
+| `[livekit]` | Public signalling URL, spawn/external mode and credentials |
+| `[livekit.rtc]` and `[livekit.turn]` | Public media ports and NAT behavior |
+| `[trust]` | Public or private mode and origin discovery |
+| `[limits]` | Per-call bitrate, rooms, participants and **transfer budget** |
+| `[admin]` | Admin dashboard and local bind |
+
+**For public relays, do not leave limits at zero by accident.** In settings such as `transfer_budget_bytes`, zero means **unlimited**. Review the transfer period and stop threshold against your provider's actual allocation.
 
 ### External LiveKit
 
-```toml
-[livekit]
-mode = "external"
-url = "http://livekit.internal:7880"
-public_url = "https://sfu.example.com"
-api_key = "<your LiveKit API key>"
-api_secret = "<your LiveKit API secret>"
-```
-
-`sfu.toml` does not support `${file:…}` or `${env:…}` references, so keep the file readable only by the SFU's user.
+Set `[livekit] mode = "External"`, provide its internal `url`, public HTTPS `public_url`, and the matching API key and secret. Keep credentials out of public logs and repositories.
 
 ### TURN over TLS
 
-For networks that block UDP, give the embedded TURN a TLS port and a certificate covering its hostname:
-
-```toml
-[livekit.turn]
-enabled = true
-tls_port = 5349
-domain = "turn.example.com"
-cert_file = "/etc/letsencrypt/live/turn.example.com/fullchain.pem"
-key_file = "/etc/letsencrypt/live/turn.example.com/privkey.pem"
-```
+For networks that block UDP, LiveKit's `[livekit.turn]` supports a TLS port (commonly 5349) with a configured certificate and hostname. Open that port only if you enable the option.
 
 ### Public SFU
 
@@ -211,23 +156,19 @@ key_file = "/etc/letsencrypt/live/turn.example.com/privkey.pem"
 [trust]
 discovery = true
 public = true
+allow_insecure_discovery = false
 ```
 
-Any homeserver that publishes keys can then use the SFU by pasting its URL into a guild. Rooms are namespaced by the verified origin, so guilds stay isolated. Turn this on only if you mean to run a shared public SFU.
-
-:::caution
-Keep `trust.allow_insecure_discovery = false` on any SFU reachable from the internet. In public mode the origin comes from an unauthenticated request body, and this flag lets a stranger make the SFU connect to loopback, your LAN or cloud metadata addresses.
-:::
+Do **not** turn on `allow_insecure_discovery` on any internet-facing relay; it can make discovery probe unsafe addresses. To list a public relay, use [telium.chat/list](https://telium.chat/list) and choose **A relay (SFU)**.
 
 ## Troubleshooting
 
-| Symptom | Cause |
-|---|---|
-| `/health` is `{"ok":false}` | LiveKit is not running. Check the binary is findable and ports 7880 and 7881 are free. The SFU logs `generated livekit.yaml` before launching it. |
-| `/session` returns 403 | The SFU does not trust the homeserver: `server_name` or `discovery_url` is wrong, or the origin is missing. |
-| `/session` returns 400 about `max_bitrate` | The join token carries no positive bitrate; update the homeserver. |
-| Health is fine but there is no audio | UDP 50000-60000, TCP 7881 or UDP 3478 is blocked, or the browser has no microphone permission. |
-| Calls use mesh | No `voice.regions` entry has an `sfu` URL, or `default_region` does not name one. |
-| Build cannot find `telium-protocol` | Keep `telium-protocol/` next to `sfu/`. |
+| Problem | Check |
+| --- | --- |
+| `/health` says `ok: false` | LiveKit process, config and internal port 7880 |
+| `/session` returns 403 | Trusted origin, discovery URL and matching server name |
+| Call joins but no sound or video | Public UDP ports, firewall, NAT settings and microphone permissions |
+| Calls stay in mesh mode | Voice regions, region health and SFU availability |
+| Docker relay works locally, not externally | Host firewall, Docker UDP mappings and DNS-only records |
 
-Calls themselves are described in [Voice and video](/features/voice-and-video/).
+**Next:** [Set transfer limits](/self-hosting/sfu-docker/#3-configure-the-relay) before offering public capacity.
