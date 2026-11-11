@@ -243,9 +243,10 @@ A hash match is refused and filed in the report queue under the list's name. See
 
 | Key | Default | Does |
 |---|---|---|
-| `open` | `true` | Whether anybody may create an account. Close it once your account exists. |
+| `open` | `true` | Compiled default for open signup; the native installer asks for your policy and defaults to private. When `false`, valid invitation codes may still create accounts. |
 | `min_password_len` | `8` | Shortest password accepted. |
-| `admins` | `[]` | Account localparts granted admin on registration. Empty means the first account becomes the administrator. |
+| `first_account_is_admin` | `true` | Legacy automatic first-account promotion **on open signup only**. The native installer explicitly sets `false`. Do not enable this on a public server: a stranger could register first. |
+| `admins` | `[]` | Legacy localpart-based admin promotion **on open signup only**. A private invitation code does not grant admin rights. Use the local `admin recover` command for the native install. |
 | `recommendations.accepting` | `false` | Offer this server to beginners looking for an account home. Also needs an opt-in in telium.chat's public registry. See [Onboarding](/federation/onboarding/). |
 | `recommendations.referral_weight` | `1` | Relative admission preference among accepting servers (catalogue clamps to 1–3). |
 | `recommendations.suggest_alternatives` | `false` | Your signup form offers a community recommendation instead of creating the account here. |

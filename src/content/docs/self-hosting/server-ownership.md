@@ -5,7 +5,9 @@ sidebar:
   order: 15
 ---
 
-This page covers who counts as a server administrator, the routes and commands that manage them, and how to regain admin access from the host's shell.
+**Native installs never give the first registrant administrator rights.** After creating your account, run the local `admin recover` command printed by the installer. Older Compose installs may still use first-account promotion; register the operator account before allowing anyone else to sign up.
+
+This page covers who can manage the server, how to grant or revoke access, and how to recover it from the host.
 
 ## Who is an administrator
 
@@ -13,11 +15,13 @@ The `accounts.admin` flag decides. The server reads it from the database on ever
 
 The flag is set automatically for:
 
-- the first account registered on a deployment that enables `registration.first_account_is_admin`, and
-- any localpart listed in `registration.admins` when it registers.
+- the first account registered **through open signup** on a deployment that enables legacy `registration.first_account_is_admin`, or
+- a localpart listed in `registration.admins` **during open signup**.
+
+**Private registration codes never grant administrator privileges.** To promote an account on a native installation, use local `admin recover`. Set `first_account_is_admin = false` on any public server.
 
 :::caution
-An unregistered name in `registration.admins` makes whoever registers it first an admin. Empty the list once those accounts exist.
+On a server with open signups, an unregistered name in `registration.admins` can give a stranger admin access if they claim it first. Empty the list and use explicit admin grants instead.
 :::
 
 ## Routes

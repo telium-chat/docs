@@ -32,7 +32,7 @@ sudo sh -c 'printf "TUNNEL_TOKEN=%s\n" "$1" > /opt/telium/tunnel.env' sh YOUR_TU
 sudo chmod 600 /opt/telium/tunnel.env
 ```
 
-Replace the placeholder with your token, or enter it securely without putting it in shell history. Don't commit `tunnel.env`.
+The prompt hides the token and keeps it out of shell history. Restrict access to `tunnel.env` and never commit it to Git.
 
 ```sh
 cd /opt/telium
