@@ -1,11 +1,11 @@
 ---
 title: Development
-description: Repository layout, how to build and test each component, and conventions for changes that cross boundaries.
+description: Build and test Telium from source.
 sidebar:
   order: 4
 ---
 
-The repository is a monorepo of separate builds, not one build graph. Build and test the component you change, plus any component on the other side of a boundary you touched.
+Telium is a monorepo, but its server, web, desktop, Android and SFU projects have separate build steps. Choose the component you're changing below. When a change crosses an API or protocol boundary, test both sides before opening a contribution.
 
 ## Layout
 

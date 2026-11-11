@@ -1,13 +1,11 @@
 ---
 title: Protocol compatibility
-description: The Telium protocol version window, capability tokens, what counts as a breaking change, and how version skew is reported.
+description: Supported protocol versions and capability checks.
 sidebar:
   order: 2
 ---
 
-This page defines how Telium servers and clients on different versions talk to each other. The rules are enforced in [`telium-protocol/src/compat.rs`](https://github.com/telium-chat/telium/blob/main/telium-protocol/src/compat.rs) and tested in `server/tests/interop.rs`.
-
-The protocol version is one integer covering the durable wire formats: the federation API (`/_telium/v1/`), gateway frames, migration bundles, and signed documents (identity assertions, key documents, promotion and relocation records). It is separate from the release version and from the local database format (`STATE_FORMAT_VERSION`, see [Upgrades](/self-hosting/upgrades/)).
+Client and server versions are not always interchangeable. Before adding an endpoint or changing a serialized field, check the compatibility rules and capability negotiation below. The implementation and interoperability tests are authoritative when this page lags a release.
 
 ## Version window
 

@@ -1,11 +1,11 @@
 ---
 title: Signing
-description: Ed25519 signing rules, canonical serialisation and the five signing families used across Telium.
+description: Canonical signing and verification rules.
 sidebar:
   order: 2
 ---
 
-Every Telium signature is Ed25519 (RFC 8032). There is no algorithm negotiation and no fallback. This page defines how each kind of signed object is serialised and verified.
+Telium uses Ed25519 across several **different message formats**. Do not use one canonicalization routine indiscriminately: choose the signing family for the request or document, then apply its exact serialization and domain separation. Conformance vectors are in [Protocol conformance](/reference/protocol/conformance/).
 
 ## General rules
 

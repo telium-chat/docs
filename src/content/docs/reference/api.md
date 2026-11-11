@@ -1,13 +1,22 @@
 ---
 title: HTTP and gateway API
-description: A map of Telium's HTTP endpoint families, authentication classes and the realtime gateway.
+description: Telium HTTP and gateway API reference.
 sidebar:
   order: 1
 ---
 
-This page maps Telium's network surface by family. It is a guide, not a schema: the executable registry is [`server/src/routes/mod.rs`](https://github.com/telium-chat/telium/blob/main/server/src/routes/mod.rs), and it wins when the two disagree. Read it before scripting against exact methods and paths.
+**Looking for an endpoint?** This is a directory of route families, not a generated OpenAPI schema. The executable [route registry](https://github.com/telium-chat/telium/blob/main/server/src/routes/mod.rs) is the source of truth for methods, fields and authentication.
 
-All application endpoints below live under `/_telium/v1` unless shown with a full path. Which families a server mounts depends on its enabled roles (identity, guild, media, relay).
+| Task | Section |
+| --- | --- |
+| Sign in or manage an account | [Account and identity](#account-and-identity) |
+| Manage guilds and messages | [Guilds](#guilds-channels-roles-and-invites), [messages](#messages-and-channel-state) |
+| Send or receive real-time events | [Gateway](#gateway) |
+| Build a bot | [Bots and applications](#bots-and-applications) |
+| Operate a homeserver | [Operator administration](#operator-administration) |
+| Handle files | [Media](#media) |
+
+Most application endpoints use the `/_telium/v1` prefix. Use the appropriate bearer token or signed request type; don't reuse a human session for server-to-server calls.
 
 ## Authentication classes
 

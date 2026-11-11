@@ -1,11 +1,11 @@
 ---
 title: Federation
-description: Server discovery, server-to-server authentication, the signed route list and error semantics.
+description: Federation protocol routes and authentication.
 sidebar:
   order: 3
 ---
 
-This page lists how one Telium server finds another, authenticates to it, which routes are signed, and how errors are reported. Every signed route uses [Family C](/reference/protocol/signing/#family-c-federation-requests) request signing and none accepts a user session token. Behaviour is described in [Federation overview](/federation/overview/).
+This is the **wire-level reference** for server discovery, federation signatures, signed routes and errors. For an operator explanation, see [Federation](/federation/overview/). Server-to-server signatures are not interchangeable with user session tokens.
 
 ## Discovery
 

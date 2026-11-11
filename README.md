@@ -1,13 +1,16 @@
-# Telium docs
+# Telium documentation
 
-Source for [docs.telium.chat](https://docs.telium.chat/), built with [Starlight](https://starlight.astro.build).
+Documentation source for [docs.telium.chat](https://docs.telium.chat).
+
+The site uses Astro Starlight. Pages live in `src/content/docs/`; navigation is in `astro.config.mjs`.
+
+## Work on the docs
 
 ```sh
-bun install
-bun run dev      # http://localhost:4321/
-bun run build    # dist/, fails on broken internal links
+bun install --frozen-lockfile
+bun run build
 ```
 
-Pages live in `src/content/docs/`. A push to `main` deploys.
+The build checks internal links and anchors. Keep pages task-first, commands copyable, and version-sensitive claims checked against [telium-chat/telium](https://github.com/telium-chat/telium).
 
-The code is at [telium-chat/telium](https://github.com/telium-chat/telium).
+See [the editorial guide](DOCS_EDITORIAL_PLAN.md) before changing installation instructions.

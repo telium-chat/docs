@@ -1,11 +1,11 @@
 ---
 title: Translating
-description: How Telium's client catalogues are laid out, how to add a language or a string, and the message pattern syntax.
+description: Help translate the Telium client.
 sidebar:
   order: 5
 ---
 
-The client ships English (the source) and nine translations: German, Japanese, Arabic, French, Spanish, Portuguese, Simplified Chinese, Russian and Korean. Every catalogue holds every English key, but much of the text is a machine-assisted first draft that no person has reviewed yet. `web/src/lib/i18n/catalog/stamps.json` records which keys a reviewer has accepted.
+Translations live in the web client's catalogues. Start with the steps below to add a language or edit a string, and run the catalogue checks before submitting changes. Some existing strings were machine-assisted and still need human review.
 
 ## Layout
 

@@ -1,20 +1,11 @@
 ---
 title: Conformance
-description: The protocol test vectors, the order to implement them in, and the cases they cover.
+description: Protocol conformance tests and fixtures.
 sidebar:
   order: 6
 ---
 
-The [test vectors](https://github.com/telium-chat/telium/tree/main/docs/spec/vectors) are the highest authority in the spec. `server/tests/spec_vectors.rs` generates them from the production code, diffs them on every run, and runs each case through the production verifiers.
-
-To regenerate (two passes, then a check):
-
-```sh
-cd server
-UPDATE_SPEC_VECTORS=1 cargo test --test spec_vectors
-UPDATE_SPEC_VECTORS=1 cargo test --test spec_vectors
-cargo test --test spec_vectors
-```
+The test vectors are for **independent implementations** and changes to the wire format. Use them to verify exact serialized bytes, signature checks and rejection behavior. Keep normative examples consistent with the repository's production verifiers.
 
 ## Vectors, in suggested order
 

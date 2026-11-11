@@ -1,17 +1,11 @@
 ---
 title: Gateway
-description: The guild realtime WebSocket, its lifecycle, opcodes, intents and close codes.
+description: Realtime gateway protocol.
 sidebar:
   order: 4
 ---
 
-A client opens one WebSocket per guild server at `GET <api>/gateway/v1`. This page defines the frame format, connection lifecycle, opcodes, intents and close codes.
-
-Frames are JSON text only (binary closes with 4002), with no compression. Every frame has `op`. `DISPATCH` frames add `s` (increasing sequence), `t` (event name) and `d`; other frames carry `d`.
-
-```json
-{ "op": "DISPATCH", "s": 42, "t": "MESSAGE_CREATE", "d": { } }
-```
+This is the WebSocket frame reference for client and bot authors. Connect to the guild server's gateway, identify the session, process dispatch events and resume when supported. Review the opcode and close-code tables below before implementing reconnect logic.
 
 ## Lifecycle
 
