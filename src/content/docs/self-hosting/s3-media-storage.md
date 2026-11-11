@@ -5,9 +5,13 @@ sidebar:
   order: 8
 ---
 
-**Use this if local attachment storage is filling your VPS.** Telium keeps the account database and API on the homeserver while new file bytes are written to a private S3-compatible bucket.
+**Want to run Telium on a small VPS without using its disk for every attachment?** You can put uploaded files in an S3-compatible object-storage bucket. Your homeserver still handles accounts, messages and the upload/download API; the bucket holds the actual stored media.
 
-You don't need S3 for a small private server. **If you already have uploads, don't switch `media_store.store` without migrating those objects**; existing links may break. S3 uploads and encrypted [server backups](/self-hosting/backups/) are different systems.
+This is **optional**. A small private server can keep the default local storage. If you expect many users or attachments, remote media storage may make capacity easier to manage.
+
+:::caution[Already have uploads on this server?]
+**Do not simply change `media_store.store` from `local` to `s3` on a server containing important uploads.** Changing the backend does not itself migrate existing files; old attachments may become unavailable. This guide describes setting up the storage backend for a **new server or a server with no important uploads**. For an existing server, arrange and test a migration of both object bytes and their expected keys before switching. Keep a full backup and the original local media until every old attachment has been verified.
+:::
 
 ## 1. Pick a provider and create a bucket
 
@@ -86,14 +90,14 @@ If the service fails to start, check your region/endpoint, bucket name, credenti
 1. Sign into Telium with a test account and upload a small attachment.
 2. Download or open it through the Telium client. Do **not** make the bucket public just to test a download.
 3. Open the bucket in your provider's dashboard and confirm that a new object appears under the expected prefix.
-4. Try an upload larger than your configured [media file-size limit](/self-hosting/public-server/#2-set-file-sizes-quotas-and-retention) to confirm rejection. Remember that your HTTP proxy or Cloudflare Tunnel can impose a **lower** upload limit.
+4. Try an upload larger than your configured [media file-size limit](/self-hosting/public-server/#set-media-limits) to confirm rejection. Remember that your HTTP proxy or Cloudflare Tunnel can impose a **lower** upload limit.
 5. Test a disposable file with short expiry. After expiry/cleanup, verify that it is no longer retrievable **and** that the corresponding remote object was removed.
 
 Your server still receives upload and download traffic; S3 does not bypass HTTP request limits or eliminate all local disk use (for example, the database, logs or temporary upload staging).
 
 ## 5. Set limits and protect the data
 
-Remote storage is not unlimited free storage. For public servers, set [per-user quotas, maximum file size and automatic expiry](/self-hosting/public-server/#2-set-file-sizes-quotas-and-retention) before allowing strangers to register. Monitor storage usage, request counts, outbound transfer, and the provider bill.
+Remote storage is not unlimited free storage. For public servers, set [per-user quotas, maximum file size and automatic expiry](/self-hosting/public-server/#set-media-limits) before allowing strangers to register. Monitor storage usage, request counts, outbound transfer, and the provider bill.
 
 **Remote media is not included in Telium's regular encrypted backup archives.** Enabling `[backup.remote]` uploads those archives to S3; it does **not** back up the contents of your `[media_store.s3]` bucket. Protect the bucket separately with a provider-supported backup/replication or versioning strategy, and test recovery. Keep a copy of your server configuration and backup key off the VPS as well. See [Backups](/self-hosting/backups/#what-an-archive-holds).
 

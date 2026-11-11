@@ -5,11 +5,7 @@ sidebar:
   order: 15
 ---
 
-This page is about **server-wide administrators**, not guild moderators.
-
-**Native installs:** the first signup is deliberately *not* promoted automatically. Run the installer's local `admin recover` command for the operator account, then verify the control plane is available. Other deployment profiles may bootstrap the first user differently; don't assume every kit shares that behavior.
-
-Keep at least one usable administrator account. Unregistered names in `registration.admins` are dangerous: whoever registers one first receives admin status.
+This page covers who counts as a server administrator, the routes and commands that manage them, and how to regain admin access from the host's shell.
 
 ## Who is an administrator
 
@@ -17,7 +13,7 @@ The `accounts.admin` flag decides. The server reads it from the database on ever
 
 The flag is set automatically for:
 
-- the first account registered on a fresh server, and
+- the first account registered on a deployment that enables `registration.first_account_is_admin`, and
 - any localpart listed in `registration.admins` when it registers.
 
 :::caution

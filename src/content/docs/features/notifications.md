@@ -1,13 +1,11 @@
 ---
 title: Notifications
-description: How Telium wakes devices, what each push transport supports, and what servers and push providers can see.
+description: Get notifications on your devices.
 sidebar:
   order: 3
 ---
 
-**Using Telium?** Browser notifications work through Web Push, and the Android app supports UnifiedPush. The rest of this page is for readers who want to know what gets delivered, what notification providers can see, or how to set up optional push transports.
-
-This page covers push transports, what triggers a notification, the per-device encrypted inbox, and what each party learns.
+Browser notifications use Web Push; the Android app supports UnifiedPush. Enable notifications in your client and operating system, then check the per-channel settings. The sections below cover operator transports, encrypted inboxes and the information push services may still learn.
 
 ## Get notifications working
 

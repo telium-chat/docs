@@ -1,11 +1,11 @@
 ---
 title: Watch together
-description: Play one video in sync for everyone in a call, which services work, what they learn, and how operators turn it off.
+description: Watch a video together during a call.
 sidebar:
   order: 7
 ---
 
-Watch together puts one video on everyone's screen in a call and keeps every copy on the same second. It lives on the call stage, rides the call's signalling, and ends when the call ends.
+Join a call, open **Watch together**, and choose a supported source or link. Everyone must be able to access the video on their own device. Playback is synchronized, but Telium doesn't bypass streaming-service sign-in, region locks or copyright restrictions.
 
 ## Start a watch session
 

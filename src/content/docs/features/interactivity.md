@@ -1,13 +1,11 @@
 ---
 title: Interactivity
-description: Buttons, selects, cards, modals and ephemeral messages that bots attach to messages, and the interaction round trip.
+description: Add interactive controls to bot messages.
 sidebar:
   order: 9
 ---
 
-Bots can attach controls (`components`) and structured blocks (`cards`) to a message. A person pressing a control creates an *interaction* that the server delivers to the bot, which answers with a callback.
-
-Only a bot, or an application hosted by the same server, can attach non-empty `components` or `cards`. A human session that tries gets `403` and nothing is written. The same check applies on edit, so a person cannot add buttons to a message later. See [Bots](/features/bots/) for installing one.
+Bots can attach buttons, selects, cards and modals to messages. When someone interacts, Telium sends the event to the bot and expects a response. This page documents the payloads; new bot authors should read [Bots](/features/bots/) first.
 
 ## Round trip
 

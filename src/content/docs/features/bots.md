@@ -1,11 +1,11 @@
 ---
 title: Bots
-description: Bot identities, tokens, guild installation, intents and permission ceilings, and the @telium/bot SDK.
+description: Build and run a Telium bot.
 sidebar:
   order: 10
 ---
 
-A Telium bot is a federated identity such as `@weather:bots.example`, with its own home server. This page covers how a bot authenticates, how a guild installs it, and how to run one with the JavaScript SDK.
+Bots have their own Telium identity and token. Start with the SDK below; the permission model explains what a bot can access after installation. Never put a bot token in a client app or public repository.
 
 ## Security model
 

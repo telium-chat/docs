@@ -1,11 +1,11 @@
 ---
 title: DM calls
-description: Calls in direct messages and group chats, call privacy settings, and how media stays end-to-end encrypted through an SFU.
+description: Start and secure direct-message calls.
 sidebar:
   order: 6
 ---
 
-This page covers calls in direct messages and group chats: the three call privacy settings, how a call picks mesh or SFU, where the SFU comes from, and what each server can see. Guild voice channels are covered in [Voice and video](/features/voice-and-video/).
+Open a DM or group conversation and start a call. Call privacy controls determine whether peers connect directly, through TURN, or through an SFU. Those choices affect **who learns your IP**, not whether other participants can hear the call. Guild calls work differently: see [Voice and video](/features/voice-and-video/).
 
 ## Start a private call
 

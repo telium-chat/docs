@@ -5,21 +5,9 @@ sidebar:
   order: 6
 ---
 
-Edit your installation's `telium.toml` and restart the server for changes to take effect. On native installs it is usually `/etc/telium/telium.toml`; on the Compose kits it is `/opt/telium/telium.toml`.
+This page lists every `telium.toml` key, one at a time. A key you leave out takes its compiled-in default, shown in each table below. The same list in annotated-file form is [`server/telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml), and `telium-server init` writes it for you.
 
-**Most operators need only a few settings:**
-
-| Task | Section |
-| --- | --- |
-| Public address and database | [The server itself](#the-server-itself) |
-| Open or invitation-only registration | [Registration](#registration) |
-| File-size limits and per-user quota | [Media policy](#media-policy) |
-| Local or S3 attachment storage | [Media store](#media-store) |
-| Backups | [Backup](#backup) |
-| SFUs for calls | [Voice](#voice) |
-| Monitoring and security | [Metrics](#metrics), [Moderation](#moderation) |
-
-For full defaults, compare the version actually installed with [the annotated config](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml). **Don't paste an entire example over your existing config.** This page is a reference, not an installation checklist.
+The server reads `telium.toml` once at startup. Nothing writes it at runtime, including the admin console, so a change means editing the file and restarting.
 
 ## Writing sizes, durations and rates
 
@@ -140,7 +128,7 @@ Ignored unless `roles.relay = true`. A relay carries guild traffic for this serv
 
 ## Media policy
 
-**For public operators:** Start with the practical [50 MiB / 1 GiB quota / 30-day expiry recipe](/self-hosting/public-server/#2-set-file-sizes-quotas-and-retention) before using this reference table. The reference default allows unlimited total upload storage per user.
+**For public operators:** Start with the practical [50 MiB / 1 GiB quota / 30-day expiry recipe](/self-hosting/public-server/#set-media-limits) before using this reference table. The reference default allows unlimited total upload storage per user.
 
 
 | Key | Default | Does |

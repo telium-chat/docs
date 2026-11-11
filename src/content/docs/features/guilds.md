@@ -1,11 +1,11 @@
 ---
 title: Guilds and moderation
-description: Channels, roles, permission evaluation, invites, moderation tools, AutoMod and the audit log in a Telium guild.
+description: Create and manage communities.
 sidebar:
   order: 1
 ---
 
-A guild is a community with channels, roles and members — similar to a Discord server, but it can live on a different Telium server than your account. This page covers how permissions resolve, how invites and addresses work, and the moderation tools a guild has.
+A **guild** is a community with text/voice channels, members and roles. It can live on a different Telium server from your account. To get started, create a guild or open an invite, add channels, then configure roles and permissions. The rest is a moderator and operator reference.
 
 ## Start with a guild
 

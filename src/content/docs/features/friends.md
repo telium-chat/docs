@@ -1,13 +1,11 @@
 ---
 title: Friends and presence
-description: Friend requests, blocks, presence and mutual friends across Telium servers, and what each one reveals.
+description: Add friends and manage presence.
 sidebar:
   order: 2
 ---
 
-**For users:** Add a friend using their complete account address, such as `@alex:home.example`. You can send and accept requests across home servers, see mutual connections, or block someone. Your friend does not have to use the same server as you.
-
-The sections below explain relationship states, presence and the cross-server behavior. Each account home stores its own user's side of every relationship; there is no shared friendship database.
+Add people by their full address, such as `@alex:example.com`, even when they use a different homeserver. Accept or decline requests, block accounts, and choose what presence to share. The details below explain cross-server behavior.
 
 ## Add someone as a friend
 

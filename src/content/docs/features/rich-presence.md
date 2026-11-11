@@ -1,11 +1,11 @@
 ---
 title: Rich presence
-description: Share the game, music or video you are playing from the Telium desktop app, and what it does with that data.
+description: Share games and music from the desktop app.
 sidebar:
   order: 8
 ---
 
-The Telium desktop app (Electron) can show what you are playing, listening to or watching as part of your presence. This page covers the controls, the sources it reads, and what reaches other people.
+Rich presence is optional. In the desktop client, open Settings and choose which game, media and activity sources to share. Browser clients cannot detect arbitrary local applications. Check the privacy section below before enabling it.
 
 ## Turn it on (or off)
 

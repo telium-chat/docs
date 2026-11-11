@@ -1,17 +1,17 @@
 ---
 title: Media
-description: Where Telium stores uploads, how guilds decide which media origins to accept, and how link previews avoid exposing viewers.
+description: Upload files and control where they are stored.
 sidebar:
   order: 4
 ---
 
-This page covers file uploads (the three upload tiers), operator media policy and quotas, how a guild decides which media origins it accepts, external hosts such as Gofile, and link previews through camo.
+**Sending a file?** Choose its upload destination in **Settings → Account → Where your uploads go**. The selected host may limit file size, total usage and expiry. Files aren't automatically end-to-end encrypted just because Telium transports them. Operators should set a [media policy](/self-hosting/configuration/#media-policy) before enabling public signups.
 
 ## The short version
 
 **If you're sending a file:** Open **Settings → Account → Where your uploads go** to choose your preferred home for uploads. Files can stay on your home server, go to another Telium media host, or go directly to an external provider. When attaching a file, look at its **expiry** and the destination's limits; not every attachment is permanent.
 
-**If you're running a server:** Attachments can consume much more storage than chat messages. Follow the [public homeserver media recipe](/self-hosting/public-server/#2-set-file-sizes-quotas-and-retention) for a ready-to-adapt 50 MiB / 1 GiB quota / 30-day example, then consult the [upload size, quota and expiry controls](#media-policy). You do not have to offer unlimited file hosting to operate an account home.
+**If you're running a server:** Attachments can consume much more storage than chat messages. Follow the [public homeserver media recipe](/self-hosting/public-server/#set-media-limits) for a ready-to-adapt 50 MiB / 1 GiB quota / 30-day example, then consult the [upload size, quota and expiry controls](#media-policy). You do not have to offer unlimited file hosting to operate an account home.
 
 **If you're managing a guild:** Your guild can restrict which media origins are accepted, regardless of where a member's account is hosted.
 

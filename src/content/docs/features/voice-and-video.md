@@ -1,11 +1,11 @@
 ---
 title: Voice and video
-description: Guild voice channels, camera, screen sharing, mesh and SFU modes, regions, permissions and encryption.
+description: Join guild voice channels and share your screen.
 sidebar:
   order: 5
 ---
 
-This page covers calls in **guild voice channels**: joining, mesh and SFU modes, end-to-end encryption, regions, permissions, camera and screen sharing. Calls in DMs and group chats work differently; see [DM calls](/features/dm-calls/). Running an SFU is covered in [SFU](/self-hosting/sfu/).
+Join a guild voice channel, grant microphone permission, and use the call controls for camera or screen sharing. Small calls can connect directly; larger calls use an SFU. **You don't need to host an SFU yourself.** For private group calls, see [DM calls](/features/dm-calls/).
 
 ## Your first voice call
 
