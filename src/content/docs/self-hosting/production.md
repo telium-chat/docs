@@ -31,6 +31,6 @@ After your chosen installer reports a healthy local server:
 1. Check `https://YOUR-API-HOST/.well-known/telium/server` from outside the host.
 2. Register through [telium.chat](https://telium.chat). Native private installs issue a one-time registration code; keep it until you've used it.
 3. **Grant administrator access.** Native installs require the local `admin recover` command; other installers may use first-account bootstrap. Follow your install guide rather than assuming the first user is an admin.
-4. Go through [After setup](/self-hosting/after-setup/) for backups, updates, uploads and federation.
+4. Go through [After setup](/self-hosting/after-setup/) for backups, updates, uploads and federation. For everyday changes, start with [Common settings](/self-hosting/common-settings/) instead of the full configuration reference.
 
 Calls can use public SFUs; operating a homeserver does **not** require operating an SFU.

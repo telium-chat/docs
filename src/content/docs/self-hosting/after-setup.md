@@ -13,7 +13,7 @@ Your installer has started Telium. Do these checks before depending on it.
 2. **Create an account** through [telium.chat](https://telium.chat), choosing your server. If registration is private, enter the one-time code from the installer.
 3. **Confirm you're an administrator.** The **native** installer deliberately does *not* grant the first signup admin access. On that machine, run the `admin recover` command printed by the installer. Don't assume registration makes you an admin.
 4. Open **User Settings → Control plane** in the client to check server administration.
-5. **Check registration policy** in `telium.toml`: `[registration] open = false` allows new accounts with valid codes; `true` allows open signup. Keep it closed unless you intend to accept strangers.
+5. **Check registration policy** in [Common settings](/self-hosting/common-settings/) and `telium.toml`: `[registration] open = false` allows new accounts with valid codes; `true` allows open signup. Keep it closed unless you intend to accept strangers.
 
 ## Protect the data
 

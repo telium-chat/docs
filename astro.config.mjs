@@ -64,6 +64,7 @@ export default defineConfig({
               items: [
                 { slug: 'self-hosting/exposing', label: 'DNS and HTTPS' },
                 { slug: 'self-hosting/domain-delegation', label: 'Account domains' },
+                { slug: 'self-hosting/common-settings', label: 'Common settings' },
                 { slug: 'self-hosting/s3-media-storage', label: 'S3 uploads' },
                 { slug: 'self-hosting/backups' },
                 { slug: 'self-hosting/updates' },
@@ -74,7 +75,7 @@ export default defineConfig({
               label: 'Advanced operations',
               collapsed: true,
               items: [
-                { slug: 'self-hosting/configuration' },
+                { slug: 'self-hosting/configuration', label: 'Configuration reference' },
                 { slug: 'self-hosting/observability' },
                 { slug: 'self-hosting/secrets' },
                 { slug: 'self-hosting/upgrades' },
