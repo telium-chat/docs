@@ -263,7 +263,7 @@ A scheduled, encrypted backup that runs without being thought about. See [Backup
 | `interval_secs` | `6h` | Backup cadence. The first run happens at startup unless a fresh archive exists. |
 | `keep` | `8` | Archives kept on this disk. |
 | `stale_after_secs` | `2d` | Warn once the newest archive (or off-box upload) is older than this. |
-| `include_media` | `true` | Put `media_dir` in the archive. `cache/` and `camo/` never go. |
+| `media_mode` | `"all"` | `none`, `profile_assets`, or `all`. See [media modes](/self-hosting/backups/#media-modes) for availability and coverage. Legacy `include_media = true/false` maps to `all`/`none` with a deprecation warning. `cache/` and `camo/` never go. |
 | `key_file` | `backup.key` | AES-256 key sealing archives. `TELIUM_BACKUP_KEY` overrides. Copy it off the machine — archives without the key are unreadable. |
 | `previous_key_files` | `[]` | Old keys that still open older archives. Never used to seal. |
 | `drill` | `true` | Periodically fetch, decrypt and open the newest archive as a rehearsal. |

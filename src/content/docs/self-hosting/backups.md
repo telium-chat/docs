@@ -19,7 +19,7 @@ One run writes one file, `telium-<unix-ms>.tbk`, to `backup.dir`, sealed with AE
 |---|---|---|
 | `database` | `VACUUM INTO` snapshot of `database_url` | One consistent instant, taken while the server keeps serving. Includes database-held secrets such as the federation signing keys, the OPAQUE setup and the VAPID key. |
 | `cold` | `[archive] dir` | Archived history segments, if present. |
-| `media` | `media_dir` | Attachments, avatars, emoji, stickers. `include_media = false` leaves it out. `cache/` and `camo/` are never included; they are re-fetched on demand. |
+| `media` | `media_dir` | Local files selected by `media_mode`: `none`, `profile_assets`, or `all`. `cache/` and `camo/` are never included; they are re-fetched on demand. |
 
 Not included: the config file, TLS certificates, the backup key itself, and media or cold segments stored in S3 (`[media_store]` or `[archive] store = "s3"`). The archive manifest lists S3-held parts under `excluded`, and `verify` and the drill report them.
 
@@ -27,23 +27,50 @@ Not included: the config file, TLS certificates, the backup key itself, and medi
 Do not back up by copying `telium.db` out of a running server. The database runs in WAL mode, so the `.db` file alone misses recent writes and copying `.db`, `-wal` and `-shm` separately captures three different moments. Use the built-in backup.
 :::
 
+## Media modes
+
+The media modes below accompany [Telium PR #47](https://github.com/telium-chat/telium/pull/47); use them with a server build containing that change.
+
+| Mode | Contents |
+|---|---|
+| `none` | Database and locally stored cold message history. |
+| `profile_assets` | Above, plus local avatars, banners, guild icons, custom emoji and stickers. |
+| `all` | Above, plus all other local media, including attachments and videos. |
+
+For small public servers, `profile_assets` reduces backup size while retaining identity and expression assets. Selection follows references in the database snapshot to media records, regardless of upload category, and includes each file once. The code default remains `all` so upgrading does not reduce existing coverage. Legacy `media_mode = "profile_assets"/false` maps to `all`/`none` with a deprecation warning. Replace the old key; specifying both keys is an error.
+
+All modes use the existing encrypted archive format. A `profile_assets` restore preserves database references and included assets; omitted attachments are unavailable. On an existing destination, `--yes` moves the old media tree aside when the archive contains a media part. A `none` archive leaves any existing media directory alone. A fresh destination avoids retaining unrelated files.
+
+The engine builds a database snapshot, compressed payload and encrypted archive locally before uploading. Allow temporary disk space in addition to retained archives; `backup.min_free_bytes` can reserve free space during creation.
+
 ## Configuration
+
+Local backups need no S3 account or endpoint. This example recommends one daily local backup with profile assets:
 
 ```toml
 [backup]
 enabled = true
 dir = "/var/backups/telium/archives"
 key_file = "/var/backups/telium/backup.key"
-interval_secs = 21600          # every six hours
-keep = 8                       # local archives kept
+interval_secs = "1d"           # once per day
+keep = 1                       # local archives kept
 stale_after_secs = 172800      # warn when the newest copy is two days old
-include_media = true
+media_mode = "profile_assets"
 drill = true
 drill_interval_secs = 86400
 drill_stale_after_secs = 259200
 pre_migration_backup = true
 require_backup_before_migration = false
 
+[backup.remote]
+enabled = false
+```
+
+### Optional offsite copies
+
+For recovery after loss of the VPS or disk, you can enable an S3-compatible destination. This is optional; local backups work without it. If you choose it, keep at least two remote archives: retaining only one can replace the last healthy recovery point with a backup of a corrupt database. Local and remote retention are independent.
+
+```toml
 [backup.remote]
 enabled = true
 endpoint = "https://s3.eu-west-1.amazonaws.com"
@@ -53,7 +80,7 @@ prefix = ""                    # empty means telium/<server_name>/
 access_key_id = "${file:/run/secrets/s3-id}"
 secret_access_key = "${file:/run/secrets/s3-secret}"
 path_style = true
-keep = 8                       # archives kept in the bucket
+keep = 2                       # archives kept in the bucket
 timeout_secs = 60
 ```
 
