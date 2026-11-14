@@ -41,8 +41,6 @@ For a first public deployment, this is a **suggested policy**, not Telium's defa
 default = "quota"
 quota_bytes = "1GiB"
 max_file_bytes = "50MiB"
-max_expiry_secs = "30d"
-default_expiry_secs = "30d"
 attachment_max_age_days = "30d"
 ```
 
@@ -51,11 +49,11 @@ attachment_max_age_days = "30d"
 | `default = "quota"` | Uploads are allowed, but each account has a stored-file allowance. |
 | `quota_bytes = "1GiB"` | A user can store at most roughly 1 GiB of server-hosted media at a time (subject to current recorded usage). This is **not** a monthly upload bandwidth allowance. |
 | `max_file_bytes = "50MiB"` | A single upload cannot exceed 50 MiB. Change it to `"25MiB"` or `"100MiB"` if your budget supports a different limit. |
-| `max_expiry_secs = "30d"` | An upload cannot request a lifetime longer than 30 days. Shorter choices remain available. |
-| `default_expiry_secs = "30d"` | A file uploaded without an explicit lifetime receives 30 days rather than keeping its bytes indefinitely. |
-| `attachment_max_age_days = "30d"` | An additional hard cleanup policy sweeps **attachments** older than 30 days, even when messages still reference them. |
+| `attachment_max_age_days = "30d"` | Attachments are deleted 30 days after upload, even when messages still reference them. Avatars, banners, emoji and stickers are not affected. |
 
-**This is deletion, not just hiding files.** Users will lose access to attachments after their lifetime; the original message may remain. Describe the retention policy on your signup or community information page. Backup copies can outlive an upload's live expiry according to your backup retention settings.
+**This is deletion, not just hiding files.** Users lose access to attachments after 30 days; the original message may remain. Describe the retention policy on your signup or community information page. Backup copies can outlive an upload's live expiry according to your backup retention settings.
+
+Avoid `default_expiry_secs` and `max_expiry_secs` for this. They apply to every upload, so avatars, banners and custom emoji would disappear after the same period. Uploaders can still pick a shorter lifetime, and guild owners can set shorter limits for their channels.
 
 A server and the destination guild/channel may each impose limits; the **smallest applicable file-size and expiry cap wins**. Guild owners can narrow both in their settings but cannot raise your server-wide ceiling. Profile assets have a separate size limit. Read [the full media settings](/self-hosting/configuration/#media-policy) for allowlists, blocked users and avatars.
 
