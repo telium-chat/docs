@@ -30,6 +30,32 @@ If you lack `curl`, use `wget -qO /tmp/telium-native-setup.sh URL` with the same
 
 The installer runs the server as the `telium` system user, installs the update timer, and leaves your config and data intact if rerun. It does not set up a public HTTPS proxy.
 
+### Storage and backup questions
+
+On a first install, the script asks whether registration is open or closed, then walks through storage limits and backups. Press Enter to accept each suggestion or type your own value. It asks for:
+
+- the upload policy (`quota`, `enabled` or `disabled`), the per-account allowance and the largest single file;
+- a server-wide media limit and a free-space reserve for the media disk;
+- how many days to keep attachments before deleting them;
+- whether backups include attachments, how often they run, how many to keep, and a free-space reserve for the backup disk.
+
+The size suggestions come from the free space it measures: a server-wide limit of about three quarters of the media disk, and a reserve of about a tenth of each disk. Per-account defaults are 1 GiB per account and 50 MiB per file.
+
+Open and closed registration start from different suggestions:
+
+| | Open registration | Closed registration |
+|---|---|---|
+| Attachment retention | 30 days, even if a message still uses the file | No forced deletion |
+| Backups | Profile assets only (avatars, banners, guild icons, emoji, stickers); no attachments | All media |
+
+If backups leave attachments out, they cannot be restored after a disk failure. The installer says so before you confirm; read [choosing what media to back up](/self-hosting/backups/#choosing-what-media-to-back-up) for the details. Either way, local archives are not an off-site copy: save the backup key elsewhere and set up [an off-site destination](/self-hosting/backups/#copying-archives-off-the-machine).
+
+To run unattended, set `TELIUM_REGISTRATION=open` or `closed` (required when there is no terminal). Any question can be answered in advance with its variable: `TELIUM_MEDIA_POLICY`, `TELIUM_MEDIA_QUOTA`, `TELIUM_MEDIA_FILE_MAX`, `TELIUM_MEDIA_TOTAL`, `TELIUM_MEDIA_FREE_RESERVE`, `TELIUM_MEDIA_RETENTION_DAYS`, `TELIUM_BACKUP_MEDIA` (`yes`/`no`), `TELIUM_BACKUP_INTERVAL`, `TELIUM_BACKUP_KEEP` and `TELIUM_BACKUP_FREE_RESERVE`. Invalid values stop the install.
+
+Re-running the installer on an existing server skips these questions and leaves `telium.toml` as it is.
+
+If you install **without** the interactive script, the compiled defaults do not limit total media uploads. Review [the public media limits](/self-hosting/public-server/#set-media-limits) before inviting anyone.
+
 ## 2. Set up DNS and HTTPS
 
 Point the API hostname at the host. Follow [Expose a homeserver](/self-hosting/exposing/) to use Caddy, nginx or a tunnel. Then check:

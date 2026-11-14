@@ -16,21 +16,67 @@ A public homeserver lets strangers create accounts. **You can operate a private 
 
 ## Set media limits
 
-These values are **an example public policy**, not Telium's compiled defaults:
+For a first public deployment, this is a **suggested policy**, not Telium's default:
 
 ```toml
 [media_policy]
 default = "quota"
 quota_bytes = "1GiB"
 max_file_bytes = "50MiB"
-max_expiry_secs = "30d"
-default_expiry_secs = "30d"
+max_total_bytes = "150GiB"     # whole server; size this for your disk (below)
+min_free_bytes = "20GiB"       # free space to leave on the media disk
 attachment_max_age_days = "30d"
 ```
 
-That permits up to 50 MiB per uploaded file and roughly 1 GiB of *stored* media per user, with 30-day attachment retention. The quota is not a monthly bandwidth limit. Files can disappear while messages that referenced them remain; tell users your policy.
+| Setting | What users experience |
+| --- | --- |
+| `default = "quota"` | Uploads are allowed, but each account has a stored-file allowance. |
+| `quota_bytes = "1GiB"` | A user can store at most roughly 1 GiB of server-hosted media at a time (subject to current recorded usage). This is **not** a monthly upload bandwidth allowance. |
+| `max_file_bytes = "50MiB"` | A single upload cannot exceed 50 MiB. Change it to `"25MiB"` or `"100MiB"` if your budget supports a different limit. |
+| `max_total_bytes`, `min_free_bytes` | A limit on the whole server, not on any one person. When it is reached, new uploads fail with a "server storage full" error and existing files still download. See [Size the server-wide limits](#size-the-server-wide-limits) for picking values. |
+| `attachment_max_age_days = "30d"` | Attachments are deleted 30 days after upload, even when messages still reference them. Avatars, banners, emoji and stickers are not affected. |
 
-New uploads can use an [S3-compatible bucket](/self-hosting/s3-media-storage/) instead of filling VPS disk space. Moving an existing media store needs a separate migration plan. Verify that your proxy or tunnel allows the file sizes you advertise.
+**This is deletion, not just hiding files.** Users lose access to attachments after 30 days; the original message may remain. Describe the retention policy on your signup or community information page. Backup copies can outlive an upload's live expiry according to your backup retention settings.
+
+`attachment_max_age_days` is the simplest way to do this. If you would rather give each upload a lifetime it can see, `default_expiry_secs` sets the lifetime a new attachment gets and `max_expiry_secs` the longest one it may ask for. Like the age rule, both apply only to attachments; avatars, banners and custom emoji keep their files. Uploaders can still pick a shorter lifetime, and guild owners can set shorter limits for their channels.
+
+A server and the destination guild/channel may each impose limits; the **smallest applicable file-size and expiry cap wins**. Guild owners can narrow both in their settings but cannot raise your server-wide ceiling. Profile assets have a separate size limit. Read [the full media settings](/self-hosting/configuration/#media-policy) for allowlists, blocked users and avatars.
+
+:::tip[How much storage does that buy a user?]
+At a 50 MiB file limit, a 1 GiB quota fits roughly twenty maximum-sized files **at once**, or many more small images. Files that expire or are deleted release live storage after cleanup. Total capacity depends on users, their actual file sizes, backups, replication and object-store billing — do not multiply quota by user count and treat it as a forecast.
+:::
+
+### Size the server-wide limits
+
+Per-account quotas do not cap the server: a few hundred accounts with 1 GiB each can fill any disk. `max_total_bytes` and `min_free_bytes` are the two settings that do, and both are off by default.
+
+The values in the example suit a media disk with about 200 GiB free. Scale them to yours; a reasonable starting point, and what the native installer suggests, is:
+
+- `max_total_bytes`: about three quarters of the free space on the disk that holds `media_dir`.
+- `min_free_bytes`: about a tenth of that free space, so the database, logs and temporary upload files have room.
+
+`max_total_bytes` counts the media the server has recorded, not what is on disk, and neither setting accounts for backups, logs, the database or other programs. Keep watching real free space, including `media_dir/tmp`, with [storage monitoring](/self-hosting/observability/).
+
+### Leave room for backups
+
+Backups usually live on the same machine and, by default, copy every media file on every run, so they can take more disk than the uploads themselves. Decide how much media to back up and how many archives to keep before you open signups: see [choosing what media to back up](/self-hosting/backups/#choosing-what-media-to-back-up). Backing up only profile assets saves a lot of space, but then attachments cannot be restored after a disk failure, and your users should know that.
+
+
+### Where the files live
+
+The server stores media under `media_dir` by default. For growth, Telium also supports **S3-compatible object storage** through `[media_store]` / `[media_store.s3]`. That can separate file capacity from your VPS disk, but it does **not** eliminate upload, download, request or backup costs. Keep bucket credentials private and check the provider's egress and API-request billing.
+
+**Want to set this up?** Start with the [step-by-step S3 media storage guide](/self-hosting/s3-media-storage/) for bucket permissions, a copyable config, restart instructions, and an upload test. Do not switch a populated local media store without a migration plan.
+
+See [Media store configuration](/self-hosting/configuration/#media-store), [Data lifecycle](/self-hosting/data-lifecycle/) and [Storage monitoring](/self-hosting/observability/). Test expiry and reclamation with actual attachments before putting real users on the service. For S3 in particular, do not assume the local-filesystem orphan-file sweep cleans up stray bucket objects.
+
+### Upload problems to test
+
+- Upload a small file and confirm it downloads.
+- Try a file just above `max_file_bytes`; it should be rejected rather than accepted.
+- Check that the client shows the expiry and usage limit where appropriate.
+- Try again after the retention period on a test object; its message may still exist, but the file should not be retrievable.
+- If requests fail with HTTP `413` below your configured limit, inspect your reverse proxy or tunnel. Cloudflare's upload cap can be stricter than Telium's. See [Exposing your server](/self-hosting/exposing/).
 
 ## Open registration
 

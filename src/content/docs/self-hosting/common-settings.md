@@ -49,18 +49,20 @@ For a public server, consider a starting policy such as:
 default = "quota"
 quota_bytes = "1GiB"
 max_file_bytes = "50MiB"
-max_expiry_secs = "30d"
-default_expiry_secs = "30d"
+max_total_bytes = "150GiB"    # example for a disk with ~200 GiB free
+min_free_bytes = "20GiB"      # reserve on the media filesystem
 attachment_max_age_days = "30d"
 ```
 
-This is **an example**, not Telium's default. It allows a stored-file quota of 1 GiB per account, single files up to 50 MiB, and 30-day attachment expiry. Users must know that old attachments may disappear even while their messages remain.
+This is **an example**, not Telium's default. It allows 1 GiB per account, files up to 50 MiB, and 30-day attachment expiry. The 150 GiB server-wide cap and 20 GiB free-space reserve assume a media disk with about 200 GiB available: **size them for your actual disk**. User quotas alone do not protect the whole host. Old attachments may disappear while their messages remain. See [server-wide limits](/self-hosting/public-server/#size-the-server-wide-limits).
 
 Your proxy or tunnel may impose a **smaller** upload limit. See [Store files in S3](/self-hosting/s3-media-storage/) if VPS disk space is the issue, or [Media policy reference](/self-hosting/configuration/#media-policy) for all options.
 
 ## Backups
 
 Your installer configures the local backup paths, but **you still need to save the backup key and actual archives off the host**. Decryption isn't possible without the key, and a second folder on the same VPS isn't disaster recovery.
+
+Set `backup.media_mode` to `all` (every local media file), `profile_assets` (avatars, guild icons, banners, emoji and stickers, but **no attachments**), or `none`. `profile_assets` saves space but **attachments cannot be restored** from that backup. Set `backup.min_free_bytes` to keep a reserve on the backup filesystem. See [choosing what to back up](/self-hosting/backups/#choosing-what-media-to-back-up).
 
 Follow [Backups](/self-hosting/backups/) to check the schedule, verify an archive and perform a restore drill. Don't edit key paths casually on a populated server.
 
