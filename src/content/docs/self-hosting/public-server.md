@@ -53,7 +53,7 @@ attachment_max_age_days = "30d"
 
 **This is deletion, not just hiding files.** Users lose access to attachments after 30 days; the original message may remain. Describe the retention policy on your signup or community information page. Backup copies can outlive an upload's live expiry according to your backup retention settings.
 
-Avoid `default_expiry_secs` and `max_expiry_secs` for this. They apply to every upload, so avatars, banners and custom emoji would disappear after the same period. Uploaders can still pick a shorter lifetime, and guild owners can set shorter limits for their channels.
+`attachment_max_age_days` is the simplest way to do this. If you would rather give each upload a lifetime it can see, `default_expiry_secs` sets the lifetime a new attachment gets and `max_expiry_secs` the longest one it may ask for. Like the age rule, both apply only to attachments; avatars, banners and custom emoji keep their files. Uploaders can still pick a shorter lifetime, and guild owners can set shorter limits for their channels.
 
 A server and the destination guild/channel may each impose limits; the **smallest applicable file-size and expiry cap wins**. Guild owners can narrow both in their settings but cannot raise your server-wide ceiling. Profile assets have a separate size limit. Read [the full media settings](/self-hosting/configuration/#media-policy) for allowlists, blocked users and avatars.
 
