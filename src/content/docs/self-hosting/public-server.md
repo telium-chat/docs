@@ -43,8 +43,6 @@ quota_bytes = "1GiB"
 max_file_bytes = "50MiB"
 max_total_bytes = "150GiB"     # whole server; size this for your disk (below)
 min_free_bytes = "20GiB"       # free space to leave on the media disk
-max_expiry_secs = "30d"
-default_expiry_secs = "30d"
 attachment_max_age_days = "30d"
 ```
 
@@ -54,11 +52,11 @@ attachment_max_age_days = "30d"
 | `quota_bytes = "1GiB"` | A user can store at most roughly 1 GiB of server-hosted media at a time (subject to current recorded usage). This is **not** a monthly upload bandwidth allowance. |
 | `max_file_bytes = "50MiB"` | A single upload cannot exceed 50 MiB. Change it to `"25MiB"` or `"100MiB"` if your budget supports a different limit. |
 | `max_total_bytes`, `min_free_bytes` | A limit on the whole server, not on any one person. When it is reached, new uploads fail with a "server storage full" error and existing files still download. See [Size the server-wide limits](#size-the-server-wide-limits) for picking values. |
-| `max_expiry_secs = "30d"` | An upload cannot request a lifetime longer than 30 days. Shorter choices remain available. |
-| `default_expiry_secs = "30d"` | A file uploaded without an explicit lifetime receives 30 days rather than keeping its bytes indefinitely. |
-| `attachment_max_age_days = "30d"` | An additional hard cleanup policy sweeps **attachments** older than 30 days, even when messages still reference them. |
+| `attachment_max_age_days = "30d"` | Attachments are deleted 30 days after upload, even when messages still reference them. Avatars, banners, emoji and stickers are not affected. |
 
-**This is deletion, not just hiding files.** Users will lose access to attachments after their lifetime; the original message may remain. Describe the retention policy on your signup or community information page. Backup copies can outlive an upload's live expiry according to your backup retention settings.
+**This is deletion, not just hiding files.** Users lose access to attachments after 30 days; the original message may remain. Describe the retention policy on your signup or community information page. Backup copies can outlive an upload's live expiry according to your backup retention settings.
+
+`attachment_max_age_days` is the simplest way to do this. If you would rather give each upload a lifetime it can see, `default_expiry_secs` sets the lifetime a new attachment gets and `max_expiry_secs` the longest one it may ask for. Like the age rule, both apply only to attachments; avatars, banners and custom emoji keep their files. Uploaders can still pick a shorter lifetime, and guild owners can set shorter limits for their channels.
 
 A server and the destination guild/channel may each impose limits; the **smallest applicable file-size and expiry cap wins**. Guild owners can narrow both in their settings but cannot raise your server-wide ceiling. Profile assets have a separate size limit. Read [the full media settings](/self-hosting/configuration/#media-policy) for allowlists, blocked users and avatars.
 
