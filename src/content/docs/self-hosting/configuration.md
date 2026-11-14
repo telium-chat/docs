@@ -263,7 +263,8 @@ A scheduled, encrypted backup that runs without being thought about. See [Backup
 | `interval_secs` | `6h` | Backup cadence. The first run happens at startup unless a fresh archive exists. |
 | `keep` | `8` | Archives kept on this disk. |
 | `stale_after_secs` | `2d` | Warn once the newest archive (or off-box upload) is older than this. |
-| `include_media` | `true` | Put `media_dir` in the archive. `cache/` and `camo/` never go. |
+| `media_mode` | `all` | Which local media each archive holds: `all`, `profile_assets` (avatars, banners, guild icons, emoji and stickers; no attachments) or `none`. See [choosing what media to back up](/self-hosting/backups/#choosing-what-media-to-back-up). `cache/` and `camo/` never go. The older `include_media = true/false` means `all`/`none` and logs a deprecation warning. |
+| `min_free_bytes` | `0` | Free space to keep on the backup filesystem while writing an archive. A run that would go below it stops with an error and leaves earlier archives in place. `0` turns the check off. |
 | `key_file` | `backup.key` | AES-256 key sealing archives. `TELIUM_BACKUP_KEY` overrides. Copy it off the machine — archives without the key are unreadable. |
 | `previous_key_files` | `[]` | Old keys that still open older archives. Never used to seal. |
 | `drill` | `true` | Periodically fetch, decrypt and open the newest archive as a rehearsal. |

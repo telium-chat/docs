@@ -19,7 +19,7 @@ One run writes one file, `telium-<unix-ms>.tbk`, to `backup.dir`, sealed with AE
 |---|---|---|
 | `database` | `VACUUM INTO` snapshot of `database_url` | One consistent instant, taken while the server keeps serving. Includes database-held secrets such as the federation signing keys, the OPAQUE setup and the VAPID key. |
 | `cold` | `[archive] dir` | Archived history segments, if present. |
-| `media` | `media_dir` | Attachments, avatars, emoji, stickers. `include_media = false` leaves it out. `cache/` and `camo/` are never included; they are re-fetched on demand. |
+| `media` | `media_dir` | Attachments, avatars, emoji, stickers, as chosen by [`media_mode`](#choosing-what-media-to-back-up). `cache/` and `camo/` are never included; they are re-fetched on demand. |
 
 Not included: the config file, TLS certificates, the backup key itself, and media or cold segments stored in S3 (`[media_store]` or `[archive] store = "s3"`). The archive manifest lists S3-held parts under `excluded`, and `verify` and the drill report them.
 
@@ -27,23 +27,56 @@ Not included: the config file, TLS certificates, the backup key itself, and medi
 Do not back up by copying `telium.db` out of a running server. The database runs in WAL mode, so the `.db` file alone misses recent writes and copying `.db`, `-wal` and `-shm` separately captures three different moments. Use the built-in backup.
 :::
 
+## Choosing what media to back up
+
+`media_mode` decides how much of `media_dir` goes into each archive:
+
+| Mode | Adds to the database and cold history |
+|---|---|
+| `all` (default) | Every local media file: attachments, videos, avatars, banners, guild icons, emoji and stickers. |
+| `profile_assets` | Only avatars, banners, guild icons, emoji and stickers that are still in use. Attachments are left out. |
+| `none` | No media. |
+
+Every run copies the selected media in full; archives are not incremental. With `all`, each archive you keep is roughly the size of your media directory again, so a server with a lot of uploads can spend more disk on backups than on live files.
+
+`profile_assets` keeps what people would notice missing after a restore (who they are and how their guilds look) at a fraction of the size. The cost is that **attachments cannot be restored**: messages come back, but their files return 404. If you choose it, say so wherever you describe your retention policy, or back up attachments some other way. The manifest records the exclusion, and `verify` and the drill report it.
+
+The older `include_media = true` / `false` still works and means `all` / `none`, with a deprecation warning at startup. Setting both `include_media` and `media_mode` is an error.
+
+### Disk space while a backup runs
+
+An archive is built on local disk before anything is uploaded, so turning on `[backup.remote]` does not remove the need for local space. During a run the database snapshot, the compressed payload and the encrypted archive can all exist at once, on top of the archives you already keep.
+
+`min_free_bytes` sets a floor of free space on the backup filesystem. The server checks it before starting and while writing, and stops the run with an error instead of eating into the floor. Earlier archives are not pruned when a run fails. This is best-effort: other processes can still fill the disk, so keep monitoring free space.
+
 ## Configuration
+
+Local backups work on their own, with no bucket or S3 account. A small starting point:
 
 ```toml
 [backup]
 enabled = true
 dir = "/var/backups/telium/archives"
 key_file = "/var/backups/telium/backup.key"
-interval_secs = 21600          # every six hours
-keep = 8                       # local archives kept
-stale_after_secs = 172800      # warn when the newest copy is two days old
-include_media = true
+interval_secs = "1d"           # once a day
+keep = 2                       # local archives kept
+stale_after_secs = "2d"        # warn when the newest copy is two days old
+media_mode = "all"             # or "profile_assets" / "none"; see above
+min_free_bytes = 0             # optional free-space floor, e.g. "10GiB"
 drill = true
-drill_interval_secs = 86400
-drill_stale_after_secs = 259200
+drill_interval_secs = "1d"
+drill_stale_after_secs = "3d"
 pre_migration_backup = true
 require_backup_before_migration = false
+```
 
+Local archives live on the same machine as the server. They cover a bad upgrade, an accidental deletion or a corrupt database, but not losing the machine, so a long local history mostly costs disk. Two is a sensible minimum: with only one, a backup taken after something has gone wrong replaces your last good copy. The compiled-in defaults (every six hours, eight archives) are in [the configuration reference](/self-hosting/configuration/#backup).
+
+### Copying archives off the machine
+
+To survive losing the server or its disk, add an S3-compatible destination. Local and remote retention are set separately; keep at least two remote archives for the same reason as above.
+
+```toml
 [backup.remote]
 enabled = true
 endpoint = "https://s3.eu-west-1.amazonaws.com"
@@ -53,7 +86,7 @@ prefix = ""                    # empty means telium/<server_name>/
 access_key_id = "${file:/run/secrets/s3-id}"
 secret_access_key = "${file:/run/secrets/s3-secret}"
 path_style = true
-keep = 8                       # archives kept in the bucket
+keep = 7                       # archives kept in the bucket
 timeout_secs = 60
 ```
 
@@ -163,7 +196,9 @@ The restore:
 2. Refuses if the database, media or cold directory has content, unless you pass `--yes`.
 3. Refuses an archive whose schema is newer than the binary. Upgrade first. Older archives are migrated at next start.
 4. Decrypts and authenticates everything into a staging directory beside the database. A failure here changes nothing.
-5. Moves the existing database, media and cold directories aside as `<name>.pre-restore-<stamp>` and moves the restored parts into place.
+5. Moves the existing database, media and cold directories aside as `<name>.pre-restore-<stamp>` and moves the restored parts into place Media and cold directories are only touched when the archive contains them, so restoring a `media_mode = "none"` archive leaves the existing media directory where it is.
+
+Restoring a `profile_assets` archive replaces the whole media directory with the profile assets it holds. If the old directory still has attachments you want, copy them back from the `pre-restore` copy before deleting it.
 
 Delete the `pre-restore` copies once the restored server checks out. `--key <file>` uses a key other than the configured one.
 
