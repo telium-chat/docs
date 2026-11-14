@@ -135,6 +135,8 @@ Ignored unless `roles.relay = true`. A relay carries guild traffic for this serv
 |---|---|---|
 | `default` | `"enabled"` | `enabled` (uploads free), `quota` (a per-user allowance) or `disabled`. |
 | `quota_bytes` | `1GiB` | The allowance. Only enforced when `default = "quota"`, and for `allowlist` users. |
+| `max_total_bytes` | `0` | Server-wide limit on the combined size of hosted media across all accounts. A file stored by several people counts once. Uploads past it are refused with `server_storage_full`; downloads keep working. `0` means no limit. |
+| `min_free_bytes` | `0` | Free space to keep on the media filesystem. Uploads that would go below it are refused. Helps protect the database if it shares that disk, but is not a substitute for disk monitoring. `0` turns the check off. |
 | `allowlist` | `[]` | User ids that always get tier-1 upload. |
 | `blocklist` | `[]` | User ids that never do. |
 | `profile_asset_carveout_bytes` | `512KiB` | Avatars and banners stay allowed up to this size even on a media-disabled server. |

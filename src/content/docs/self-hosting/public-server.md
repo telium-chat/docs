@@ -41,6 +41,8 @@ For a first public deployment, this is a **suggested policy**, not Telium's defa
 default = "quota"
 quota_bytes = "1GiB"
 max_file_bytes = "50MiB"
+max_total_bytes = "150GiB"     # whole server; size this for your disk (below)
+min_free_bytes = "20GiB"       # free space to leave on the media disk
 max_expiry_secs = "30d"
 default_expiry_secs = "30d"
 attachment_max_age_days = "30d"
@@ -51,6 +53,7 @@ attachment_max_age_days = "30d"
 | `default = "quota"` | Uploads are allowed, but each account has a stored-file allowance. |
 | `quota_bytes = "1GiB"` | A user can store at most roughly 1 GiB of server-hosted media at a time (subject to current recorded usage). This is **not** a monthly upload bandwidth allowance. |
 | `max_file_bytes = "50MiB"` | A single upload cannot exceed 50 MiB. Change it to `"25MiB"` or `"100MiB"` if your budget supports a different limit. |
+| `max_total_bytes`, `min_free_bytes` | A limit on the whole server, not on any one person. When it is reached, new uploads fail with a "server storage full" error and existing files still download. See [Size the server-wide limits](#size-the-server-wide-limits) for picking values. |
 | `max_expiry_secs = "30d"` | An upload cannot request a lifetime longer than 30 days. Shorter choices remain available. |
 | `default_expiry_secs = "30d"` | A file uploaded without an explicit lifetime receives 30 days rather than keeping its bytes indefinitely. |
 | `attachment_max_age_days = "30d"` | An additional hard cleanup policy sweeps **attachments** older than 30 days, even when messages still reference them. |
@@ -62,6 +65,22 @@ A server and the destination guild/channel may each impose limits; the **smalles
 :::tip[How much storage does that buy a user?]
 At a 50 MiB file limit, a 1 GiB quota fits roughly twenty maximum-sized files **at once**, or many more small images. Files that expire or are deleted release live storage after cleanup. Total capacity depends on users, their actual file sizes, backups, replication and object-store billing — do not multiply quota by user count and treat it as a forecast.
 :::
+
+### Size the server-wide limits
+
+Per-account quotas do not cap the server: a few hundred accounts with 1 GiB each can fill any disk. `max_total_bytes` and `min_free_bytes` are the two settings that do, and both are off by default.
+
+The values in the example suit a media disk with about 200 GiB free. Scale them to yours; a reasonable starting point, and what the native installer suggests, is:
+
+- `max_total_bytes`: about three quarters of the free space on the disk that holds `media_dir`.
+- `min_free_bytes`: about a tenth of that free space, so the database, logs and temporary upload files have room.
+
+`max_total_bytes` counts the media the server has recorded, not what is on disk, and neither setting accounts for backups, logs, the database or other programs. Keep watching real free space, including `media_dir/tmp`, with [storage monitoring](/self-hosting/observability/).
+
+### Leave room for backups
+
+Backups usually live on the same machine and, by default, copy every media file on every run, so they can take more disk than the uploads themselves. Decide how much media to back up and how many archives to keep before you open signups: see [choosing what media to back up](/self-hosting/backups/#choosing-what-media-to-back-up). Backing up only profile assets saves a lot of space, but then attachments cannot be restored after a disk failure, and your users should know that.
+
 
 ### Where the files live
 
