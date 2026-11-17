@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 (#78) is merged; phase 3 is in review (telium #79); phase 4 is not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
+**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 (#78) is merged; phase 3 is implemented in an open pull request (telium #79, not yet merged); phase 4 is not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
 
 ## Goal
 
@@ -91,12 +91,19 @@ read is not awaited before the vault load (`lifecycle.js`), so it can be stale i
   lost everywhere.
 - **Password reset** (`resetPasswordOpaque`). The server swaps `opaque_record`, deletes all sessions, sets every
   device `active = 0` and announces revocation of all devices (`opaque.rs` `password_reset_finish`). It does not touch
-  `key_vault` or `cross_signing`. The resetting client holds the new `W_pw` and `W_rk`. On its next vault load the
-  primary copy no longer opens under the new `W_pw`, so the client opens `k1` with `W_rk` and writes a fresh primary
-  copy (`loadOnce`, `recoveryKeyPayload` branch). Read in code; no real-server test covers it (**unverified by test**).
-- **Password change.** **There is no password-change route.** `opaque_record` is written only by `register_finish`,
-  by `enroll_finish` (only where it is NULL), and by `password_reset_finish`. It is nulled on account deletion
-  (`identity/mod.rs:708`).
+  `cross_signing`. On `main` (through phase 2) it also did not touch `key_vault`: the primary copy stayed under the old
+  `W_pw` until the resetting client's next vault load opened `k1` with `W_rk` and wrote a fresh one (`loadOnce`,
+  `recoveryKeyPayload` branch), which no real-server test covered. Phase 3 (telium #79, open) changes this:
+  `password_reset_start` hands the recovery copy `R` to a caller that signs the request with the recovery key, the client
+  opens it, and `password_reset_finish` carries the new `P` (inside the recovery-key signature) and writes it in the same
+  transaction as the record. A reset that would leave an opaque vault with a `k1.` copy under the old password is
+  refused. If the copy does not open under the key (an account moved here carries the source server's copy), the key's
+  holder can sign "reset anyway, leave the vault"; the history stays locked, as it did before phase 3.
+- **Password change.** On `main` there is no password-change route: `opaque_record` is written only by
+  `register_finish`, by `enroll_finish` (only where it is NULL), and by `password_reset_finish`. It is nulled on account
+  deletion (`identity/mod.rs:708`). Phase 3 (telium #79, open) adds `POST /auth/opaque/password/change/start` and
+  `/finish`, which replace the record and the vault in one transaction and end every other session and outstanding
+  reauth proof.
 
 ---
 
@@ -149,7 +156,7 @@ recoverability.
 | T1 | **Vault only** | `P` (+`R`), no root | The vault write landed but the root write did not (lost answer, tab closed). Under I1 the sign-up call does not return until both have landed. |
 | T2 | **Healthy** | `P` + `R` + `recovery-v1:` root | Normal. |
 | T2n | **Healthy, no recovery key** | `P` + `recovery-v1:` root, `recovery_public_key` NULL | The user never enrolled a key (pre-recovery-key accounts, or a server that refused enrollment). Settings shows "Recovery key: Not made yet". |
-| T3 | **Re-wrap pending** | `R` valid, `P` under an old export key | Only possible today: after a password reset, before the resetting client's next vault load. I5 removes it. |
+| T3 | **Re-wrap pending** | `R` valid, `P` under an old export key | On `main`: after a password reset, before the resetting client's next vault load. Phase 3 (telium #79, open) removes that cause: reset and change re-wrap `P` in the same write. It can still arise where there is no openable `R` to re-wrap from: L4 (copy missing), L5 (legacy passphrase copy, not `k1.`) and an account moved from another server whose copy does not open. The server leaves such a vault as it is. |
 | T4 | **Reset identity** | As T2, with a new immutable id | The root was lost everywhere and was reset with the recovery key (#74). Contacts see "changed" until they compare emoji again. |
 | TX | **Lost** | `P` unopenable (password forgotten), no `R`, no device holds AK | See 3.3. History and the root are gone; only #74 with a recovery key recovers, and there is none here. |
 
@@ -289,8 +296,8 @@ stretching function (KSF).
   device** (an older phone in a browser or WebView), not by the host. A Raspberry Pi 3 homeserver (1 GB RAM) is not
   constrained by it. The attacker pays the same cost per guess, on their own hardware, which is why the parameter
   matters after a compromise.
-- **Today's KSF.** `opaque-auth.js` passes no `keyStretching`, so production uses `@serenity-kit/opaque`'s default,
-  "memory-constrained" Argon2id: m = 2^16 KiB (64 MiB), t = 3, p = 4. Tests use a cheap override
+- **Today's KSF.** On `main`, `opaque-auth.js` passes no `keyStretching`, so production uses `@serenity-kit/opaque`'s default,
+  "memory-constrained" Argon2id (phase 3, open, passes it explicitly as version 1 of a `KSF_VERSIONS` table, with the same values): m = 2^16 KiB (64 MiB), t = 3, p = 4. Tests use a cheap override
   (`src/test/opaque-ksf.js`, test-only alias).
 - **Decision: keep these parameters.** Do **not** raise to 128 MiB or above on a guess. The constraint is the slowest
   client device, and that has not been measured. Change them only after measuring on the slowest supported Android
@@ -332,13 +339,17 @@ Each phase ships on its own and leaves every account no worse off. There is no w
    - "Seal it properly now" (I4) in `startOnce` and after `adoptSecret`.
    - Sign-up does not finish until `R` is confirmed written (3.3). The user's "yes, I saved it" is kept as it is and
      recorded separately.
-4. **Phase 3: atomic re-wrap.** Server and client. *Status: in review (telium #79).*
+4. **Phase 3: atomic re-wrap.** Server and client. *Status: implemented in telium #79 (open, not yet merged).*
    - Password-change route (`/auth/opaque/password/change/start` and `/finish`), and a Change password section in account settings.
    - `password_reset_finish` takes the new `P`; the `loadOnce` re-wrap-from-`R` path stays as a fallback.
    - KSF parameter version (`accounts.opaque_ksf_version`), plus upgrade at sign-in. The parameters themselves stay as in 3.5 until
      measured: version 1 is Argon2id at 64 MiB, t = 3, p = 4.
-   - A password change leaves other signed-in devices signed in. Their in-memory wrapper is stale, so their next vault
-     write loses the version race instead of overwriting `P`, and they sign in again.
+   - A password change ends every other session and every outstanding reauth proof (the current session stays), and a
+     device whose answer to the change was lost drops the old password's key from memory. `loadOnce` seals a vault a
+     password key cannot open only for a key made from the password typed in that sign-in, never for one kept in
+     memory.
+   - A reset whose recovery copy does not open can be finished with a signed "vault unopenable" marker, so a moved
+     account is not locked out of its password.
 5. **Phase 4: refuse and delete legacy custody.** One phase, server and client, no waiting period.
    - **Server:**
      - `put_vault` / `set_vault_mode` accept only `opaque_custody` (`self_custody`, `device_custody` and `escrowed` get
