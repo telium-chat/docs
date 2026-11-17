@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 (#78) is merged; phase 3 is implemented in an open pull request (telium #79, not yet merged); phase 4 is not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
+**Status: design, being implemented in phases.** Phases 0 to 3 are merged: the gate (#75), phase 1 (#76), phase 2 (#78) and phase 3 (#79). Phase 4 is implemented in an open pull request (telium #80, not yet merged). Until it merges, the legacy custody modes described below still exist on `main`. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
 
 ## Goal
 
@@ -91,17 +91,17 @@ read is not awaited before the vault load (`lifecycle.js`), so it can be stale i
   lost everywhere.
 - **Password reset** (`resetPasswordOpaque`). The server swaps `opaque_record`, deletes all sessions, sets every
   device `active = 0` and announces revocation of all devices (`opaque.rs` `password_reset_finish`). It does not touch
-  `cross_signing`. On `main` (through phase 2) it also did not touch `key_vault`: the primary copy stayed under the old
+  `cross_signing`. Through phase 2 it also did not touch `key_vault`: the primary copy stayed under the old
   `W_pw` until the resetting client's next vault load opened `k1` with `W_rk` and wrote a fresh one (`loadOnce`,
-  `recoveryKeyPayload` branch), which no real-server test covered. Phase 3 (telium #79, open) changes this:
+  `recoveryKeyPayload` branch), which no real-server test covered. Phase 3 (telium #79, merged) changed this:
   `password_reset_start` hands the recovery copy `R` to a caller that signs the request with the recovery key, the client
   opens it, and `password_reset_finish` carries the new `P` (inside the recovery-key signature) and writes it in the same
   transaction as the record. A reset that would leave an opaque vault with a `k1.` copy under the old password is
   refused. If the copy does not open under the key (an account moved here carries the source server's copy), the key's
   holder can sign "reset anyway, leave the vault"; the history stays locked, as it did before phase 3.
-- **Password change.** On `main` there is no password-change route: `opaque_record` is written only by
+- **Password change.** Before phase 3 there was no password-change route: `opaque_record` is written only by
   `register_finish`, by `enroll_finish` (only where it is NULL), and by `password_reset_finish`. It is nulled on account
-  deletion (`identity/mod.rs:708`). Phase 3 (telium #79, open) adds `POST /auth/opaque/password/change/start` and
+  deletion (`identity/mod.rs:708`). Phase 3 (telium #79, merged) added `POST /auth/opaque/password/change/start` and
   `/finish`, which replace the record and the vault in one transaction and end every other session and outstanding
   reauth proof.
 
@@ -156,11 +156,11 @@ recoverability.
 | T1 | **Vault only** | `P` (+`R`), no root | The vault write landed but the root write did not (lost answer, tab closed). Under I1 the sign-up call does not return until both have landed. |
 | T2 | **Healthy** | `P` + `R` + `recovery-v1:` root | Normal. |
 | T2n | **Healthy, no recovery key** | `P` + `recovery-v1:` root, `recovery_public_key` NULL | The user never enrolled a key (pre-recovery-key accounts, or a server that refused enrollment). Settings shows "Recovery key: Not made yet". |
-| T3 | **Re-wrap pending** | `R` valid, `P` under an old export key | On `main`: after a password reset, before the resetting client's next vault load. Phase 3 (telium #79, open) removes that cause: reset and change re-wrap `P` in the same write. It can still arise where there is no openable `R` to re-wrap from: L4 (copy missing), L5 (legacy passphrase copy, not `k1.`) and an account moved from another server whose copy does not open. The server leaves such a vault as it is. |
+| T3 | **Re-wrap pending** | `R` valid, `P` under an old export key | Before phase 3: after a password reset, before the resetting client's next vault load. Phase 3 (telium #79, merged) removed that cause: reset and change re-wrap `P` in the same write. It can still arise where there is no openable `R` to re-wrap from: L4 (copy missing), L5 (legacy passphrase copy, not `k1.`) and an account moved from another server whose copy does not open. The server leaves such a vault as it is. |
 | T4 | **Reset identity** | As T2, with a new immutable id | The root was lost everywhere and was reset with the recovery key (#74). Contacts see "changed" until they compare emoji again. |
 | TX | **Lost** | `P` unopenable (password forgotten), no `R`, no device holds AK | See 3.3. History and the root are gone; only #74 with a recovery key recovers, and there is none here. |
 
-**Legacy and broken states.** These are not migrated. Phase 1 stops creating them, and phase 4 refuses and deletes them; an account still in one is reset (L2x/L1x) or re-created.
+**Legacy and broken states.** These are not migrated. Phase 1 stops creating them, and phase 4 (telium #80, open) refuses them and withdraws their key material (3.4); an account still in one is converted by a device that holds its keys (L1h), given a new vault (L1x, L6, L7), reset (L2x/L1x) or re-created.
 
 | # | State | Server | How an account can be in it (verified unless marked) |
 |---|---|---|---|
@@ -231,7 +231,7 @@ under AK keep working.
   `finishRegistration`. `R` reaches the client from `password_reset_start`, which hands it out only against a
   recovery-key signature over the request. The new `P` and the version it replaces are inside the signature on finish.
   A reset that would leave an `opaque_custody` vault with a `k1.` copy under the old password is refused (`vault_rewrap_required`).
-- Keep the `loadOnce` re-wrap-from-`R` path as a fallback for resets made by older clients.
+- Keep the `loadOnce` re-wrap-from-`R` path as a fallback for resets made by older clients. It runs only at a sign-in or an unlock with `reseal: true`, where the password key is the one just typed.
 
 Changing the KSF parameters (3.5) is the same operation: re-register at the next sign-in, while the password is in
 hand, and write the new `P` in that same request.
@@ -264,15 +264,21 @@ found that uses it (**unverified** beyond reading that file).
 
 ### 3.4 Legacy modes: refuse and delete
 
-There is no migration window. Phase 1 stops the client creating legacy state. Phase 4 then makes the server refuse
-it and deletes the code and columns in the same change. Existing accounts in a legacy state are not carried forward.
+There is no migration window. Phase 1 stops the client creating legacy state. Phase 4 (telium #80, open) then makes the
+server refuse it and deletes the code in the same change. Key material is withdrawn, not silently destroyed: migration
+0099 copies every retired `key_vault` row whole into `key_vault_legacy_archive` and then nulls `escrow_key` and the
+PBKDF2 `independent_ciphertext` copies. The columns and the rows stay, and the archive restores one account with a
+single statement (it is in the migration). Existing accounts in a legacy state are not carried forward silently: the
+client says so, and the user chooses.
 
 | Legacy | Outcome |
 |---|---|
-| L7 escrowed, L6 self custody, L5 passphrase copy | Refused and deleted in phase 4, including `escrow_key` and any remaining PBKDF2 `independent_ciphertext`. |
+| L7 escrowed, L6 self custody | Refused on every device, even one that holds the ring (that ring could have been exposed by the server-held key or a passphrase-sealed blob). The vault is shown locked, and Settings offers **Start a new vault**, after a confirmation that the old history stays locked for good. The old row is in the archive. |
+| L5 passphrase copy | Nulled by migration 0099 (archived first). Nothing reads one; an account import drops one. |
 | L4 copy missing | Exists: "Needs reconnecting" then `restoreRecoveryCopy`. Stays, because it is the repair for a lost `R`. |
-| L1h / L2h root `device-v1:`, held | **"Seal it properly now"** (I4) in phase 2: if the held root binds and AK is known, re-seal as `recovery-v1:`. Works token-only when the vault mode is opaque or self custody. **L1h (vault `device_custody`) is not healed in phase 2:** phase 4 handles it. The exception is `onRecoveryAdopted` with the password in hand, which converts the vault to `opaque_custody` first and then seals. |
-| L1x / L2x root held by no device | #74 reset with the recovery key, sealed under AK. With no recovery key either, the user creates a new account. |
+| L1h / L2h root `device-v1:`, held | **"Seal it properly now"** (I4) in phase 2: if the held root binds and AK is known, re-seal as `recovery-v1:`. Works token-only when the vault mode is opaque or self custody. **L1h (vault `device_custody`) is not healed in phase 2.** Phase 4 converts it: a device that holds the ring (or whose recovery copy opens under the typed recovery key) rewrites the vault as `opaque_custody` with the same ring, at the next password sign-in, and the held root is then re-sealed. A token-only device leaves it locked. `onRecoveryAdopted` with the password in hand converts it too. |
+| L1x root held by no device, vault retired | **Start a new vault** first (there is no account key to seal under until there is one), then the #74 reset with the recovery key, sealed under the new AK. A new vault has no recovery copy until the user reconnects the recovery key (the L4 step). With no recovery key either, the user creates a new account. A device that still holds the root keeps its identity: it re-seals the root under the new key and no reset is needed. |
+| L2x root held by no device, vault opaque | #74 reset with the recovery key, sealed under AK (the password opens `P`). With no recovery key either, the user creates a new account. |
 | L3 ring held by nobody, no root | Any `W_pw` sign-in recovers it (T1 to T2). |
 
 ### 3.5 Offline guessing after a homeserver compromise
@@ -296,8 +302,8 @@ stretching function (KSF).
   device** (an older phone in a browser or WebView), not by the host. A Raspberry Pi 3 homeserver (1 GB RAM) is not
   constrained by it. The attacker pays the same cost per guess, on their own hardware, which is why the parameter
   matters after a compromise.
-- **Today's KSF.** On `main`, `opaque-auth.js` passes no `keyStretching`, so production uses `@serenity-kit/opaque`'s default,
-  "memory-constrained" Argon2id (phase 3, open, passes it explicitly as version 1 of a `KSF_VERSIONS` table, with the same values): m = 2^16 KiB (64 MiB), t = 3, p = 4. Tests use a cheap override
+- **Today's KSF.** Before phase 3, `opaque-auth.js` passed no `keyStretching`, so production used `@serenity-kit/opaque`'s default,
+  "memory-constrained" Argon2id. Phase 3 (merged) passes it explicitly as version 1 of a `KSF_VERSIONS` table, with the same values: m = 2^16 KiB (64 MiB), t = 3, p = 4. Tests use a cheap override
   (`src/test/opaque-ksf.js`, test-only alias).
 - **Decision: keep these parameters.** Do **not** raise to 128 MiB or above on a guess. The constraint is the slowest
   client device, and that has not been measured. Change them only after measuring on the slowest supported Android
@@ -339,9 +345,9 @@ Each phase ships on its own and leaves every account no worse off. There is no w
    - "Seal it properly now" (I4) in `startOnce` and after `adoptSecret`.
    - Sign-up does not finish until `R` is confirmed written (3.3). The user's "yes, I saved it" is kept as it is and
      recorded separately.
-4. **Phase 3: atomic re-wrap.** Server and client. *Status: implemented in telium #79 (open, not yet merged).*
+4. **Phase 3: atomic re-wrap.** Server and client. *Status: merged (#79).*
    - Password-change route (`/auth/opaque/password/change/start` and `/finish`), and a Change password section in account settings.
-   - `password_reset_finish` takes the new `P`; the `loadOnce` re-wrap-from-`R` path stays as a fallback.
+   - `password_reset_finish` takes the new `P`. The `loadOnce` re-wrap-from-`R` path is kept for resets made before this, and runs only at a sign-in or an unlock with `reseal: true`, not at an ordinary start.
    - KSF parameter version (`accounts.opaque_ksf_version`), plus upgrade at sign-in. The parameters themselves stay as in 3.5 until
      measured: version 1 is Argon2id at 64 MiB, t = 3, p = 4.
    - A password change ends every other session and every outstanding reauth proof (the current session stays), and a
@@ -350,13 +356,14 @@ Each phase ships on its own and leaves every account no worse off. There is no w
      memory.
    - A reset whose recovery copy does not open can be finished with a signed "vault unopenable" marker, so a moved
      account is not locked out of its password.
-5. **Phase 4: refuse and delete legacy custody.** One phase, server and client, no waiting period.
+5. **Phase 4: refuse and delete legacy custody.** One phase, server and client, no waiting period. *Status: implemented in telium #80 (open, not yet merged); the list below is what that pull request does.*
    - **Server:**
      - `put_vault` / `set_vault_mode` accept only `opaque_custody` (`self_custody`, `device_custody` and `escrowed` get
        a 400 with a code);
      - `put_cross_signing` / `rotate` / `reset_finish` refuse `device-v1:` seals;
-     - remove `key_vault.escrow_key`, `server_can_recover`/`server_can_read` and the non-opaque arms of
-       `set_vault_mode`.
+     - stop serving `key_vault.escrow_key`, `server_can_recover` and `server_can_read`, and remove the non-opaque arms of
+       `set_vault_mode` (the `escrow_key` column stays and is emptied, see Data). Writing `opaque_custody` over a row in
+       a retired mode is allowed: it is the conversion.
    - **Client:**
      - `vault.js`: `device_custody`, `self_custody` and `escrowed` branches of `loadOnce`/`setMode`, `rotatedFrom`
        escrow rotation, `fromPassphrase`/`LEGACY_SALT`/`p2` handling, `setIndependentRecovery`;
@@ -364,7 +371,8 @@ Each phase ships on its own and leaves every account no worse off. There is no w
      - `verify.js`: `DEVICE_SEAL`, the unprefixed seal read and the `mode` parameter of `start`;
      - `trustMethods.custodyMode()`;
      - the UI notes for the retired modes in `RecoveryPane.jsx`.
-   - **Data:** null out remaining PBKDF2 `independent_ciphertext`.
+   - **Data:** migration 0099 archives every retired `key_vault` row (`key_vault_legacy_archive`), then nulls `escrow_key` and the PBKDF2 `independent_ciphertext` copies. Nothing is dropped; the archive is dropped by a later migration once no account needs the way back.
+   - **Client, conversion and refusal:** a retired vault is locked (`retiredMode`). `device_custody` converts with a held ring or the recovery key (L1h). Anything else is locked until the user starts a new vault on purpose.
    - Old clients degrade to "update to keep using encrypted DMs".
    - What remains:
      - One mode.
@@ -436,6 +444,7 @@ when, sizes), which the homeserver sees in every mode.
 2. **KSF.** Keep Argon2id at 64 MiB, t = 3, p = 4 and change it only after measuring the slowest supported client
    device. The KSF runs on the client, so the homeserver's hardware is not the constraint (3.5).
 3. **Legacy custody.** No deprecation or migration window. Legacy modes and `DEVICE_SEAL` are refused and deleted in
-   one phase (phase 4). Escrowed accounts are not carried forward.
+   one phase (phase 4). Escrowed accounts are not carried forward. The key material the phase withdraws is archived first,
+   so the step can be undone per account.
 4. **Recovery key at sign-up.** No new blocking acknowledgement step. Sign-up must not finish until the server-side
    recovery copy is confirmed written, and the user's acknowledgement is tracked separately (3.3).
