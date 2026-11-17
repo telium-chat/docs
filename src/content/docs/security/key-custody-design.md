@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-**Status: design, being implemented in phases.** Phases 0 to 3 are merged: the gate (#75), phase 1 (#76), phase 2 (#78) and phase 3 (#79). Phase 4 is implemented in an open pull request (telium #80, not yet merged). Until it merges, the legacy custody modes described below still exist on `main`. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
+**Status: design, being implemented in phases.** Phases 0 to 3 are merged: the gate (#75), phase 1 (#76), phase 2 (#78) and phase 3 (#79). Phase 4 is merged (telium #80). Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
 
 ## Goal
 
@@ -160,7 +160,7 @@ recoverability.
 | T4 | **Reset identity** | As T2, with a new immutable id | The root was lost everywhere and was reset with the recovery key (#74). Contacts see "changed" until they compare emoji again. |
 | TX | **Lost** | `P` unopenable (password forgotten), no `R`, no device holds AK | See 3.3. History and the root are gone; only #74 with a recovery key recovers, and there is none here. |
 
-**Legacy and broken states.** These are not migrated. Phase 1 stops creating them, and phase 4 (telium #80, open) refuses them and withdraws their key material (3.4); an account still in one is converted by a device that holds its keys (L1h), given a new vault (L1x, L6, L7), reset (L2x/L1x) or re-created.
+**Legacy and broken states.** These are not migrated. Phase 1 stops creating them, and phase 4 (merged in telium #80) refuses them and withdraws their key material (3.4); an account still in one is converted by a device that holds its keys (L1h), given a new vault (L1x, L6, L7), reset (L2x/L1x) or re-created.
 
 | # | State | Server | How an account can be in it (verified unless marked) |
 |---|---|---|---|
@@ -169,8 +169,8 @@ recoverability.
 | L3 | **Vault only, ring held by nobody** | `P` (+`R`), no root, and the creating tab never kept AK | The tab closed while the first vault write was in flight. `vault.js` remembers the ring only on an *unanswered error*, not on a request that never returns (gate: *the tab is closed while the first vault write is in flight…*; passes since phase 1). The device that made the account is locked until the password is typed again. A later password sign-in on any device recovers it. |
 | L4 | **Recovery key enrolled, copy missing** | `recovery_public_key` set, `independent_ciphertext` NULL | Before #70, a second tab made a `device_custody` vault and the sign-up tab's migration dropped `R`. Also any server that lost or deleted `R`. Settings shows **"Needs reconnecting"** (`api.js` `recovery_copy_missing`). The key still resets the password and the identity, but opens no history. Repair: `restoreRecoveryCopy` (`recovery_copy_finish`). |
 | L5 | **Legacy passphrase second copy** | `P` + `p2.`/unprefixed PBKDF2 copy in `independent_ciphertext` | `self_custody` migrated to opaque carries the old ciphertext forward (`loadOnce`, self_custody branch, `setMode(..., vault.ciphertext)`), or the user set an independent passphrase. Blocks recovery-key enrollment until removed. |
-| L6 | **Self custody** | Vault `self_custody` | Legacy. Migrates to opaque (+L5) on the first `W_pw` session that holds the ring or the passphrase. |
-| L7 | **Escrowed** | Vault `escrowed`, `escrow_key` set | Legacy default. The server can read the mirror. Leaves on any start: to opaque with `W_pw`, to `device_custody` (L1) without. |
+| L6 | **Self custody** | Vault `self_custody` | Legacy, and no longer migrated: the client refuses it (phase 4). It used to migrate to opaque (+L5) on the first `W_pw` session that held the ring or the passphrase. |
+| L7 | **Escrowed** | Vault `escrowed`, `escrow_key` set | Legacy default. The server could read the mirror. Phase 4 refuses it; it used to leave on any start (to opaque with `W_pw`, to `device_custody` (L1) without). |
 | L8 | **Recovery copy "Not made yet" despite a key** | Before #70: the UI read only local flags after a sibling handover | Fixed in #70 (`onRecoveryAdopted` keeps the read flags). Listed so later code does not reintroduce it. |
 
 ### 2.4 Transitions (target)
@@ -231,7 +231,7 @@ under AK keep working.
   `finishRegistration`. `R` reaches the client from `password_reset_start`, which hands it out only against a
   recovery-key signature over the request. The new `P` and the version it replaces are inside the signature on finish.
   A reset that would leave an `opaque_custody` vault with a `k1.` copy under the old password is refused (`vault_rewrap_required`).
-- Keep the `loadOnce` re-wrap-from-`R` path as a fallback for resets made by older clients. It runs only at a sign-in or an unlock with `reseal: true`, where the password key is the one just typed.
+- Keep the `loadOnce` re-wrap-from-`R` path as a fallback for resets made by older clients. The read from `R` happens at any start; the re-seal write is gated by `reseal: true`, so it happens only at a sign-in or an unlock, where the password key is the one just typed.
 
 Changing the KSF parameters (3.5) is the same operation: re-register at the next sign-in, while the password is in
 hand, and write the new `P` in that same request.
@@ -264,11 +264,11 @@ found that uses it (**unverified** beyond reading that file).
 
 ### 3.4 Legacy modes: refuse and delete
 
-There is no migration window. Phase 1 stops the client creating legacy state. Phase 4 (telium #80, open) then makes the
+There is no migration window. Phase 1 stops the client creating legacy state. Phase 4 (merged in telium #80) then makes the
 server refuse it and deletes the code in the same change. Key material is withdrawn, not silently destroyed: migration
 0099 copies every retired `key_vault` row whole into `key_vault_legacy_archive` and then nulls `escrow_key` and the
 PBKDF2 `independent_ciphertext` copies. The columns and the rows stay, and the archive restores one account with a
-single statement (it is in the migration). Existing accounts in a legacy state are not carried forward silently: the
+single statement: a whole-row restore of `mode`, `ciphertext`, `escrow_key` and `independent_ciphertext` (it is a comment in the migration). A vault that lands in a retired mode after the migration, by account import, is archived by the server the first time a write would replace it. Existing accounts in a legacy state are not carried forward silently: the
 client says so, and the user chooses.
 
 | Legacy | Outcome |
@@ -276,8 +276,8 @@ client says so, and the user chooses.
 | L7 escrowed, L6 self custody | Refused on every device, even one that holds the ring (that ring could have been exposed by the server-held key or a passphrase-sealed blob). The vault is shown locked, and Settings offers **Start a new vault**, after a confirmation that the old history stays locked for good. The old row is in the archive. |
 | L5 passphrase copy | Nulled by migration 0099 (archived first). Nothing reads one; an account import drops one. |
 | L4 copy missing | Exists: "Needs reconnecting" then `restoreRecoveryCopy`. Stays, because it is the repair for a lost `R`. |
-| L1h / L2h root `device-v1:`, held | **"Seal it properly now"** (I4) in phase 2: if the held root binds and AK is known, re-seal as `recovery-v1:`. Works token-only when the vault mode is opaque or self custody. **L1h (vault `device_custody`) is not healed in phase 2.** Phase 4 converts it: a device that holds the ring (or whose recovery copy opens under the typed recovery key) rewrites the vault as `opaque_custody` with the same ring, at the next password sign-in, and the held root is then re-sealed. A token-only device leaves it locked. `onRecoveryAdopted` with the password in hand converts it too. |
-| L1x root held by no device, vault retired | **Start a new vault** first (there is no account key to seal under until there is one), then the #74 reset with the recovery key, sealed under the new AK. A new vault has no recovery copy until the user reconnects the recovery key (the L4 step). With no recovery key either, the user creates a new account. A device that still holds the root keeps its identity: it re-seals the root under the new key and no reset is needed. |
+| L1h / L2h root `device-v1:`, held | **"Seal it properly now"** (I4) in phase 2: if the held root binds and AK is known, re-seal as `recovery-v1:`. Works token-only when the vault mode is opaque. **L1h (vault `device_custody`) is not healed in phase 2.** Phase 4 converts it: a device that holds the ring (or whose recovery copy opens under the typed recovery key) rewrites the vault as `opaque_custody` with the same ring, at the next password sign-in or unlock (the same `reseal` rule as the other re-seals: the wrapper must come from the password typed then), and the held root is then re-sealed. A token-only device leaves it locked. `onRecoveryAdopted` with the password in hand converts it too. |
+| L1x root held by no device, vault retired | **Try the recovery key first** (Settings > Unlock): if the vault has a recovery copy it opens to the old ring and the vault converts, with history. Only if that fails, **start a new vault** (this removes the recovery copy of the old vault, and the confirmation says so) (there is no account key to seal under until there is one), then the #74 reset with the recovery key, sealed under the new AK. A new vault has no recovery copy until the user reconnects the recovery key (the L4 step). With no recovery key either, the user creates a new account. A device that still holds the root keeps its identity: it re-seals the root under the new key and no reset is needed. |
 | L2x root held by no device, vault opaque | #74 reset with the recovery key, sealed under AK (the password opens `P`). With no recovery key either, the user creates a new account. |
 | L3 ring held by nobody, no root | Any `W_pw` sign-in recovers it (T1 to T2). |
 
@@ -347,7 +347,7 @@ Each phase ships on its own and leaves every account no worse off. There is no w
      recorded separately.
 4. **Phase 3: atomic re-wrap.** Server and client. *Status: merged (#79).*
    - Password-change route (`/auth/opaque/password/change/start` and `/finish`), and a Change password section in account settings.
-   - `password_reset_finish` takes the new `P`. The `loadOnce` re-wrap-from-`R` path is kept for resets made before this, and runs only at a sign-in or an unlock with `reseal: true`, not at an ordinary start.
+   - `password_reset_finish` takes the new `P`. The `loadOnce` re-wrap-from-`R` path is kept for resets made before this: the read from `R` happens at any start, but the re-seal (the write under the password's wrapper) is gated by `reseal: true`, so it happens only at a sign-in or an unlock.
    - KSF parameter version (`accounts.opaque_ksf_version`), plus upgrade at sign-in. The parameters themselves stay as in 3.5 until
      measured: version 1 is Argon2id at 64 MiB, t = 3, p = 4.
    - A password change ends every other session and every outstanding reauth proof (the current session stays), and a
@@ -356,7 +356,7 @@ Each phase ships on its own and leaves every account no worse off. There is no w
      memory.
    - A reset whose recovery copy does not open can be finished with a signed "vault unopenable" marker, so a moved
      account is not locked out of its password.
-5. **Phase 4: refuse and delete legacy custody.** One phase, server and client, no waiting period. *Status: implemented in telium #80 (open, not yet merged); the list below is what that pull request does.*
+5. **Phase 4: refuse and delete legacy custody.** One phase, server and client, no waiting period. *Status: merged (telium #80).*
    - **Server:**
      - `put_vault` / `set_vault_mode` accept only `opaque_custody` (`self_custody`, `device_custody` and `escrowed` get
        a 400 with a code);
