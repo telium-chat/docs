@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 (#78) is merged; phases 3 and 4 are not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
+**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 (#78) is merged; phase 3 is in review (telium #79); phase 4 is not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
 
 ## Goal
 
@@ -217,11 +217,13 @@ under AK keep working.
 
 **Recommendation.**
 
-- Add `POST /auth/opaque/password/change`. It takes a reauth proof, the new registration record and the new `P`,
-  with `expected_version`. It updates `accounts.opaque_record` and `key_vault.ciphertext` in one transaction.
+- Add `POST /auth/opaque/password/change/start` and `/finish`. Finish takes a reauth proof, the new registration record and the new `P`,
+  with `expected_version`. It updates `accounts.opaque_record` and `key_vault.ciphertext` in one transaction, and spends the reauth proof in that same transaction.
 - Extend `password_reset_finish` to accept the new `P` and write it in the same transaction. The client can compute
   it because it opens `R` with the recovery key before sending finish, and the new export key exists after
-  `finishRegistration`.
+  `finishRegistration`. `R` reaches the client from `password_reset_start`, which hands it out only against a
+  recovery-key signature over the request. The new `P` and the version it replaces are inside the signature on finish.
+  A reset that would leave an `opaque_custody` vault with a `k1.` copy under the old password is refused (`vault_rewrap_required`).
 - Keep the `loadOnce` re-wrap-from-`R` path as a fallback for resets made by older clients.
 
 Changing the KSF parameters (3.5) is the same operation: re-register at the next sign-in, while the password is in
@@ -295,7 +297,7 @@ stretching function (KSF).
   WebView and low-end browser, and only to a setting that those devices finish in about 1 to 2 s. RFC 9807's 2 GiB is
   not practical in browsers (serenity notes crashes at 2^21).
 - **Changing parameters later** means re-registering at a sign-in, while the password is in hand, and writing the new
-  `P` in that request (3.2). Record the parameter version beside `P` so the client knows which to use.
+  `P` in that request (3.2). The parameter version is recorded in `accounts.opaque_ksf_version`, beside the OPAQUE record that it parameterises, rather than in `key_vault`: the client needs it at login and reset, before it has a session that could read the vault. Version 1 is the memory-constrained set above; the client's `KSF_VERSIONS` table and the server's accepted range grow together.
 - **Legacy copies are weaker, and are deleted.** PBKDF2-SHA256 at 600 000 iterations is cheap on GPUs, and the
   unprefixed self-custody format uses one fixed salt for everyone. Phase 4 deletes them.
 - **The recovery key is 256-bit random** and not guessable.
@@ -330,11 +332,13 @@ Each phase ships on its own and leaves every account no worse off. There is no w
    - "Seal it properly now" (I4) in `startOnce` and after `adoptSecret`.
    - Sign-up does not finish until `R` is confirmed written (3.3). The user's "yes, I saved it" is kept as it is and
      recorded separately.
-4. **Phase 3: atomic re-wrap.** Server and client.
-   - Password-change route.
-   - `password_reset_finish` takes the new `P`.
-   - KSF parameter version beside `P`, plus upgrade at sign-in. The parameters themselves stay as in 3.5 until
-     measured.
+4. **Phase 3: atomic re-wrap.** Server and client. *Status: in review (telium #79).*
+   - Password-change route (`/auth/opaque/password/change/start` and `/finish`), and a Change password section in account settings.
+   - `password_reset_finish` takes the new `P`; the `loadOnce` re-wrap-from-`R` path stays as a fallback.
+   - KSF parameter version (`accounts.opaque_ksf_version`), plus upgrade at sign-in. The parameters themselves stay as in 3.5 until
+     measured: version 1 is Argon2id at 64 MiB, t = 3, p = 4.
+   - A password change leaves other signed-in devices signed in. Their in-memory wrapper is stale, so their next vault
+     write loses the version race instead of overwriting `P`, and they sign in again.
 5. **Phase 4: refuse and delete legacy custody.** One phase, server and client, no waiting period.
    - **Server:**
      - `put_vault` / `set_vault_mode` accept only `opaque_custody` (`self_custody`, `device_custody` and `escrowed` get
