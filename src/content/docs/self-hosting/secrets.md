@@ -47,7 +47,7 @@ The database holds the federation signing key, the OPAQUE setup, the VAPID key a
 | Secret | Location | Rotation |
 |---|---|---|
 | Backup encryption key | `backup.key_file` or `TELIUM_BACKUP_KEY` | See [Backup key](#backup-key). |
-| Per-user escrow keys | `key_vault` | Not operator-rotatable. |
+| Per-user escrow keys (withdrawn) | `key_vault.escrow_key`, `key_vault_legacy_archive` | Emptied by migration 0099 (phase 4, [telium #80](https://github.com/telium-chat/telium/pull/80)); the copy in the archive table is dropped by a later migration. Not operator-rotatable. |
 | Cross-signing sealed secrets | `cross_signing` | Sealed to the user; the server cannot open them. The user re-enrols from a device. |
 
 ### Third-party and peer credentials
