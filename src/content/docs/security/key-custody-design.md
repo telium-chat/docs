@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 is in review (telium #78); phases 3 and 4 are not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
+**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 (#78) is merged; phases 3 and 4 are not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
 
 ## Goal
 
@@ -157,9 +157,9 @@ recoverability.
 
 | # | State | Server | How an account can be in it (verified unless marked) |
 |---|---|---|---|
-| L1 | **Device custody, root throwaway-sealed** | Vault `device_custody`, root `device-v1:` | A restored tab or second tab started before the sign-up tab and created the vault, and the sign-up tab never ran its own start (gate: *two tabs, and the restored one creates the vault…*, **fails today**). An escrowed vault opened without `W_pw` (`lifecycle.js` moves it to `device_custody`). Legacy-auth logins. **L1h:** a device still holds AK and the root. **L1x:** none does, and the account is unrecoverable except by #74 (root) and nothing at all (history). |
-| L2 | **Opaque vault, root throwaway-sealed** | `P` (+`R`), root `device-v1:` | Accounts from before #70: the root was created while `custodyMode()` read `none` and fell back to `device_custody`. **It still arises today:** a device that holds the root restarts while `GET /vault` fails once (a 503). Trust.start then gets no ring key, and `startOnce` re-seals the server's `recovery-v1:` root as `device-v1:` (the `!wantRecovery && !deviceWrapped` branch). Verified by the gate *a device holding the root restarts while the vault read fails…* (**fails today**). A stale custody read has the same effect by the same branch (inferred; the two-tab orderings tested did not hit it). **L2h:** the holder exists. Gate: *…sealed properly once the device holding it restarts* passes; it is the heal from #70. **L2x:** no holder; #74 reset. Gate: *a legacy account whose root is throwaway-sealed and held only by its first device* (**fails, by construction**). |
-| L3 | **Vault only, ring held by nobody** | `P` (+`R`), no root, and the creating tab never kept AK | The tab closed while the first vault write was in flight. `vault.js` remembers the ring only on an *unanswered error*, not on a request that never returns (gate: *the tab is closed while the first vault write is in flight…*, **fails today**). The device that made the account is locked until the password is typed again. A later password sign-in on any device recovers it. |
+| L1 | **Device custody, root throwaway-sealed** | Vault `device_custody`, root `device-v1:` | A restored tab or second tab started before the sign-up tab and created the vault, and the sign-up tab never ran its own start (gate: *two tabs, and the restored one creates the vault…*; passes since phase 1). An escrowed vault opened without `W_pw` (`lifecycle.js` moves it to `device_custody`). Legacy-auth logins. **L1h:** a device still holds AK and the root. **L1x:** none does, and the account is unrecoverable except by #74 (root) and nothing at all (history). |
+| L2 | **Opaque vault, root throwaway-sealed** | `P` (+`R`), root `device-v1:` | Accounts from before #70: the root was created while `custodyMode()` read `none` and fell back to `device_custody`. **It still arises today:** a device that holds the root restarts while `GET /vault` fails once (a 503). Trust.start then gets no ring key, and `startOnce` re-seals the server's `recovery-v1:` root as `device-v1:` (the `!wantRecovery && !deviceWrapped` branch). Phase 1 removed that branch; the gate *a device holding the root restarts while the vault read fails…* passes. A stale custody read has the same effect by the same branch (inferred; the two-tab orderings tested did not hit it). **L2h:** the holder exists. Gate: *…sealed properly once the device holding it restarts* passes; it is the heal from #70. **L2x:** no holder; #74 reset. Gate: *a legacy account whose root is throwaway-sealed and held only by its first device* (**fails, by construction**). |
+| L3 | **Vault only, ring held by nobody** | `P` (+`R`), no root, and the creating tab never kept AK | The tab closed while the first vault write was in flight. `vault.js` remembers the ring only on an *unanswered error*, not on a request that never returns (gate: *the tab is closed while the first vault write is in flight…*; passes since phase 1). The device that made the account is locked until the password is typed again. A later password sign-in on any device recovers it. |
 | L4 | **Recovery key enrolled, copy missing** | `recovery_public_key` set, `independent_ciphertext` NULL | Before #70, a second tab made a `device_custody` vault and the sign-up tab's migration dropped `R`. Also any server that lost or deleted `R`. Settings shows **"Needs reconnecting"** (`api.js` `recovery_copy_missing`). The key still resets the password and the identity, but opens no history. Repair: `restoreRecoveryCopy` (`recovery_copy_finish`). |
 | L5 | **Legacy passphrase second copy** | `P` + `p2.`/unprefixed PBKDF2 copy in `independent_ciphertext` | `self_custody` migrated to opaque carries the old ciphertext forward (`loadOnce`, self_custody branch, `setMode(..., vault.ciphertext)`), or the user set an independent passphrase. Blocks recovery-key enrollment until removed. |
 | L6 | **Self custody** | Vault `self_custody` | Legacy. Migrates to opaque (+L5) on the first `W_pw` session that holds the ring or the passphrase. |
@@ -262,7 +262,7 @@ it and deletes the code and columns in the same change. Existing accounts in a l
 |---|---|
 | L7 escrowed, L6 self custody, L5 passphrase copy | Refused and deleted in phase 4, including `escrow_key` and any remaining PBKDF2 `independent_ciphertext`. |
 | L4 copy missing | Exists: "Needs reconnecting" then `restoreRecoveryCopy`. Stays, because it is the repair for a lost `R`. |
-| L1h / L2h root `device-v1:`, held | **"Seal it properly now"** (I4) in phase 2: if the held root binds and AK is known, re-seal as `recovery-v1:`. Works token-only. |
+| L1h / L2h root `device-v1:`, held | **"Seal it properly now"** (I4) in phase 2: if the held root binds and AK is known, re-seal as `recovery-v1:`. Works token-only when the vault mode is opaque or self custody. **L1h (vault `device_custody`) is not healed in phase 2:** phase 4 handles it. The exception is `onRecoveryAdopted` with the password in hand, which converts the vault to `opaque_custody` first and then seals. |
 | L1x / L2x root held by no device | #74 reset with the recovery key, sealed under AK. With no recovery key either, the user creates a new account. |
 | L3 ring held by nobody, no root | Any `W_pw` sign-in recovers it (T1 to T2). |
 
@@ -308,7 +308,7 @@ stretching function (KSF).
 
 Each phase ships on its own and leaves every account no worse off. There is no waiting period between phases.
 
-1. **Phase 0: the design and the gate.** This page, and the gate `fresh-device-login.test.js` (8 pass, 4 `it.fails`).
+1. **Phase 0: the design and the gate.** This page, and the gate `fresh-device-login.test.js` (at phase 0: 8 pass, 4 `it.fails`; after phase 1: 11 pass, 1 `it.fails`).
 2. **Phase 1: stop creating broken states.** Client only. *Status: merged (#76).*
    - `signIn` creates the vault and root before `save()` (I1).
    - Keep AK locally before the vault create (I6).
@@ -326,7 +326,7 @@ Each phase ships on its own and leaves every account no worse off. There is no w
 
      Their `it.fails` markers come off. The fourth gate (a throwaway-sealed root held by a device that never runs
      again) stays `it.fails`: only phase 4 and a #74 reset deal with it.
-3. **Phase 2: heal held roots and finish sign-up.** Client only. *Status: in review (#78).* One limit: the `startOnce` re-seal still runs only when the vault mode is opaque or self custody; a held `device-v1:` root in a `device_custody` vault (L1h) is left for phase 4.
+3. **Phase 2: heal held roots and finish sign-up.** Client only. *Status: merged (#78).* One limit: both the `startOnce` re-seal and `sealRootProperly` apply the same mode check (`ringIsAccountKey` in `web/src/lib/verify.js`), so they run only when the vault mode is opaque or self custody. A held `device-v1:` root in a `device_custody` vault (L1h) on a token-only device is left for phase 4. `onRecoveryAdopted` does heal L1h when the password is in hand: it converts the vault to `opaque_custody` first, then seals.
    - "Seal it properly now" (I4) in `startOnce` and after `adoptSecret`.
    - Sign-up does not finish until `R` is confirmed written (3.3). The user's "yes, I saved it" is kept as it is and
      recorded separately.
