@@ -101,6 +101,7 @@ export default defineConfig({
             { slug: 'security/network-privacy' },
             { slug: 'security/sync-encryption' },
             { slug: 'security/identity-continuity' },
+            { slug: 'security/key-custody-design', label: 'Key custody design' },
             { slug: 'security/threat-model' },
           ],
         },
