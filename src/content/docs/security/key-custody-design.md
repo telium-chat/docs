@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-**Status: design proposal.** Nothing on this page changes behaviour yet. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
+**Status: design, being implemented in phases.** Phase 0 (the gate, #75) and phase 1 (#76) are merged; phase 2 is in review (telium #78); phases 3 and 4 are not started. Sections below describe the target; where a state is marked as fixed today it names the phase. The release gate it argues from is `web/src/test/fresh-device-login.test.js` in [telium-chat/telium](https://github.com/telium-chat/telium) (added in the custody-design pull request, #75), which runs against the built `telium-server`. For what users see today, read [DM encryption](/security/dm-encryption/#key-custody) and [Account security](/security/account-security/).
 
 ## Goal
 
@@ -309,7 +309,7 @@ stretching function (KSF).
 Each phase ships on its own and leaves every account no worse off. There is no waiting period between phases.
 
 1. **Phase 0: the design and the gate.** This page, and the gate `fresh-device-login.test.js` (8 pass, 4 `it.fails`).
-2. **Phase 1: stop creating broken states.** Client only.
+2. **Phase 1: stop creating broken states.** Client only. *Status: merged (#76).*
    - `signIn` creates the vault and root before `save()` (I1).
    - Keep AK locally before the vault create (I6).
    - A start without `W_pw` never creates a vault: the `loadOnce` throwaway branch becomes "locked, needs_password".
@@ -326,7 +326,7 @@ Each phase ships on its own and leaves every account no worse off. There is no w
 
      Their `it.fails` markers come off. The fourth gate (a throwaway-sealed root held by a device that never runs
      again) stays `it.fails`: only phase 4 and a #74 reset deal with it.
-3. **Phase 2: heal held roots and finish sign-up.** Client only.
+3. **Phase 2: heal held roots and finish sign-up.** Client only. *Status: in review (#78).* One limit: the `startOnce` re-seal still runs only when the vault mode is opaque or self custody; a held `device-v1:` root in a `device_custody` vault (L1h) is left for phase 4.
    - "Seal it properly now" (I4) in `startOnce` and after `adoptSecret`.
    - Sign-up does not finish until `R` is confirmed written (3.3). The user's "yes, I saved it" is kept as it is and
      recorded separately.
