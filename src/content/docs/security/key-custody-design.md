@@ -282,7 +282,7 @@ stretching function (KSF).
 
 - **Where the KSF runs.** On the client, not the server. In `opaque-ke` 4.0.1 the KSF is applied in exactly two
   places, `ClientRegistration::finish` and `ClientLogin::finish` (`get_password_derived_key`); `ServerLogin` and
-  `ServerRegistration` never call it. The `type Ksf = argon2::Argon2` in `server/src/routes/opaque.rs` only fixes the
+  `ServerRegistration` never call it. Nothing in the server crate (`server/src`) runs the client role either; only its integration tests do. The `type Ksf = argon2::Argon2` in `server/src/routes/opaque.rs` only fixes the
   cipher-suite type and does not run on the server. So the memory and time cost is paid by the **slowest client
   device** (an older phone in a browser or WebView), not by the host. A Raspberry Pi 3 homeserver (1 GB RAM) is not
   constrained by it. The attacker pays the same cost per guess, on their own hardware, which is why the parameter
