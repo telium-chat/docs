@@ -36,8 +36,8 @@ bash /tmp/telium-native-setup.sh
 
 The installer will not accept placeholder domains such as `chat.example.com`.
 
-:::tip[Point DNS first]
-If you want the installer to set up HTTPS for you (it uses Caddy on Debian/Ubuntu), add the DNS `A` record for your domain, pointing at this machine's public IP, **before** you start. The installer checks it at the very beginning and tells you if it doesn't match, so you can fix it before anything is installed. Ports 80 and 443 must also be open.
+:::note[HTTPS and DNS]
+If you choose automatic HTTPS (Caddy, on Debian/Ubuntu), the installer sets Caddy up right away and ports 80 and 443 must be open. HTTPS starts working once you add the DNS `A` record for your domain, which the last step of the installer tells you to do. Caddy gets the certificate by itself after that.
 :::
 
 The bootstrap automatically uses `sudo` for ordinary users when available; if you're already root, no `sudo` command is needed. When neither `sudo` nor root privileges are available, ask the machine's administrator for access. If both `curl` and `wget` are missing on Debian/Ubuntu, run `apt-get update && apt-get install -y curl ca-certificates` **as root**, then use the first command above. Missing packages like `tar` and `sha256sum` are installed by the bootstrap on Debian/Ubuntu.
