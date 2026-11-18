@@ -34,7 +34,7 @@ wget -qO /tmp/telium-native-setup.sh https://raw.githubusercontent.com/telium-ch
 bash /tmp/telium-native-setup.sh
 ```
 
-To skip the question (for unattended installs), pass the domain as an argument: `bash /tmp/telium-native-setup.sh chat.yourdomain.com`. The installer refuses placeholder domains such as `chat.example.com`.
+The installer will not accept placeholder domains such as `chat.example.com`.
 
 :::tip[Point DNS first]
 If you want the installer to set up HTTPS for you (it uses Caddy on Debian/Ubuntu), add the DNS `A` record for your domain, pointing at this machine's public IP, **before** you start. The installer checks it at the very beginning and tells you if it doesn't match, so you can fix it before anything is installed. Ports 80 and 443 must also be open.
