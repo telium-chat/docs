@@ -20,18 +20,18 @@ You can keep your existing website at `example.com` (on any hosting provider), r
 
 ## Quick install (no Git needed)
 
-From **any directory**, download the small bootstrap script and launch it with the domain:
+From **any directory**, download the small bootstrap script and run it. It asks which domain to use, so there is nothing to edit first:
 
 ```sh
 curl -fsSLo /tmp/telium-native-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-native.sh
-bash /tmp/telium-native-setup.sh chat.example.com
+bash /tmp/telium-native-setup.sh
 ```
 
 If you don't have `curl`, use `wget` for the download instead:
 
 ```sh
 wget -qO /tmp/telium-native-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-native.sh
-bash /tmp/telium-native-setup.sh chat.example.com
+bash /tmp/telium-native-setup.sh
 ```
 
 The bootstrap automatically uses `sudo` for ordinary users when available; if you're already root, no `sudo` command is needed. When neither `sudo` nor root privileges are available, ask the machine's administrator for access. If both `curl` and `wget` are missing on Debian/Ubuntu, run `apt-get update && apt-get install -y curl ca-certificates` **as root**, then use the first command above. Missing packages like `tar` and `sha256sum` are installed by the bootstrap on Debian/Ubuntu.
@@ -40,7 +40,7 @@ The bootstrap automatically uses `sudo` for ordinary users when available; if yo
 The bootstrap is [open-source shell code](https://github.com/telium-chat/telium/blob/main/deploy/bootstrap-native.sh). You can read the saved `/tmp/telium-native-setup.sh` file before executing it.
 :::
 
-The script downloads the current release from the rolling `server-latest` tag, checks it against the sha256 the release publishes, creates the `telium` user and its directories, writes `/etc/telium/telium.toml` from your domain, installs the unit and the update timer, and starts the server. It prints the three things only a human can do: DNS, TLS, and registering your account.
+The script downloads the current release from the rolling `server-latest` tag, checks it against the sha256 the release publishes, creates the `telium` user and its directories, writes `/etc/telium/telium.toml` from your domain, installs the unit and the update timer, and starts the server. If you chose automatic HTTPS it sets that up too. At the end it lists whatever is still left for you, which can include DNS, HTTPS, creating your account and making it the server admin. If HTTPS setup fails, it says so and shows how to re-run just that step.
 
 It is safe to run again. The installer preserves your server identity, configuration, data, and backup settings. It installs the updater and lets that updater manage binary upgrades and safe restarts.
 
