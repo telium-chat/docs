@@ -266,20 +266,39 @@ To find the dashboard's first-run URL, run `docker compose logs sfu | grep FIRST
 
 ## Using your website domain for accounts
 
-Want your website at `example.com` (on any hosting provider), but your Telium server at `chat.example.com`? Your account addresses can still be `@you:example.com`.
+Want your website at `example.com` (on any hosting provider), but your Telium server at `chat.example.com`? Your account addresses can still be `@you:example.com`. The server runs in Compose as usual; the only addition is a one-line `telium.txt` file on your website that tells clients where the server is.
 
-1. **Before registering any accounts**, add the account domain to `.env`, leaving `TELIUM_DOMAIN` as the chat hostname:
+1. **Before registering any accounts**, set both names in `.env`. `TELIUM_DOMAIN` stays the hostname the server is reached at, and `TELIUM_SERVER_NAME` is the domain in account IDs:
 
    ```sh
    TELIUM_DOMAIN=chat.example.com
    TELIUM_SERVER_NAME=example.com
    ```
 
-   Then run `docker compose up -d`.
+   Then run `docker compose up -d`. The server's config becomes `server_name = "example.com"` and `public_base_url = "https://chat.example.com"`, the same two lines a native install edits by hand.
 
-2. Set up DNS and HTTPS so that **`chat.example.com`** reaches this box. Keep **`example.com`** pointed at your website host.
-3. Check `https://chat.example.com/.well-known/telium/server`: it should announce `server_name` `example.com`.
-4. Put a one-line **`telium.txt`** file on your website with `chat.example.com` inside it, so clients entering `example.com` can find the server. Follow the [website-domain setup guide](/self-hosting/domain-delegation/).
+2. Point DNS for **`chat.example.com`** at this box and your reverse proxy at `127.0.0.1:8448`, as in [Put HTTPS in front](#put-https-in-front). Keep **`example.com`** pointed at your website host, not at this box.
+
+3. Create a file named **`telium.txt`** containing one line, the hostname from `TELIUM_DOMAIN`:
+
+   ```text
+   chat.example.com
+   ```
+
+4. Publish it at the root of your website, beside its homepage, so that `https://example.com/telium.txt` shows that line. Upload it with your host's file manager, FTP, or your site's `public/` folder; the [website-domain guide](/self-hosting/domain-delegation/#step-3-put-it-on-your-website) has steps for common hosts. The file lives on the website, not in Docker.
+
+5. Check both ends from another machine:
+
+   ```sh
+   curl -i -H 'Origin: https://telium.chat' https://example.com/telium.txt
+   curl -fsS https://chat.example.com/.well-known/telium/server
+   ```
+
+   The first should answer `200` with your hostname and an `Access-Control-Allow-Origin` header; without that header, browsers cannot read the file (see [if the file loads but Telium cannot read it](/self-hosting/domain-delegation/#if-the-file-loads-in-a-browser-but-telium-cannot-read-it)). The second is the server's own discovery document, which clients fetch after reading `telium.txt`. It should show `"server_name": "example.com"`. Nothing needs to be published at that path on your website.
+
+6. Open [telium.chat](https://telium.chat), enter **`example.com`** as your server, and register (with the setup code, on a closed server). Your address is `@you:example.com`. Then [make the account the admin](#create-your-account-and-make-it-the-admin) as usual.
+
+The file stays the same when the server updates, so the updater never needs to touch your website. If you list a [public server](/self-hosting/public-server/), submit `example.com`, not `chat.example.com`.
 
 **Do not change `TELIUM_SERVER_NAME` on an established server.** It is part of every account ID. [Why the account domain matters](/self-hosting/domain-delegation/#how-it-works).
 

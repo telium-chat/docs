@@ -7,10 +7,6 @@ Have a website at `example.com`, but want to run Telium at `chat.example.com` an
 
 **The simple way is to put one text file on your existing website.** You don't need to move the site, create a DNS record, learn JSON, or copy your server's cryptographic keys.
 
-:::caution[Feature rollout]
-The `/telium.txt` method requires Telium versions that include the new text-file discovery feature. Until that code has been merged and released, use the [existing `.well-known` method](#existing-well-known-method) instead. This page is the guide for the upcoming simpler setup.
-:::
-
 ## How it works
 
 | | Example | Purpose |
@@ -21,10 +17,9 @@ The `/telium.txt` method requires Telium versions that include the new text-file
 
 When Telium discovers `example.com`:
 
-1. It checks the existing `/.well-known/telium/server` route for compatibility with older setups.
-2. If no usable document is there, it reads the `telium.txt` file on your website.
-3. It then fetches **the full, live** `/.well-known/telium/server` response from `chat.example.com`.
-4. It verifies the server identifies itself as `example.com` before connecting.
+1. It reads the `telium.txt` file on your website.
+2. It then fetches **the full, live** discovery document from `chat.example.com`.
+3. It verifies the server identifies itself as `example.com` before connecting.
 
 **The website file stays the same** when the server rotates keys, changes capabilities, or updates its public settings. You aren't maintaining a second copy of the server's discovery information.
 
@@ -106,7 +101,7 @@ This approach also works with Netlify, Vercel or other static hosts that preserv
 
 Find a way to publish a normal, publicly readable text file at `/telium.txt`. Some website builders have a file manager or custom static-asset feature; others cannot serve arbitrary paths.
 
-If your provider can't publish a file at that URL, use a hosting feature that serves a custom route, or the [older `.well-known` approach](#existing-well-known-method) if that is supported. There is no magic DNS setting that makes a missing file appear.
+If your provider can't publish a file at that URL, use a hosting feature that serves a custom route. There is no magic DNS setting that makes a missing file appear.
 
 ## Step 4: Verify and sign up
 
@@ -157,25 +152,5 @@ The response should include `Access-Control-Allow-Origin: *` (or a specific allo
 - Don't write a path, username/password, query string, or multiple lines. The file contains one server hostname.
 - The backend's live discovery must claim `server_name = "example.com"`, and its published API address must match the pointer.
 - The file is **not an HTTP 301/302 redirect**. It contains a hostname Telium can validate.
-- The new method does not replace the Telium server's own `/.well-known/telium/server` endpoint. That stays on the actual server to provide live metadata.
-
-## Existing .well-known method
-
-For deployments using older Telium versions or those that prefer fully explicit control, you can still publish `https://example.com/.well-known/telium/server` on the account domain. The full server's JSON document can be served directly there or reverse-proxied from the backend.
-
-The simplest backwards-compatible static example is:
-
-```json
-{
-  "server_name": "example.com",
-  "api": "https://chat.example.com",
-  "gateway": "wss://chat.example.com/gateway/v1",
-  "protocol_version": "v1"
-}
-```
-
-Publish it as an extensionless file at `.well-known/telium/server` with the appropriate `application/json` content type. That is the **old method**, not a required extra step when `telium.txt` discovery is available.
-
-**Important:** If you publish both, the existing `.well-known` JSON has priority. Remove the old file if you want the new text pointer to be used.
 
 **Next:** [Run a public homeserver](/self-hosting/public-server/) to configure media upload limits, retention, registration and directory listing.
