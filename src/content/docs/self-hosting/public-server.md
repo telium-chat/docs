@@ -30,7 +30,7 @@ Plan for the following before asking strangers to sign up:
 open = false
 ```
 
-On a native install edit `/etc/telium/telium.toml`; with the production Compose kits edit `/opt/telium/telium.toml`. Apply changes using your installation's restart or redeploy procedure. Closing registration does not disable existing accounts.
+On a native install edit `/etc/telium/telium.toml`; with the [Compose install](/self-hosting/install-docker/) set `TELIUM_REGISTRATION` in `.env` or edit `TELIUM_CONFIG` in `compose.yml`; with the older `/opt/telium` kits edit `/opt/telium/telium.toml`. Apply changes using your installation's restart or redeploy procedure. Closing registration does not disable existing accounts.
 
 ## 2. Set file sizes, quotas and retention
 

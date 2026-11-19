@@ -90,7 +90,7 @@ The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted ser
 
 To run a relay **without installing a Telium homeserver**, follow [Standalone SFU with Docker](/self-hosting/sfu-docker/). It runs `telium-sfu` and LiveKit in one container.
 
-If you are **also setting up a Telium homeserver**, the [homeserver Compose installer](/self-hosting/install-docker/) offers an option to run an SFU alongside it. This is a different installer, because a homeserver and an SFU do different jobs.
+If you are **also setting up a Telium homeserver**, the [homeserver Compose file](/self-hosting/install-docker/#voice-calls-on-your-own-sfu) can run an SFU alongside it through its `voice` profile. This is a different setup from the standalone relay, because a homeserver and an SFU do different jobs.
 
 For either Docker deployment, `livekit.rtc.use_external_ip` must be `true` behind Docker NAT, and the corresponding media ports must be open on the host. In public mode the SFU discovers guild-server keys as needed; private relays use configured trust origins.
 

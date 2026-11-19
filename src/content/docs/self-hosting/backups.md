@@ -212,6 +212,14 @@ docker compose -f /opt/telium/compose.yml start server
 
 The entrypoint already passes `--config`. `--no-deps` keeps the tunnel container down.
 
+With the [Compose install](/self-hosting/install-docker/), run these from the directory holding `compose.yml`. Stop the updater as well, so it cannot start the server again in the middle of the restore:
+
+```sh
+docker compose stop updater server
+docker compose run --rm --no-deps server restore latest --yes
+docker compose start server updater
+```
+
 ### Onto a new machine
 
 1. Install `telium-server` and write a config with the same `server_name`.

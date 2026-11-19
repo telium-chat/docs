@@ -119,11 +119,19 @@ journalctl -u telium-update.service -n 50   # what each run did
 
 On the container path `--now` does not bypass the update window. Old images are pruned after a week, so pin an older digest within that time for a quick rollback.
 
-### Standalone Compose
+### Compose kit
 
-The [standalone kit](/self-hosting/install-docker/) ships the third updater, and the installer enables it before it prints anything else: `update.sh` and `telium-update.timer` in `/opt/telium`. It reads the same `update.conf` fields as the container updater — automatic or manual, a pin, a window — and applies them to the whole project, so the server and, when the voice profile is on, the SFU image move together on one release.
+The [Compose install](/self-hosting/install-docker/) runs its updater as a container in the same project, so there is no timer or script on the host. Its settings are the same fields as `update.conf`, written as lines in the project's `.env` instead: `TELIUM_UPDATES`, `TELIUM_PIN`, `TELIUM_PIN_REASON`, `TELIUM_UPDATE_WINDOW` (in **UTC**, because the container has no time zone data) and `TELIUM_RESTART_NOTICE_SECS`. It updates every running service of the project, so the server and, when the voice profile is on, the SFU move together on one release.
 
-What it does not do is reconcile shipped config files. A release that changes the kit's `compose.yml` or its like says so in its notes: re-run the installer, which upgrades the scripts and units and leaves every file you could have edited alone.
+Before each run it copies its logic out of the running server image, so each release brings its own updater with it. It never recreates its own container. It does not rewrite your `compose.yml`; a release that changes the kit's file says so in its notes.
+
+```sh
+docker compose exec updater telium-update --status   # mode, pin, window, anything waiting
+docker compose exec updater telium-update --now      # take a held release, without the notice
+docker compose logs updater                          # what each run did
+```
+
+Boxes installed with the older standalone installer (`/opt/telium`, `telium-update.timer`) keep that timer-driven updater, configured in `/opt/telium/update.conf`.
 
 ### Native updater
 
