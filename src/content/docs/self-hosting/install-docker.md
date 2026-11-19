@@ -28,15 +28,20 @@ curl -fsSLO https://raw.githubusercontent.com/telium-chat/telium/main/deploy/com
 curl -fsSLo .env https://raw.githubusercontent.com/telium-chat/telium/main/deploy/compose/.env.example
 ```
 
-Open `.env` in any editor. Only two lines are required, and they are at the top:
+**Before starting anything, open `.env` in any editor and fill in the two required lines at the top.** They ship empty, and Compose refuses to start until both have a value:
 
 ```sh
-# The hostname clients connect to, through your reverse proxy.
+# The hostname clients connect to, through your reverse proxy,
+# for example: TELIUM_DOMAIN=chat.example.com
 TELIUM_DOMAIN=chat.example.com
 
 # Who may sign up: closed (only people with a registration code) or open.
 TELIUM_REGISTRATION=closed
 ```
+
+:::caution[Decide the account domain now]
+The first start sets the server's identity. `TELIUM_DOMAIN` (or `TELIUM_SERVER_NAME`, if you use [your website domain for accounts](#using-your-website-domain-for-accounts)) becomes part of every account ID, and it cannot change once accounts exist. The storage suggestions are also worked out on the first start. Everything else can be changed later in the same `.env`.
+:::
 
 Then start it:
 
@@ -44,7 +49,7 @@ Then start it:
 docker compose up -d
 ```
 
-Every other setting in the template is commented out and described above its line; uncomment one to change it. They are the same settings as the tables below. Put comments on their own lines: in a `.env` file, text after a value becomes part of the value. If you would rather keep everything in one file, write the values into `compose.yml` in place of its `${…}` defaults instead.
+Every other setting in the template is commented out and described above its line; uncomment one to change it, now or later. `.env` stays the place for settings: the server rebuilds its `telium.toml` from it on every start, so you never edit `telium.toml` itself (see [Changing settings](#changing-settings-and-running-server-commands)). They are the same settings as the tables below. Put comments on their own lines: in a `.env` file, text after a value becomes part of the value. If you would rather keep everything in one file, write the values into `compose.yml` in place of its `${…}` defaults instead.
 
 If either required line is missing, Compose stops with a message naming it.
 
