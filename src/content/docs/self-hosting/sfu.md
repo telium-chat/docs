@@ -62,15 +62,14 @@ The homeserver stays the authority. The SFU verifies the homeserver's signature 
 
 ## Install with the script
 
-On a Debian or Ubuntu host, clone Telium and run the SFU-specific installer (not the homeserver installer):
+On a Debian or Ubuntu host, download the SFU bootstrap script and run it (not the homeserver installer). No git checkout is needed:
 
 ```sh
-git clone https://github.com/telium-chat/telium.git
-cd telium
-sudo bash sfu/install.sh
+curl -fsSLo /tmp/telium-sfu-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-sfu.sh
+sudo bash /tmp/telium-sfu-setup.sh
 ```
 
-It installs nginx, Certbot, Rust if needed, `livekit-server` and `telium-sfu`, creates a `telium-sfu` system user and service, and opens the ports above when UFW is active. It then prints a one-time setup URL. In the browser you set the admin password, enter the SFU and LiveKit signalling hostnames, choose public or private mode, and the dashboard configures nginx and Let's Encrypt.
+It installs nginx, Certbot, `livekit-server` and the `telium-sfu` release binary (checksum-verified, nothing is compiled), creates a `telium-sfu` system user and service, and opens the ports above when UFW is active. It then prints a one-time setup URL. In the browser you set the admin password, enter the SFU and LiveKit signalling hostnames, choose public or private mode, and the dashboard configures nginx and Let's Encrypt.
 
 The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted servers** (`/admin/trust`) you add a homeserver by its `server_name`. The SFU discovers it, verifies its key and starts accepting its tokens without a restart. Removing one stops new sessions from it; calls already connected are left alone.
 
