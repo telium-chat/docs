@@ -152,6 +152,5 @@ The response should include `Access-Control-Allow-Origin: *` (or a specific allo
 - Don't write a path, username/password, query string, or multiple lines. The file contains one server hostname.
 - The backend's live discovery must claim `server_name = "example.com"`, and its published API address must match the pointer.
 - The file is **not an HTTP 301/302 redirect**. It contains a hostname Telium can validate.
-- An old `/.well-known/telium/server` file on your **website** from an earlier setup takes priority over `telium.txt`. Delete it.
 
 **Next:** [Run a public homeserver](/self-hosting/public-server/) to configure media upload limits, retention, registration and directory listing.
