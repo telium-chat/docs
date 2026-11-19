@@ -49,6 +49,12 @@ Then start it:
 docker compose up -d
 ```
 
+**On a closed server you need a code to sign up, including for your own account.** Get the one-time setup code from the box once the server is running. [Create your account](#create-your-account-and-make-it-the-admin) has the full steps:
+
+```sh
+docker compose exec server telium-server registration-code bootstrap
+```
+
 Every other setting in the template is commented out and described above its line; uncomment one to change it, now or later. `.env` stays the place for settings: the server rebuilds its `telium.toml` from it on every start, so you never edit `telium.toml` itself (see [Changing settings](#changing-settings-and-running-server-commands)). They are the same settings as the tables below. Put comments on their own lines: in a `.env` file, text after a value becomes part of the value. If you would rather keep everything in one file, write the values into `compose.yml` in place of its `${…}` defaults instead.
 
 If either required line is missing, Compose stops with a message naming it.
