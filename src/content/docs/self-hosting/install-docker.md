@@ -1,6 +1,6 @@
 ---
 title: Install with Compose
-description: One compose.yml and a two-line .env, from nothing to a homeserver that keeps itself up to date.
+description: One compose.yml and a .env template with two required lines, from nothing to a homeserver that keeps itself up to date.
 sidebar:
   order: 3
 ---
@@ -21,16 +21,20 @@ You can keep your existing website at `example.com` (on any hosting provider), r
 
 ## Quick install
 
-From an empty directory, for example `~/telium`:
+From an empty directory, for example `~/telium`, download the Compose file and the settings template. The template is saved as `.env`:
 
 ```sh
 curl -fsSLO https://raw.githubusercontent.com/telium-chat/telium/main/deploy/compose/compose.yml
+curl -fsSLo .env https://raw.githubusercontent.com/telium-chat/telium/main/deploy/compose/.env.example
 ```
 
-Create a `.env` file beside it with your two answers:
+Open `.env` in any editor. Only two lines are required, and they are at the top:
 
 ```sh
+# The hostname clients connect to, through your reverse proxy.
 TELIUM_DOMAIN=chat.example.com
+
+# Who may sign up: closed (only people with a registration code) or open.
 TELIUM_REGISTRATION=closed
 ```
 
@@ -40,7 +44,9 @@ Then start it:
 docker compose up -d
 ```
 
-`TELIUM_DOMAIN` is the hostname clients connect to. `TELIUM_REGISTRATION` is `closed` (only people with a registration code can sign up) or `open` (anyone can). If either is missing, Compose stops with a message naming it.
+Every other setting in the template is commented out and described above its line; uncomment one to change it. They are the same settings as the tables below. Put comments on their own lines: in a `.env` file, text after a value becomes part of the value. If you would rather keep everything in one file, write the values into `compose.yml` in place of its `${…}` defaults instead.
+
+If either required line is missing, Compose stops with a message naming it.
 
 That starts two containers:
 
@@ -57,7 +63,7 @@ That starts two containers:
 
 ### Storage and backup settings
 
-The native installer asks about uploads and backups. Here those answers are optional lines in `.env`, with the same names. Leave a line out to accept the suggestion.
+The native installer asks about uploads and backups. Here those answers are the optional lines in `.env`, with the same names. Leave a line commented out to accept the suggestion.
 
 | Setting | Suggestion | What it is |
 |---|---|---|
