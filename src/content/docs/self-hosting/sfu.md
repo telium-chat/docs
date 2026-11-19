@@ -62,15 +62,27 @@ The homeserver stays the authority. The SFU verifies the homeserver's signature 
 
 ## Install with the script
 
-On a Debian or Ubuntu host, clone Telium and run the SFU-specific installer (not the homeserver installer):
+On a Debian or Ubuntu host, download the SFU bootstrap script and run it (not the homeserver installer). No git checkout is needed:
 
 ```sh
-git clone https://github.com/telium-chat/telium.git
-cd telium
-sudo bash sfu/install.sh
+curl -fsSLo /tmp/telium-sfu-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-sfu.sh
+sudo bash /tmp/telium-sfu-setup.sh
 ```
 
-It installs nginx, Certbot, Rust if needed, `livekit-server` and `telium-sfu`, creates a `telium-sfu` system user and service, and opens the ports above when UFW is active. It then prints a one-time setup URL. In the browser you set the admin password, enter the SFU and LiveKit signalling hostnames, choose public or private mode, and the dashboard configures nginx and Let's Encrypt.
+The script starts a local-only browser installer and prints a one-time URL with a random token. Over SSH, forward the printed port (`ssh -L PORT:127.0.0.1:PORT user@server`) and open the URL on localhost. Nothing is installed until you choose an option there.
+
+Choose **Full installation** to let Telium set up HTTPS, or **Portable** to use a reverse proxy you already manage. For a full installation the installer looks at what is already on the machine and offers only what fits. It shows what each option changes before you confirm:
+
+| Found on the host | What Telium does |
+| --- | --- |
+| Nothing on ports 80/443 | Installs Caddy, which gets the certificates itself (the same as the homeserver installer). |
+| Caddy | Leaves your Caddy configuration alone and adds one file, `/etc/caddy/telium-sfu.caddy`. Adding a single `import` line to your Caddyfile needs a separate confirmation; a backup is saved first and the change is undone if Caddy rejects it. |
+| nginx | Leaves nginx and all your sites alone, including the default site. Adds one server file for the two SFU hostnames and uses Certbot for certificates for those two names only. |
+| Another program on 80/443 | Full installation is not offered. Use the portable installation with your own reverse proxy. |
+
+Either way it downloads the checksum-verified `telium-sfu` release binary and `livekit-server` (nothing is compiled), creates a `telium-sfu` system user and service, enables automatic updates, and opens the ports above when UFW is active.
+
+When it finishes it prints a one-time setup URL. On a fresh Caddy install that URL uses the server's address. If you use an existing Caddy or nginx, your proxy is not touched before you enter the domains, so reach the setup page through an SSH tunnel to port 7891 (`ssh -L 7891:127.0.0.1:7891 user@server`) and open the printed URL with `localhost`. In the browser you set the admin password, enter the SFU and LiveKit signalling hostnames, and choose public or private mode. The dashboard then adds the two sites to your proxy and gets the certificates.
 
 The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted servers** (`/admin/trust`) you add a homeserver by its `server_name`. The SFU discovers it, verifies its key and starts accepting its tokens without a restart. Removing one stops new sessions from it; calls already connected are left alone.
 
