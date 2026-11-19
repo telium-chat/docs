@@ -33,7 +33,7 @@ Edit the `telium.toml` file created by your installation:
 | Installation | Config file |
 | --- | --- |
 | [Native / systemd](/self-hosting/install-systemd/) | `/etc/telium/telium.toml` |
-| [Docker Compose](/self-hosting/install-docker/) | `/opt/telium/telium.toml` |
+| [Docker Compose](/self-hosting/install-docker/) | the `TELIUM_CONFIG` block in `compose.yml` ([details](/self-hosting/install-docker/#changing-settings-and-running-server-commands)) |
 | [Docker Compose + Cloudflare Tunnel](/self-hosting/install-docker-tunnel/) | `/opt/telium/telium.toml` |
 
 Find or add the following sections, replacing the example values **with your provider's real values**:
@@ -75,7 +75,7 @@ sudo systemctl restart telium-server
 sudo systemctl status telium-server
 ```
 
-For a Compose installation (with or without a tunnel), save `/opt/telium/telium.toml` and recreate just the server container:
+For the [Compose install](/self-hosting/install-docker/), add the sections to `TELIUM_CONFIG` in `compose.yml`, put the two credential variables in `.env` and in the server's `environment:` list, and run `docker compose up -d`. For the tunnel kit or an older `/opt/telium` install, save `/opt/telium/telium.toml` and recreate just the server container:
 
 ```sh
 cd /opt/telium

@@ -20,7 +20,7 @@ If you have not installed a server yet, start with [Running in production](/self
   open = false
   ```
 
-  Save `telium.toml` and restart the server. Native installations use `/etc/telium/telium.toml`; the Compose kits use `/opt/telium/telium.toml`. Leave registration open only if you intend to accept new accounts. Closing it does **not** remove existing accounts.
+  Save `telium.toml` and restart the server. Native installations use `/etc/telium/telium.toml`; the Compose install sets it with `TELIUM_REGISTRATION` in `.env` (then `docker compose up -d`); the older `/opt/telium` kits use `/opt/telium/telium.toml`. Leave registration open only if you intend to accept new accounts. Closing it does **not** remove existing accounts.
 
 - [ ] **Try the client.** Sign in, create a guild (a community with text and voice channels), post a message, and invite a second test account. You can use the hosted client; you do **not** need to host a web app.
 
@@ -48,7 +48,8 @@ Both supported production installs enable an updater by default. **Do not assume
 | Install | Check it |
 | --- | --- |
 | Native systemd | `systemctl status telium-update-native.timer` and `update-native.sh --status` |
-| Compose | `systemctl status telium-update.timer` and `/opt/telium/update.sh --status` |
+| Compose | `docker compose exec updater telium-update --status` and `docker compose logs updater` |
+| Compose (older `/opt/telium` installs) | `systemctl status telium-update.timer` and `/opt/telium/update.sh --status` |
 
 Your update policy, pins and maintenance windows are in [Updates](/self-hosting/updates/). Since Telium is [alpha](/start/stability/), protocol changes can require coordinated updates. Investigate anything held for manual intervention instead of letting the installation drift.
 
