@@ -72,7 +72,7 @@ The native installer asks about uploads and backups. Here those answers are opti
 | `TELIUM_BACKUP_KEEP` | `2` | How many backups to keep |
 | `TELIUM_BACKUP_FREE_RESERVE` | ⅒ of the backup disk | Skip a backup that would leave less than this free |
 
-The disk suggestions use the same proportions as the native installer, measured from the size of the disk that holds Docker's volumes. Open and closed registration start from different retention and backup suggestions, for the reasons on the [native page](/self-hosting/install-systemd/#storage-and-backup-questions). If backups leave attachments out, those files cannot be restored after a disk failure; read [choosing what media to back up](/self-hosting/backups/#choosing-what-media-to-back-up). Either way, these archives are on the same machine: save the backup key elsewhere and set up [an off-site destination](/self-hosting/backups/#copying-archives-off-the-machine).
+The disk suggestions use the same proportions as the native installer, measured from the size of the disk that holds Docker's volumes. Open and closed registration start from different retention and backup suggestions, for the reasons on the [native page](/self-hosting/install-systemd/#storage-and-backup-questions). Like the installer's answers, the suggestions are worked out on the first start and then kept, so opening a closed server later does not start deleting its old attachments. To change one later, set its line in `.env`. If backups leave attachments out, those files cannot be restored after a disk failure; read [choosing what media to back up](/self-hosting/backups/#choosing-what-media-to-back-up). Either way, these archives are on the same machine: save the backup key elsewhere and set up [an off-site destination](/self-hosting/backups/#copying-archives-off-the-machine).
 
 An invalid value stops the server at start, and `docker compose logs server` says which one.
 
@@ -172,7 +172,7 @@ There is no `telium.toml` to edit on the host. The server's whole configuration 
 docker compose up -d
 ```
 
-Compose recreates the server when its configuration changed and leaves it alone otherwise. You can add any key from [`telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml) to that block, for example [`[backup.remote]`](/self-hosting/backups/#buckets) or [S3 media storage](/self-hosting/s3-media-storage/). Secrets such as S3 keys belong in `.env` and the server's `environment:` list, not in the block; see [Secrets](/self-hosting/secrets/).
+Compose recreates the server when its configuration changed and leaves it alone otherwise. You can add any key from [`telium.example.toml`](https://github.com/telium-chat/telium/blob/main/server/telium.example.toml) to that block, for example [`[backup.remote]`](/self-hosting/backups/#buckets) or [S3 media storage](/self-hosting/s3-media-storage/). Secrets such as S3 keys belong in `.env` and the server's `environment:` list, not in the block; see [Secrets](/self-hosting/secrets/). Inside the block, write the server's own references with a doubled `$`, as `"$${env:NAME}"` or `"$${file:/path}"`. With a single `$`, Compose reads `${…}` as its own variable and refuses to start.
 
 Server commands run inside the container, which already knows where its config is:
 
@@ -236,10 +236,10 @@ Everything lives in Docker named volumes, prefixed with the project name `telium
 
 **`docker compose down -v` deletes every one of them, data included.** Plain `docker compose down` keeps them.
 
-Copy the backup key off the machine once the server has created it:
+Once the server has created the backup key, copy it out of the container, then move it somewhere safe that is not this machine:
 
 ```sh
-docker compose exec server cat /var/backups/telium/backup.key
+docker compose cp server:/var/backups/telium/backup.key ./telium-backup.key
 ```
 
 See [Backups](/self-hosting/backups/) for what the archives protect against and how to restore. To keep uploads off the VPS disk, see [Store uploads in S3-compatible storage](/self-hosting/s3-media-storage/).
