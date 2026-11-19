@@ -16,6 +16,7 @@ You can keep your existing website at `example.com` (on any hosting provider), r
 ## What you need
 
 - A Linux box with Docker Engine and the Compose plugin (`docker compose version` prints v2.20 or newer)
+- An x86_64 (amd64) machine. The Telium images are not built for ARM yet, so on a Raspberry Pi or another ARM64 box Compose stops with `no matching manifest`; use the [native install](/self-hosting/install-systemd/) there, which supports both.
 - A public hostname for the Telium HTTPS endpoint (for example, `chat.example.com`). Your account domain may stay on a separate website host.
 - A reverse proxy for HTTPS: one already on the host (Caddy, nginx, Traefik, a tunnel), or the Caddy container this file can run for you (see [Put HTTPS in front](#put-https-in-front))
 
@@ -103,6 +104,29 @@ You do **not** need to edit `rate_limit.trusted_proxies`. A proxy on the host re
 
 Port `8448` already taken on the host? Set `TELIUM_PORT=8449` in `.env` and point the proxy there.
 
+### A reverse proxy in another container
+
+If your proxy runs in its own Compose project (Nginx Proxy Manager, Traefik, a Caddy container), it can reach the server directly over this kit's network, which is named `telium`. Give the proxy a fixed address from the unused part of the subnet, so that it never takes an address this file assigns to its own containers (`.2` to `.4`). In the proxy's `compose.yml`:
+
+```yaml
+services:
+  proxy:            # your proxy's service
+    networks:
+      telium:
+        ipv4_address: 172.31.241.10
+networks:
+  telium:
+    external: true
+```
+
+Point the proxy at `http://telium-server-1:8448`. Then trust its address in this kit's `.env`, keeping the two defaults, and run `docker compose up -d`:
+
+```sh
+TELIUM_TRUSTED_PROXIES='"172.31.241.1", "172.31.241.2", "172.31.241.10"'
+```
+
+Start this kit first: the `telium` network has to exist before the proxy can join it.
+
 ### No proxy yet: the bundled Caddy
 
 Add these to `.env` and run `docker compose up -d` again:
@@ -181,6 +205,10 @@ The updater has the Docker socket mounted, which is root-equivalent on the host.
 
 To update by hand instead (with `TELIUM_UPDATES=manual`), run `docker compose pull && docker compose up -d`. Compose then replaces the server without warning connected users first.
 
+### Portainer and other stack managers
+
+The updater runs Compose again from the directory you started the project in, and it reads `compose.yml` and `.env` from there. It therefore needs both files in a real directory on the host, at the path Compose recorded. Portainer stacks don't have that: Portainer runs Compose inside its own container and keeps stack variables outside a `.env` file, so the updater cannot find your settings. There, set `TELIUM_UPDATES=manual` and update by redeploying the stack with **Re-pull image**. Managers that keep each stack as plain files on the host, at the same path inside and out (Dockge does this), should work like a terminal, but this hasn't been tested.
+
 ## Changing settings and running server commands
 
 There is no `telium.toml` to edit on the host. The server's whole configuration is the `TELIUM_CONFIG` block in `compose.yml`, filled in from `.env`. Edit either one, then:
@@ -201,6 +229,22 @@ docker compose exec server telium-server backup drill
 
 Inside the container the generated file is `/var/lib/telium/telium.toml`. It is rewritten on every start, so edits to it are lost.
 
+## Keeping compose.yml current
+
+The updater replaces images, never your `compose.yml`. Most releases need nothing more, but when the kit itself changes, for example a new setting or a fix to how the config is written, the new version of the file ships inside the server image. To see how yours differs from the one for the release you are running:
+
+```sh
+docker compose exec server cat /usr/share/telium/deploy/compose/compose.yml | diff compose.yml -
+```
+
+To take the new version, download `compose.yml` again (as in [Quick install](#quick-install)), copy your own lines from the old copy into its `TELIUM_CONFIG` block, and run `docker compose up -d`. `.env` is not touched, so settings kept there need nothing.
+
+To make that easy, keep your changes out of `compose.yml` where you can:
+
+- **Settings** go in `.env`.
+- **Changes to services** (another network, extra volumes, labels for your proxy) go in a `compose.override.yml` beside it. Compose reads that file automatically, and the updater uses it too.
+- **Additions to the server config** (`[backup.remote]`, S3, `[mail]`) have to go in the `TELIUM_CONFIG` block for now. Keep a note of what you added.
+
 ## Voice calls on your own SFU
 
 Group calls already work through Telium's shared relays. To run your own [SFU](/self-hosting/sfu/) on this box instead:
@@ -216,7 +260,7 @@ Group calls already work through Telium's shared relays. To run your own [SFU](/
 2. In `compose.yml`, uncomment the `[voice]` lines at the end of `TELIUM_CONFIG`.
 3. Point DNS for both names at the box. On Cloudflare they must be **DNS-only**: media cannot go through the proxy.
 4. Front them. The bundled Caddy does this automatically. With your own proxy, send `sfu.…` to `http://127.0.0.1:7890` (and its `/admin` path to `127.0.0.1:7891`), and `livekit.…` to `http://127.0.0.1:7880` with WebSocket upgrades allowed.
-5. Open TCP 7881, UDP 3478 and UDP 50000–60000 in the firewall, then run `docker compose up -d`.
+5. Open TCP 7881, UDP 3478 and UDP 50000–60000 in your provider's firewall, then run `docker compose up -d`. Ports that Docker publishes bypass `ufw` and `firewalld` on the host, so they are reachable whatever those say. This also applies to the bundled Caddy's 80 and 443, but not to `8448`, which listens on `127.0.0.1` only.
 
 To find the dashboard's first-run URL, run `docker compose logs sfu | grep FIRST-RUN`. The updater keeps the SFU current along with the server.
 
