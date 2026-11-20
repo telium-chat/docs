@@ -64,12 +64,15 @@ The homeserver stays the authority. The SFU verifies the homeserver's signature 
 
 On a Debian or Ubuntu host, download the SFU bootstrap script and run it (not the homeserver installer). No git checkout is needed:
 
+Log in with one SSH tunnel that carries both the installer (port 7892) and the dashboard it installs (port 7891), then run the script:
+
 ```sh
+ssh -L 7892:127.0.0.1:7892 -L 7891:127.0.0.1:7891 user@server
 curl -fsSLo /tmp/telium-sfu-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-sfu.sh
 sudo bash /tmp/telium-sfu-setup.sh
 ```
 
-The script starts a local-only browser installer and prints a one-time URL with a random token. Over SSH, forward the printed port (`ssh -L PORT:127.0.0.1:PORT user@server`) and open the URL on localhost. Nothing is installed until you choose an option there.
+The script starts a local-only browser installer and prints a one-time `http://localhost:7892/?token=…` URL. Open it in your browser. If you logged in without the `-L` options, the script also prints the `ssh -N …` command to run in a second terminal. That is the only tunnel you need, during installation and afterwards. Nothing is installed until you choose an option in the browser.
 
 Choose **Full installation** to let Telium set up HTTPS, or **Portable** to use a reverse proxy you already manage. For a full installation the installer looks at what is already on the machine and offers only what fits. It shows what each option changes before you confirm:
 
@@ -82,7 +85,12 @@ Choose **Full installation** to let Telium set up HTTPS, or **Portable** to use 
 
 Either way it downloads the checksum-verified `telium-sfu` release binary and `livekit-server` (nothing is compiled), creates a `telium-sfu` system user and service, enables automatic updates, and opens the ports above when UFW is active.
 
-When it finishes it prints a one-time setup URL. On a fresh Caddy install that URL uses the server's address. If you use an existing Caddy or nginx, your proxy is not touched before you enter the domains, so reach the setup page through an SSH tunnel to port 7891 (`ssh -L 7891:127.0.0.1:7891 user@server`) and open the printed URL with `localhost`. In the browser you set the admin password, enter the SFU and LiveKit signalling hostnames, and choose public or private mode. The dashboard then adds the two sites to your proxy and gets the certificates.
+When it finishes, the installer page shows a **Continue to dashboard setup** button. It goes through the same tunnel, so you need nothing new. There you set the admin password and enter the SFU and LiveKit signalling hostnames. Then you choose who can use the relay:
+
+- **Public relay**: guilds on any Telium homeserver can run calls through it. Choose this if you will list the relay at [telium.chat/list](https://telium.chat/list). A private relay in the directory turns every caller away.
+- **Private relay**: only the homeservers you trust. Enter yours; add more later under **Trusted servers**.
+
+The dashboard then adds the two sites to your proxy and gets the certificates.
 
 The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted servers** (`/admin/trust`) you add a homeserver by its `server_name`. The SFU discovers it, verifies its key and starts accepting its tokens without a restart. Removing one stops new sessions from it; calls already connected are left alone.
 
