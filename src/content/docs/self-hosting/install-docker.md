@@ -259,10 +259,10 @@ Group calls already work through Telium's shared relays. To run your own [SFU](/
 
 2. In `compose.yml`, uncomment the `[voice]` lines at the end of `TELIUM_CONFIG`.
 3. Point DNS for both names at the box. On Cloudflare they must be **DNS-only**: media cannot go through the proxy.
-4. Front them. The bundled Caddy does this automatically. With your own proxy, send `sfu.…` to `http://127.0.0.1:7890` (and its `/admin` path to `127.0.0.1:7891`), and `livekit.…` to `http://127.0.0.1:7880` with WebSocket upgrades allowed.
+4. Front them. The bundled Caddy does this automatically. With your own proxy, send `sfu.…` to `http://127.0.0.1:7890`, and `livekit.…` to `http://127.0.0.1:7880` with WebSocket upgrades allowed.
 5. Open TCP 7881, UDP 3478 and UDP 50000–60000 in your provider's firewall, then run `docker compose up -d`. Ports that Docker publishes bypass `ufw` and `firewalld` on the host, so they are reachable whatever those say. This also applies to the bundled Caddy's 80 and 443, but not to `8448`, which listens on `127.0.0.1` only.
 
-To find the dashboard's first-run URL, run `docker compose logs sfu | grep FIRST-RUN`. The updater keeps the SFU current along with the server.
+To check on the SFU, run `docker compose exec sfu telium-sfu status`. The updater keeps the SFU current along with the server.
 
 ## Using your website domain for accounts
 
