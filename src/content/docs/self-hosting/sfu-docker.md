@@ -51,7 +51,7 @@ public = true
 allow_insecure_discovery = false
 ```
 
-**Edit the existing sections; do not append duplicate TOML tables.** Keep the generated `bind = "0.0.0.0:7890"` and `[admin] bind = "0.0.0.0:7891"` *inside the container*; the Compose port mappings expose them to the host only on loopback. Keep `livekit.rtc.use_external_ip = true` behind Docker NAT. Keep the generated LiveKit configuration and admin state in the persistent data volume; the SFU writes LiveKit credentials at startup.
+**Edit the existing sections; do not append duplicate TOML tables.** Keep the generated `bind = "0.0.0.0:7890"` *inside the container*; the Compose port mapping exposes it to the host only on loopback. Keep `livekit.rtc.use_external_ip = true` behind Docker NAT. Keep the generated LiveKit configuration in the persistent data volume; the SFU writes LiveKit credentials at startup.
 
 In public mode, any Telium homeserver with valid published signing keys can request sessions. In private mode, only homeservers you explicitly trust can do so. Never set `allow_insecure_discovery` to `true` on a public relay.
 
@@ -107,7 +107,7 @@ sudo /opt/telium-sfu/update-sfu.sh --status
 
 Expect a healthy `/health` response with `"ok":true`. Check that the LiveKit hostname supports secure WebSockets and test a real call from two accounts: a working API alone does not prove the UDP media ports are reachable.
 
-The SFU's admin first-run link appears in the container logs. Access the host-loopback dashboard over an SSH tunnel, for example `ssh -L 7891:127.0.0.1:7891 operator@your-host`, then open the local URL shown by the logs. Unlike the **native** SFU, the Compose dashboard cannot rewrite host nginx or request certificates for you.
+Check on the relay with `docker compose exec sfu telium-sfu status`. Unlike the **native** SFU, `telium-sfu configure` cannot rewrite host nginx or request certificates from inside a container. Its config lives on the host, so to change the trusted servers or blocks, edit `sfu.toml` there and run `docker compose restart sfu`.
 
 ### 6. List it for other communities (public relays only)
 
@@ -123,4 +123,4 @@ Being in the public directory and **opting into automatic selection** are separa
 | `/health` works, but calls have no media | Check UDP RTC and TURN ranges in both Docker mappings **and** `sfu.toml`, plus provider firewalls; verify public DNS is not proxied. |
 | Docker reports a port already allocated | Another service is already using a required host port. |
 | Public calls get `403` | Set `[trust] public = true` (keeping secure discovery) and confirm the requesting guild server publishes valid keys. |
-| Dashboard says it cannot configure nginx | That wizard is native-only. Configure host TLS/proxy yourself. |
+| `telium-sfu configure` or `trust add` refuses inside the container | Compose config is edited on the host; configure host TLS/proxy yourself, then `docker compose restart sfu`. |

@@ -32,7 +32,7 @@ You choose who may use your SFU. Hosting one for your community does **not** aut
 
 | Mode | Who can use it? | What to configure |
 | --- | --- | --- |
-| **Private (recommended to start)** | Only the homeservers you add to **Trusted servers** | Keep `trust.public = false`; add your homeserver in the SFU admin dashboard or `[[trust.origins]]`. |
+| **Private (recommended to start)** | Only the homeservers you add to the trust list | Keep `trust.public = false`; add your homeserver with `telium-sfu trust add` or `[[trust.origins]]`. |
 | **Public (optional)** | Any homeserver that publishes keys and can reach the SFU | Set `trust.public = true` **only** when you want to share your relay capacity. |
 
 An SFU can also serve several specific trusted homeservers without being public. If you are inviting other operators to use it, consider bandwidth and participant limits before making it available. [Post-installation checklist](/self-hosting/after-setup/#want-to-help-grow-the-network).
@@ -64,17 +64,15 @@ The homeserver stays the authority. The SFU verifies the homeserver's signature 
 
 On a Debian or Ubuntu host, download the SFU bootstrap script and run it (not the homeserver installer). No git checkout is needed:
 
-Log in with one SSH tunnel that carries both the installer (port 7892) and the dashboard it installs (port 7891), then run the script:
-
 ```sh
-ssh -L 7892:127.0.0.1:7892 -L 7891:127.0.0.1:7891 user@server
 curl -fsSLo /tmp/telium-sfu-setup.sh https://raw.githubusercontent.com/telium-chat/telium/main/deploy/bootstrap-sfu.sh
 sudo bash /tmp/telium-sfu-setup.sh
 ```
 
-The script starts a local-only browser installer and prints a one-time `http://localhost:7892/?token=…` URL. Open it in your browser. If you logged in without the `-L` options, the script also prints the `ssh -N …` command to run in a second terminal. That is the only tunnel you need, during installation and afterwards. Nothing is installed until you choose an option in the browser.
+The installer is a conversation in your terminal, and nothing is installed until you confirm. It asks:
 
-Choose **Full installation** to let Telium set up HTTPS, or **Portable** to use a reverse proxy you already manage. For a full installation the installer looks at what is already on the machine and offers only what fits. It shows what each option changes before you confirm:
+1. **Full** or **Portable**. Full lets Telium set up HTTPS; portable uses a reverse proxy you already manage and keeps everything in one folder under `/opt` or `/srv`.
+2. For a full installation, **which HTTPS front end** to use. The installer looks at what is already on the machine and offers only what fits:
 
 | Found on the host | What Telium does |
 | --- | --- |
@@ -83,16 +81,49 @@ Choose **Full installation** to let Telium set up HTTPS, or **Portable** to use 
 | nginx | Leaves nginx and all your sites alone, including the default site. Adds one server file for the two SFU hostnames and uses Certbot for certificates for those two names only. |
 | Another program on 80/443 | Full installation is not offered. Use the portable installation with your own reverse proxy. |
 
-Either way it downloads the checksum-verified `telium-sfu` release binary and `livekit-server` (nothing is compiled), creates a `telium-sfu` system user and service, enables automatic updates, and opens the ports above when UFW is active.
+3. For a portable installation, **which directory**.
 
-When it finishes, the installer page shows a **Continue to dashboard setup** button. It goes through the same tunnel, so you need nothing new. There you set the admin password and enter the SFU and LiveKit signalling hostnames. Then you choose who can use the relay:
+It then lists the system changes and asks you to confirm. Either way it downloads the checksum-verified `telium-sfu` release binary and `livekit-server` (nothing is compiled), creates a `telium-sfu` system user and service, and enables automatic updates. A full installation also opens the ports above when UFW is active. A portable one touches no packages, proxy, certificates or firewall.
 
-- **Public relay**: guilds on any Telium homeserver can run calls through it. Choose this if you will list the relay at [telium.chat/list](https://telium.chat/list). A private relay in the directory turns every caller away.
-- **Private relay**: only the homeservers you trust. Enter yours; add more later under **Trusted servers**.
+When the install finishes it runs `telium-sfu configure`, which asks for:
 
-The dashboard then adds the two sites to your proxy and gets the certificates.
+- the **SFU** and **LiveKit signalling** hostnames,
+- (full installs) an email address for Let's Encrypt,
+- who can use the relay:
+  - **Public relay**: guilds on any Telium homeserver can run calls through it. Choose this if you will list the relay at [telium.chat/list](https://telium.chat/list). A private relay in the directory turns every caller away.
+  - **Private relay**: only the homeservers you trust. Give yours; add more later.
 
-The dashboard then lives at `https://sfu.example.com/admin`. Under **Trusted servers** (`/admin/trust`) you add a homeserver by its `server_name`. The SFU discovers it, verifies its key and starts accepting its tokens without a restart. Removing one stops new sessions from it; calls already connected are left alone.
+On a full installation it then adds the two sites to your proxy and gets the certificates. On a portable one it only saves the config: route the SFU name to `http://127.0.0.1:7890` and the LiveKit name (with WebSocket upgrades) to `http://127.0.0.1:7880` yourself, and open the media ports in your own firewall.
+
+Every question is also a flag, so the installer can run unattended. `sudo bash sfu/install.sh --help` lists them, and `--dry-run` prints the plan without changing anything:
+
+```sh
+sudo bash sfu/install.sh --mode portable --dir /opt/telium-sfu --yes \
+  --sfu-domain sfu.example.com --livekit-domain livekit.example.com \
+  --private --homeserver chat.example.com
+```
+
+There is no web interface: nothing listens except the relay API and LiveKit, both behind your proxy.
+
+### Manage it with `telium-sfu`
+
+After installing, the same binary is the control panel. It finds the relay's config by itself and, because that file belongs to the `telium-sfu` account, re-runs itself under `sudo` when you are not root. A full installation puts it on your `PATH`; a portable one runs it as `<directory>/bin/telium-sfu`.
+
+| Command | What it does |
+| --- | --- |
+| `telium-sfu status` | LiveKit health, whether new calls are accepted, rooms and participants, your domains, public or private, trusted and blocked servers, limits, estimated transfer against your budget (per guild too) and whether the relay is up to date. `--json` for scripts. |
+| `telium-sfu trust` | List the whitelist. |
+| `telium-sfu trust add chat.example.com` | Whitelist a homeserver by its `server_name`. |
+| `telium-sfu trust remove chat.example.com` | Remove one. |
+| `telium-sfu block add guild.example` | Refuse a guild server, whatever the mode. Also `block` (list) and `block remove`. |
+| `telium-sfu configure` | Change the domains or who can use the relay; sets up HTTPS on a full installation. |
+| `telium-sfu restart` | Restart the service. |
+| `telium-sfu discover chat.example.com` | Look a server's keys up the way the relay would for a join and say which step fails. |
+| `telium-sfu manage` | An interactive menu over all of the above. |
+
+`trust add` discovers the homeserver, verifies its key and saves it. The running relay follows its config file, so trust and block changes take effect within a couple of seconds with no restart. Removing a server stops new sessions from it; calls already connected are left alone. Compose deployments keep their config on the host: edit `sfu.toml` there and restart. `status` still works inside the container.
+
+**Upgrading from the web dashboard.** Earlier releases had a browser installer and a dashboard on port 7891. Both are gone. Your whitelist, blocks and limits stay in `sfu.toml`; the old `[admin]` settings are ignored and the `admin-password` file can be deleted. If you proxied `/admin` publicly, remove that location.
 
 ## Install with Docker Compose
 
@@ -195,7 +226,7 @@ Guild owners and members with *Manage Server* can add their own SFU in **Guild S
 | `trust.allow_insecure_discovery` | `false` | Development only. |
 | `limits.max_bitrate` | 8000000 | Per-participant ceiling; join tokens are clamped to it. |
 | `limits.enforce`, `poll_interval_secs` | `true`, 15 | Mute video tracks whose declared layers exceed the ceiling. |
-| `admin.enabled`, `admin.bind` | `false`, `127.0.0.1:7891` | Dashboard; the installer turns it on. |
+| `install.mode`, `install.sfu_domain` | empty | How `telium-sfu` manages this machine (`full`, `portable`, `compose`); the installer sets both. |
 
 The full annotated file is [`sfu/sfu.example.toml`](https://github.com/telium-chat/telium/blob/main/sfu/sfu.example.toml).
 
